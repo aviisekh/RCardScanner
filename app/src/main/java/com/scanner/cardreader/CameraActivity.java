@@ -1,5 +1,9 @@
 package com.scanner.cardreader;
 
+import android.content.Context;
+import android.content.res.Configuration;
+import android.media.AudioManager;
+import android.media.MediaActionSound;
 import android.support.v7.app.AppCompatActivity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,9 +27,10 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     SurfaceHolder surfaceHolder;
 
     Camera.PictureCallback jpegCallBack;
+   Camera.ShutterCallback shutterCallback;
+
 
     private int cameraId = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,14 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
             }
         };
+        shutterCallback = new Camera.ShutterCallback() {
+            @Override
+            public void onShutter() {
+                MediaActionSound sound = new MediaActionSound();
+                sound.play(MediaActionSound.SHUTTER_CLICK);
+
+            }
+        };
 
 
 
@@ -83,7 +96,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                camera.takePicture(null, null,
+                camera.takePicture(shutterCallback, null,
                         jpegCallBack);
             }
         });
@@ -170,6 +183,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
         camera.setParameters(param);
 
+
         try{
 //            The surfaceView has created a surface,
 //            Now tell the camera where to draw the picture
@@ -189,7 +203,17 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
+
+        if(this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
+            Log.d("Orientation", Integer.toString(this.getResources().getConfiguration().orientation));
+            camera.setDisplayOrientation(90);
+
+        }
+        else{
+            camera.setDisplayOrientation(0);
+        }
         refreshCamera();
+
     }
 
     @Override
