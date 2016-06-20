@@ -9,7 +9,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:backgroundTint="@color/colorPrimaryDark"
     android:background="@mipmap/ic_launcher"
-    tools:context=".CameraActivity">
+    tools:context=".CameraActivity"
+    android:keepScreenOn="true">
 
 
     <SurfaceView
