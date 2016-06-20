@@ -1,6 +1,3 @@
 <resources>
-    <string name="app_name">CardScanner</string>
-    <string name="scan_pin">Scan PIN</string>
-    <string name="scan_recharge_card">Scan Recharge Card</string>
-    <string name="cameraclick">CameraClick</string>
+    <string name="app_name">cardreader</string>
 </resources>
