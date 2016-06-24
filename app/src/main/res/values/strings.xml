@@ -3,4 +3,10 @@
     <string name="scan_pin">Scan PIN</string>
     <string name="scan_recharge_card">Scan Recharge Card</string>
     <string name="cameraclick">CameraClick</string>
+    <string name="image_from_camera">Image from Camera</string>
+    <string name="scan">Scan</string>
+    <string name="recharge">Recharge</string>
+    <string name="redo">Redo</string>
+    <string name="logo">Logo</string>
+    <string name="proceed">Proceed</string>
 </resources>
