@@ -9,12 +9,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.scanner.cardreader.CropActivity">
 
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="450dp"
         android:id="@+id/imageView"
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/image_from_camera" />
+
+    <com.scanner.cardreader.ClippingWindow
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:id="@+id/clipping"
+        />
+
 
     <LinearLayout
         android:layout_width="match_parent"
