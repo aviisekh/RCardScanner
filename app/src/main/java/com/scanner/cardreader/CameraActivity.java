@@ -45,7 +45,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
 // deprecated setting, but required on Android versions prior to 3.0
 
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+       // surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         //        Check if there is a camera on the device
