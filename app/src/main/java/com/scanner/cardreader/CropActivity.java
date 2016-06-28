@@ -20,7 +20,7 @@ public class CropActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCrgieate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
         capturedImage = (ImageView) findViewById(R.id.imageView);
         Bitmap myBitmap = CameraActivity.getBitmapImage();
