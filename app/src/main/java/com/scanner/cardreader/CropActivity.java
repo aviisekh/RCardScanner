@@ -2,6 +2,7 @@ package com.scanner.cardreader;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,8 +26,7 @@ public class CropActivity extends AppCompatActivity {
         setContentView(R.layout.activity_crop);
         capturedImage = (ImageView) findViewById(R.id.imageView);
         Bitmap bitmap = CameraActivity.getBitmapImage();
-
-       // Log.d("bitmap", "w,h::"+ bitmap.getWidth()+","+bitmap.getHeight());
+       //capturedImage.setImageResource(R.drawable.horizontal);
         capturedImage.setImageBitmap(bitmap);
         Button scanBtn = (Button) findViewById(R.id.scanBtn);
         Button rechargeBtn = (Button) findViewById(R.id.rechargeBtn);

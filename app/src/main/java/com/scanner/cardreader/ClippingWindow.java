@@ -18,86 +18,66 @@ import android.view.View;
 import android.widget.ImageView;
 
 
-public class ClippingWindow extends ImageView {
+public class ClippingWindow extends View {
 
-    Paint myRect = new Paint();
-    Path path = new Path();
+       private final int paintColor = Color.argb(100,255,0,0);
+       private Paint drawPaint;
+       float pointX;
+       float pointY;
+       float startX;
+       float startY;
 
-    public ClippingWindow(Context context) {
-        super(context);
-        init(null, 0);
-        //horizontal= BitmapFactory.decodeResource(getResources(),R.drawable.horizontal);
-//        x=0;
-//        y=0;
-    }
+       public ClippingWindow(Context context, AttributeSet attrs) {
+           super(context, attrs);
+           //setFocusable(true);
+           //setFocusableInTouchMode(true);
+           setupPaint();
+       }
 
-    public ClippingWindow(Context context, AttributeSet attrs){
-        super(context, attrs);
-        init(attrs,0);
-    }
+       private void setupPaint() {
+// Setup paint with color and stroke styles
+           drawPaint = new Paint();
+           drawPaint.setColor(paintColor);
+           drawPaint.setAntiAlias(true);
+           drawPaint.setStrokeWidth(5);
+           drawPaint.setStyle(Paint.Style.FILL);
+           drawPaint.setStrokeJoin(Paint.Join.ROUND);
+           drawPaint.setStrokeCap(Paint.Cap.ROUND);
+       }
 
-    public ClippingWindow(Context context, AttributeSet attrs, int defStyle){
-        super(context, attrs, defStyle);
-        init(attrs, defStyle);
-    }
+       @Override
+       public boolean onTouchEvent(MotionEvent event) {
+           pointX = event.getX();
+           pointY = event.getY();
+           //Checks for the event that occurs
+           switch (event.getAction()) {
+               case MotionEvent.ACTION_DOWN :
+                   startX = pointX;
+                   startY = pointY;
+                   break;
 
+               /*case MotionEvent.ACTION_UP:
+                   startX = pointX;
+                   startY = pointY;
+                   return true;*/
 
+               case MotionEvent.ACTION_MOVE:
+                   //return true;
+                   break;
 
+               default:
+                   return false;
+           }
+            // Force a view to draw again
+           postInvalidate();
+           return true;
+       }
 
-
-
-    public void init(AttributeSet attrs, int defStyle)
-    {
-        //myRect.setAlpha(100);
-        myRect.setColor(Color.RED);
-        myRect.setAlpha(100);
-    }
-
-    public void onDraw(Canvas canvas)
-    {
-
-
-        super.onDraw(canvas);
- /*       BitmapDrawable drw = (BitmapDrawable) CropActivity.capturedImage.getDrawable();
-        Bitmap bmp = drw.getBitmap();
-
-        Log.d("drawable: ", Integer.toString(bmp.getHeight()));
-        Log.d("canvas: ",Integer.toString(canvas.getHeight()));
-
-        int topLeftX = (canvas.getWidth()-bmp.getWidth())/2;
-        int topLeftY = (canvas.getHeight()/2)-(bmp.getHeight()/2);
-//
-        int bottomRightX = (canvas.getWidth()/2)+(bmp.getWidth()/2);
-        int bottomRightY = (canvas.getHeight()/2)+(bmp.getHeight()/2);*/
-
-        //canvas.drawLine(0,0,getWidth(),getHeight(),myRect);
-        canvas.drawPath(path,myRect);
-
-
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent)
-    {
-        float touchX=motionEvent.getX();
-        float touchY=motionEvent.getY();
-
-        switch (motionEvent.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                path.moveTo(touchX,touchY);
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                path.lineTo(touchX,touchY);
-                break;
-
-            case MotionEvent.ACTION_UP:
-                break;
-        }
-
-        invalidate();
-        return true;
-
-    }
-
+       @Override
+       protected void onDraw(Canvas canvas) {
+           //canvas.drawRect(60, 60, 100, 100, drawPaint);
+           //canvas.drawRect(startX=100, startY=100, pointX=500, pointY=500, drawPaint);
+           canvas.drawRect(startX, startY, pointX, pointY, drawPaint);
+       }
 }
+
