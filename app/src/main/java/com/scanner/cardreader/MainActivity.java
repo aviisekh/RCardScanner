@@ -3,6 +3,9 @@ package com.scanner.cardreader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,16 +13,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import java.io.Console;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     ImageView beforeImageView;
     ImageView afterImageView;
     Bitmap bmSource;
+    Bitmap bmResult;
     Button grayButton;
     Button thresholdButton;
-
+    long start, time;
+    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,66 +38,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         afterImageView = (ImageView) findViewById(R.id.ivafter);
         //afterImageView.setImageResource(R.drawable.colorone);
 
-        grayButton.setOnClickListener(this);
+        //linked with message queue of main thread
+        handler = new Handler() {
+
+            //executed when msg arrives from thread
+            @Override
+            public void handleMessage(Message msg) {
+                afterImageView.setImageBitmap((Bitmap) msg.obj);
+
+                time = System.currentTimeMillis() - start;
+                Log.d("thread", String.valueOf(time));
+            }
+        };
+
+        grayButton.setOnClickListener(MainActivity.this);
         thresholdButton.setOnClickListener(this);
 
     }
 
-
-    public static Bitmap doGrayScale(Bitmap bmSource) {
-        //ITU-R recommendation value
-        final double GS_RED = 0.299;
-        final double GS_GREEN = 0.587;
-        final double GS_BLUE = 0.114;
-
-        Bitmap bmDisplay = Bitmap.createBitmap(bmSource.getWidth(), bmSource.getHeight(), bmSource.getConfig());
-
-        int A, R, G, B;
-        int pixel;
-
-        //image size
-        int width = bmSource.getWidth();
-        int height = bmSource.getHeight();
-
-        Log.d("pixel value", Integer.toString(bmSource.getPixel(50, 50)));
-
-        //scan pixel
-        for (int x = 0; x < width; ++x) {
-            for (int y = 0; y < height; ++y) {
-                // get one pixel color
-                pixel = bmSource.getPixel(x, y);
-
-                // retrieve color of all channels
-                A = Color.alpha(pixel);
-                R = Color.red(pixel);
-                G = Color.green(pixel);
-                B = Color.blue(pixel);
-                // take conversion up to one single value
-                R = G = B = (int) (GS_RED * R + GS_GREEN * G + GS_BLUE * B);
-                // set new pixel color to output bitmap
-                bmDisplay.setPixel(x, y, Color.argb(A, R, G, B));
-            }
-        }
-
-        return bmDisplay;
-    }
-
-
-
     @Override
     public void onClick(View v) {
-        Bitmap afterGrayScale =doGrayScale(bmSource);
+
 
         switch (v.getId()) {
             case R.id.bgrayscale:
-                afterImageView.setImageBitmap(afterGrayScale);
+
+                start = System.currentTimeMillis();
+                Thread grayScaleThread;
+                grayScaleThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                        GrayScale grayScale = new GrayScale(bmSource);
+                        //GrayScale grayScale= new GrayScale(bmSource,MainActivity.this);
+                        bmResult = grayScale.doGrayScale();
+                        Log.e("thread", Thread.currentThread().toString());
+                        bmSource = bmResult;
+                        Message message = Message.obtain();
+                        message.obj = bmResult;
+                        handler.sendMessage(message);
+                    }
+                });
+                grayScaleThread.start();
                 break;
 
             case R.id.bthreshold:
-
+                Thread thresholdingThread;
+                thresholdingThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Thresholding thresholding = new Thresholding(bmSource);
+                        bmResult = thresholding.doThresholding();
+                        Log.e("thread", Thread.currentThread().toString());
+                        Message message = Message.obtain();
+                        message.obj = bmResult;
+                        handler.sendMessage(message);
+                    }
+                });
+                thresholdingThread.start();
                 break;
-
-
         }
     }
+
 }
