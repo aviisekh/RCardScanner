@@ -1,66 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.scanner.cardreader.CropActivity">
+    tools:context="com.scanner.cardreader.CropActivity"
+    android:orientation="vertical">
 
-
-    <ImageView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="450dp"
-        android:id="@+id/imageView"
-        android:layout_alignParentEnd="true"
-        android:contentDescription="@string/image_from_camera" />
+        android:layout_height="400dp">
 
-    <com.scanner.cardreader.ClippingWindow
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:contentDescription="@string/image_from_camera" />
+
+        <com.scanner.cardreader.ClippingWindow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/clipping"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="450dp"
-        android:id="@+id/clipping"
-        />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="false">
+        android:layout_height="match_parent"
+        android:layout_below="@id/clipping">
 
             <Button
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_alignParentStart="true"
+                android:textSize="22sp"
                 android:text="@string/redo"
                 android:id="@+id/redoBtn"
-                android:textSize="22sp"
-                android:background="@android:color/holo_red_dark"
-                android:layout_gravity="left"
-                android:layout_marginRight="60dp"/>
+               />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="22sp"
                 android:text="@string/recharge"
                 android:id="@+id/rechargeBtn"
-                android:textSize="22sp"
-                android:background="@android:color/holo_green_light"
-                android:layout_marginRight="60dp" />
 
-
+                />
 
             <Button
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
                 android:text="@string/scan"
                 android:id="@+id/scanBtn"
                 android:textSize="22sp"
-                android:background="@android:color/holo_blue_light" />
-    </LinearLayout>
-</RelativeLayout>
+                />
+        </RelativeLayout>
+</LinearLayout>
+

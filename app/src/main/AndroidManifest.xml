@@ -29,7 +29,9 @@
         <activity
             android:name=".CameraActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".CropActivity"></activity>
+
+            <activity android:name=".CropActivity">
+        </activity>
 
     </application>
 
