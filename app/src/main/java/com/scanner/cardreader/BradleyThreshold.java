@@ -1,31 +1,17 @@
 package com.scanner.cardreader;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.util.Log;
 
 /**
  * Created by anush on 6/21/2016.
  */
 
-public class BradleyThreshold {
+public class BradleyThreshold implements Threshold {
 
-    final private float limit = 0.15F;
-    private final int FRAME_SIZE = 8;
+    final private float LIMIT = 0.15F;
+    private final int FRAME_SIZE_RATIO = 8;
     private int width;
     private int height;
-    private int[] pixels;
-
-
-    public BradleyThreshold(Bitmap sourceImage) {
-        //no alpha and mutable
-        //this.afterThresholding = sourceImage.copy(Bitmap.Config.RGB_565, true);
-        width = sourceImage.getWidth();
-        height = sourceImage.getHeight();
-        pixels = new int[width * height];
-        sourceImage.getPixels(pixels, 0, width, 0, 0, width, height);
-
-    }
 
     private int[] createIntegralImage(int[] pixels) {
 
@@ -56,45 +42,66 @@ public class BradleyThreshold {
         return integralImage;
     }
 
+    private int checkPositiveXBorder(int xValue) {
+        xValue = xValue < 0 ? 0 : xValue;
+        return xValue;
+    }
 
-    public Bitmap threshold() {
+    private int checkNegativeXBorder(int xValue) {
+        xValue = xValue >= width ? width - 1 : xValue;
+        return xValue;
+    }
 
-        Bitmap afterThresholding= Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+    private int checkPositiveYBorder(int yValue) {
+        yValue = yValue < 0 ? 0 : yValue;
+        return yValue;
+    }
+
+    private int checkNegativeYBorder(int yValue) {
+        yValue = yValue >= height ? height - 1 : yValue;
+        return yValue;
+    }
+
+    private int getHalfOfFrame(int width) {
+        return (width / FRAME_SIZE_RATIO) >> 1;
+    }
+
+
+    @Override
+    public Bitmap threshold(Bitmap sourceImage) {
+
+        width = sourceImage.getWidth();
+        height = sourceImage.getHeight();
+
+        int[] pixels = new int[width * height];
+        sourceImage.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        Bitmap afterThresholding = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
 
         int[] integralImage = createIntegralImage(pixels);
         //Bradley AdaptiveThresholding
-        int currentPixel, countInFrame, sum = 0;
-
-
-        int s;
-        int s2;
-        int x1, x2, y1, y2;
-
-        s = width / FRAME_SIZE;
-        s2 = s >> 1;
+        int currentPixel, noPixelInFrame, sum = 0;
+        int negativeXValue, positiveXValue, negativeYValue, positiveYValue;
+        int halfFrameSize = getHalfOfFrame(width);
 
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 currentPixel = j * width + i;
 
-                //check sxs region
-                x1 = i - s2;
-                x2 = i + s2;
-                y1 = j - s2;
-                y2 = j + s2;
-                //check the border
-                if (x1 < 0) x1 = 0;
-                if (x2 >= width) x2 = width - 1;
-                if (y1 < 0) y1 = 0;
-                if (y2 >= height) y2 = height - 1;
-                countInFrame = (x2 - x1) * (y2 - y1);
+                //check frame and check border
+                negativeXValue = checkNegativeXBorder(i - halfFrameSize);
+                positiveXValue = checkPositiveXBorder(i + halfFrameSize);
+                negativeYValue = checkPositiveYBorder(j - halfFrameSize);
+                positiveYValue = checkNegativeYBorder(j + halfFrameSize);
 
-                sum = integralImage[y2 * width + x2] -
-                        integralImage[y1 * width + x2] -
-                        integralImage[y2 * width + x1] +
-                        integralImage[y1 * width + x1];
+                noPixelInFrame = (positiveXValue - negativeXValue) * (positiveYValue - negativeYValue);
 
-                pixels[currentPixel] = ((pixels[currentPixel] & 0xFF) * countInFrame) < (sum * (1.0F - this.limit)) ? 0x00 : 0xFFFFFF;
+                sum = integralImage[positiveYValue * width + positiveXValue]
+                        - integralImage[negativeYValue * width + positiveXValue]
+                        - integralImage[positiveYValue * width + negativeXValue]
+                        + integralImage[negativeYValue * width + negativeXValue];
+
+                pixels[currentPixel] = ((pixels[currentPixel] & 0xFF) * noPixelInFrame) < (sum * (1.0F - this.LIMIT)) ? 0x00 : 0xFFFFFF;
                 //pixels[currentPixel] = -16777216 | pixels[currentPixel]<< 16 | pixels[currentPixel] << 8 | pixels[currentPixel];
             }
         }
