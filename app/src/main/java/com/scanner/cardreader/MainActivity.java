@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 thresholdingThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Threshold thresholding = new BradleyThreshold();
-                        bmResult = thresholding.threshold(bmResult);
+                        Threshold threshold = new BradleyThreshold();
+                        bmResult = threshold.threshold(bmResult);
                         Log.d("thread", Thread.currentThread().toString());
                         Message message = Message.obtain();
                         message.obj = bmResult;
