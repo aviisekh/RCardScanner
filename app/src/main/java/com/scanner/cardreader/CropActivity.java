@@ -2,15 +2,30 @@ package com.scanner.cardreader;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+<<<<<<< HEAD
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+=======
+import android.graphics.BitmapFactory;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+>>>>>>> master
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+<<<<<<< HEAD
 public class CropActivity extends AppCompatActivity {
 
     ImageView capturedImage;
+=======
+import java.io.ByteArrayOutputStream;
+
+public class CropActivity extends AppCompatActivity {
+
+    static ImageView capturedImage;
+>>>>>>> master
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +33,16 @@ public class CropActivity extends AppCompatActivity {
         setContentView(R.layout.activity_crop);
         capturedImage = (ImageView) findViewById(R.id.imageView);
         Bitmap bitmap = CameraActivity.getBitmapImage();
+<<<<<<< HEAD
+=======
+        BitmapFactory.Options option = new BitmapFactory.Options();
+        option.inSampleSize = 8;
+//        Bitmap resized = BitmapFactory.decodeStream()
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 10,byteArrayOutputStream);
+//        byte[] data = byteArrayOutputStream.toByteArray();
+//        Bitmap resizedBitmap = BitmapFactory.decodeByteArray(data, 0 , data.length);
+>>>>>>> master
         capturedImage.setImageBitmap(bitmap);
         Button scanBtn = (Button) findViewById(R.id.scanBtn);
         Button rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
