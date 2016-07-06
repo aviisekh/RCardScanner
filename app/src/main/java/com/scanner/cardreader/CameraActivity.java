@@ -68,7 +68,9 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
                 try {
                     if (bytes != null) {
                         Intent i = new Intent(getApplicationContext(), CropActivity.class);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 4;
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length,options);
                         setBitmapImage(bitmap);
                         startActivity(i);
                         camera.stopPreview();

@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="com.scanner.cardreader.CropActivity"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageView"
-            android:contentDescription="@string/image_from_camera" />
-
-        <com.scanner.cardreader.ClippingWindow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/clipping"
-            />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/clipping">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/relativeLayout"
+        >
 
             <Button
                 android:layout_width="wrap_content"
@@ -36,7 +21,8 @@
                 android:textSize="22sp"
                 android:text="@string/redo"
                 android:id="@+id/redoBtn"
-               />
+                android:visibility="visible"/>
+
 
             <Button
                 android:layout_width="wrap_content"
@@ -45,7 +31,18 @@
                 android:textSize="22sp"
                 android:text="@string/recharge"
                 android:id="@+id/rechargeBtn"
+                android:visibility="invisible"
+                />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:textSize="22sp"
+                android:text="@string/crop"
+                android:id="@+id/cropBtn"
+                android:visibility="visible"
                 />
 
             <Button
@@ -56,7 +53,27 @@
                 android:text="@string/scan"
                 android:id="@+id/scanBtn"
                 android:textSize="22sp"
+                android:visibility="invisible"
                 />
         </RelativeLayout>
-</LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/relativeLayout">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:contentDescription="@string/image_from_camera"/>
+
+        <com.scanner.cardreader.ClippingWindow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/clipping"
+            android:visibility="visible"
+            />
+    </RelativeLayout>
+</RelativeLayout>
 

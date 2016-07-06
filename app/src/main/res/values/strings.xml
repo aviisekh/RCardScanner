@@ -9,4 +9,6 @@
     <string name="redo">Redo</string>
     <string name="logo">Logo</string>
     <string name="proceed">Proceed</string>
+    <string name="crop">Crop</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

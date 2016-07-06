@@ -9,20 +9,25 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 
-public class ClippingWindow extends View {
+public class ClippingWindow extends ImageView {
 
 
     private final int paintColor = Color.argb(100, 255, 0, 0);
 
     private Paint drawRect;
-    //private Paint drawLine;
-    Rect rect = new Rect();
+
+    static Rect rect = new Rect();
 
     boolean draggable;
     boolean croppable, topCroppable, bottomCroppable, rightCroppable, leftCroppable;
-    boolean eventIgnore = false;
+
+    private static final int MIN_CLICK_DURATION = 1000;
 
     static int parentWidth;
     static int parentHeight;
@@ -55,10 +60,10 @@ public class ClippingWindow extends View {
 
 
     void init() {
-        left = parentWidth / 4;
-        top = parentHeight / 4;
-        right = 3 * parentWidth / 4;
-        bottom = 3 * parentHeight / 4;
+        left = parentWidth / 2 - 200;
+        top = parentHeight / 2 - 100;
+        right = parentWidth / 2 + 200;
+        bottom = parentHeight / 2 + 100;
         rect.set(left, top, right, bottom);
     }
 
@@ -79,9 +84,6 @@ public class ClippingWindow extends View {
         pointX = (int) event.getX(); //get the touch position
         pointY = (int) event.getY();
         //Checks for the event that occurs
-
-        if (eventIgnore)
-            return false;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -121,7 +123,7 @@ public class ClippingWindow extends View {
             case MotionEvent.ACTION_MOVE:
                 moveX = (pointX - prevX); // find the direction of movement with units of movement
                 moveY = (pointY - prevY);
-                Log.d("move", Integer.toString(moveX));
+                // Log.d("move", Integer.toString(moveX));
 
                 if (draggable) {
                     left = left + moveX;
@@ -129,7 +131,7 @@ public class ClippingWindow extends View {
                     top = top + moveY;
                     bottom = bottom + moveY;
                     rect.set(left, top, right, bottom);
-                    Log.d("area:", "inside");
+                    //Log.d("area:", "inside");
                 } else {
                     if (topCroppable) {
                         top = top + moveY;
@@ -150,7 +152,7 @@ public class ClippingWindow extends View {
                 break;
 
             case MotionEvent.ACTION_UP:
-                Log.d("mouse", "Uped");
+                //Log.d("mouse", "Uped");
                 return false;
 
             default:
@@ -165,7 +167,13 @@ public class ClippingWindow extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        drawRectangle(canvas);
+    }
+
+    public void drawRectangle(Canvas canvas) {
         canvas.drawRect(rect, drawRect);
+
     }
 }
 
