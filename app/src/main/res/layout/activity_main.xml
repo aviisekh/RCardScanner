@@ -32,7 +32,6 @@
         android:layout_marginBottom="44dp"
         />
 
-<<<<<<< HEAD
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
@@ -45,6 +44,5 @@
 
         />
 
-=======
->>>>>>> master
+
 </RelativeLayout>

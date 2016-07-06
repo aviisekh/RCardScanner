@@ -8,25 +8,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
-<<<<<<< HEAD
-=======
 import android.util.Log;
 import android.util.Size;
->>>>>>> master
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.TextView;
-
-<<<<<<< HEAD
-=======
 import java.io.ByteArrayOutputStream;
 import java.security.Policy;
 import java.util.List;
 
->>>>>>> master
 public class CameraActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     @SuppressWarnings("deprecation")
     private Camera camera;
@@ -55,13 +48,12 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         simInfo = (TextView) findViewById(R.id.simInfo);
         simInfo.setText(MainActivity.SIM);
 
-<<<<<<< HEAD
+
 // deprecated setting, but required on Android versions prior to 3.0
 
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-=======
->>>>>>> master
+
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         //        Check if there is a camera on the device
 
@@ -82,10 +74,10 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 try {
                     if (bytes != null) {
-<<<<<<< HEAD
+
                         Intent i = new Intent(getApplicationContext(), CropActivity.class);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-=======
+
                         BitmapFactory.Options opt;
                         opt = new BitmapFactory.Options();
                         opt.inTempStorage = new byte[16*1024];
@@ -93,24 +85,18 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
                         Camera.Size size = parameters.getPictureSize();
                         int height = size.height;
                         int width = size.width;
-                        opt.inSampleSize = 16;
+                           opt.inSampleSize = 8;
                         Log.i("imageSize", height + "" + width);
-                        Intent i = new Intent(getApplicationContext(), CropActivity.class);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opt);
+
 //                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, new ByteArrayOutputStream());
->>>>>>> master
+
                         setBitmapImage(bitmap);
                         startActivity(i);
                         camera.stopPreview();
                         camera.release();
                         camera.setPreviewCallback(null);
                         camera = null;
-
-<<<<<<< HEAD
-=======
-
->>>>>>> master
-                    }
+  }
                 } catch (Exception e) {
                     System.out.println(e);
                 }
@@ -218,24 +204,16 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
 //        Modify camera surface parameters
         param.set("orientation", "portrait");
-<<<<<<< HEAD
+
 
         param.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
 
-=======
+
 //        List<Camera.Size> sizes = param.getSupportedPictureSizes();
 //        String sizeArray = sizes.toString();
-//
-        param.setPictureSize(CropActivity.capturedImage.getWidth(), CropActivity.capturedImage.getHeight());
-
-
-
 
 
         param.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
-
-
->>>>>>> master
         camera.setParameters(param);
 
 
