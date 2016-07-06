@@ -2,50 +2,45 @@ package com.scanner.cardreader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Filters.BradleyLocalThreshold;
-
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    ImageView beforeImageView;
-    ImageView afterImageView, afterImageViewFramework;
+    private ImageView afterImageView;
+    // --Commented out by Inspection (7/6/2016 2:28 PM):ImageView afterImageViewFramework;
 
     private Bitmap bmSource;
     private Bitmap bmResult;
 
-    Button grayButton;
-    Button thresholdButton;
-    long start, time;
-    Handler handler;
+    // --Commented out by Inspection (7/6/2016 2:28 PM):long start, time;
+    private static Handler handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bmSource = BitmapFactory.decodeResource(getResources(), R.drawable.pin);
-
-        grayButton = (Button) findViewById(R.id.bgrayscale);
-        thresholdButton = (Button) findViewById(R.id.bthreshold);
+        Button grayButton = (Button) findViewById(R.id.bgrayscale);
+        Button thresholdButton = (Button) findViewById(R.id.bthreshold);
         grayButton.setOnClickListener(MainActivity.this);
         thresholdButton.setOnClickListener(this);
 
 
-        beforeImageView = (ImageView) findViewById(R.id.ivbefore);
+        ImageView beforeImageView = (ImageView) findViewById(R.id.ivbefore);
         beforeImageView.setImageResource(R.drawable.pin);
+        bmSource= BitmapFactory.decodeResource(getResources(),R.drawable.pin);
         afterImageView = (ImageView) findViewById(R.id.ivafter);
-        afterImageViewFramework = (ImageView) findViewById(R.id.ivafter_framwork);
+        //afterImageViewFramework = (ImageView) findViewById(R.id.ivafter_framwork);
 
         //afterImageView.setImageResource(R.drawable.colorone);
 
@@ -77,25 +72,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                         GrayScale grayScale = new ITURGrayScale(bmSource);
-                        //ITURGrayScale grayScale= new ITURGrayScale(bmSource,MainActivity.this);
+                        //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
                         bmResult = grayScale.grayScale();
                         Log.d("thread", Thread.currentThread().toString());
                         bmSource = bmResult;
-                        Message message = Message.obtain();
-                        message.obj = bmResult;
-                        handler.sendMessage(message);
+                        Message msgToGrayScale = Message.obtain();
+                        msgToGrayScale.obj = bmResult;
+                        handler.sendMessage(msgToGrayScale);
                     }
                 });
                 grayScaleThread.start();
+
+
                 break;
 
             case R.id.bthreshold:
-                FastBitmap fb = new FastBitmap(bmSource);
+                /*FastBitmap fb = new FastBitmap(bmSource);
                 fb.toGrayscale();
                 BradleyLocalThreshold bradley = new BradleyLocalThreshold();
                 bradley.applyInPlace(fb);
                 Bitmap bitmap = fb.toBitmap();
-                afterImageViewFramework.setImageBitmap(bitmap);
+                afterImageViewFramework.setImageBitmap(bitmap);*/
 
                 Thread thresholdingThread;
                 thresholdingThread = new Thread(new Runnable() {
@@ -104,9 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Threshold threshold = new BradleyThreshold();
                         bmResult = threshold.threshold(bmResult);
                         Log.d("thread", Thread.currentThread().toString());
-                        Message message = Message.obtain();
-                        message.obj = bmResult;
-                        handler.sendMessage(message);
+                        Message msgToThreshold = Message.obtain();
+                        msgToThreshold.obj = bmResult;
+                        handler.sendMessage(msgToThreshold);
                     }
                 });
                 thresholdingThread.start();
