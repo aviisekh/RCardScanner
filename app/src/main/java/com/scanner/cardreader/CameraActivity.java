@@ -75,23 +75,10 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 try {
                     if (bytes != null) {
-
                         Intent i = new Intent(getApplicationContext(), CropActivity.class);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                        BitmapFactory.Options opt;
-                        opt = new BitmapFactory.Options();
-                        opt.inTempStorage = new byte[16 * 1024];
-                        Camera.Parameters parameters = camera.getParameters();
-                        Camera.Size size = parameters.getPictureSize();
-                        int height = size.height;
-                        int width = size.width;
-                        opt.inSampleSize = 8;
-                        Log.i("imageSize", height + "" + width);
-
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, new ByteArrayOutputStream());
-
-
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 4;
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length,options);
                         setBitmapImage(bitmap);
                         startActivity(i);
                         camera.stopPreview();

@@ -13,6 +13,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -39,7 +41,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public Button scanBtn, rechargeBtn, redoButton, cropButton;
 
     public Bitmap image;
-
+    Bitmap croppedImage;
+    private static Handler handler;
 
 
 
@@ -49,6 +52,17 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_crop);
         instantiate();
 
+
+        //linked with message queue of main thread
+        handler = new Handler() {
+
+            //executed when msg arrives from thread
+            @Override
+            public void handleMessage(Message msg) {
+                capturedImage.setImageBitmap((Bitmap) msg.obj);
+                //Log.d("thread", String.valueOf(time));
+            }
+        };
 
     }
 
@@ -64,6 +78,27 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.rechargeBtn:
+
+                Thread grayScaleThread;
+                //TODO see if you can avoid creating threads yourself. acquire form somewhere
+                grayScaleThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                        GrayScale grayScale = new ITURGrayScale(croppedImage);
+                        //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
+                        Bitmap bmResult = grayScale.grayScale();
+                        //Log.d("thread", Thread.currentThread().toString());
+
+                        Threshold threshold = new BradleyThreshold();
+                        bmResult = threshold.threshold(bmResult);
+
+                        Message msgToUIThread = Message.obtain();
+                        msgToUIThread.obj = bmResult;
+                        handler.sendMessage(msgToUIThread);
+                    }
+                });
+                grayScaleThread.start();
                 break;
 
         }
@@ -99,7 +134,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
-        Bitmap croppedImage = clippingWindow.getCroppedImage();
+         croppedImage = clippingWindow.getCroppedImage();
         capturedImage.setImageBitmap(croppedImage);
     }
 

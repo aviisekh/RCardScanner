@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private Button proceedBtn;
 
+
     public static String SIM = "NTC"; //Global Variable to define the network carrier : NTC/NCELL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getBaseContext(), CameraActivity.class));
         }
         });
+
 
 
 
