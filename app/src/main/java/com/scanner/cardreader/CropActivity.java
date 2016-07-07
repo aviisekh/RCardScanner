@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public ImageView capturedImage;
+    public static ImageView capturedImage;
     public ClippingWindow clippingWindow;
 
     public Button scanBtn, rechargeBtn, redoButton, cropButton;
@@ -63,6 +63,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void instantiate() {
         image = CameraActivity.getBitmapImage();
+        //image = BitmapFactory.decodeResource(getResources(),R.drawable.horizontal);
         scanBtn = (Button) findViewById(R.id.scanBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
@@ -86,35 +87,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
-        Bitmap croppedImage = getCroppedImage();
+        Bitmap croppedImage = clippingWindow.getCroppedImage();
         capturedImage.setImageBitmap(croppedImage);
     }
 
-    public Bitmap getCroppedImage() {
-        final Drawable drawable = capturedImage.getDrawable();
-        if (drawable == null || !(drawable instanceof BitmapDrawable)) {
-            return null;
-        }
-
-        // Get image matrix values and place them in an array.
-        final float[] matrixValues = new float[9];
-        capturedImage.getImageMatrix().getValues(matrixValues);
-
-        // Extract the scale and translation values. Note, we currently do not handle any other transformations (e.g. skew).
-        final float scaleX = matrixValues[Matrix.MSCALE_X];
-        final float scaleY = matrixValues[Matrix.MSCALE_Y];
-        final float transX = matrixValues[Matrix.MTRANS_X];
-        final float transY = matrixValues[Matrix.MTRANS_Y];
-
-        float left = (ClippingWindow.left-transX)/scaleX;  //Since Image is translated and scaled in Imageview
-        float right = (ClippingWindow.right-transX)/scaleX;
-        float top = (ClippingWindow.top-transY)/scaleY;
-        float bottom = (ClippingWindow.bottom-transY)/scaleY;
-
-        // Get the original bitmap object.
-        final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
-        return Bitmap.createBitmap(originalBitmap, (int)left, (int)top,(int)(right-left),(int)(bottom-top));
 
 
-    }
 }
