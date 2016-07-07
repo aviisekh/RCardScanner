@@ -1,6 +1,7 @@
 <resources>
 <<<<<<< Updated upstream
     <string name="app_name">cardreader</string>
+<<<<<<< HEAD
 =======
     <string name="app_name">Cardreader</string>
     <string name="desc_button_grayScale">GrayScale</string>
@@ -8,4 +9,8 @@
     <string name="desc_image_beforeThresholding">Before Thresholding</string>
     <string name="desc_image_afterThresholding">After Thresholding</string>
 >>>>>>> Stashed changes
+=======
+    <string name="bgrayScale">GrayScale</string>
+    <string name="bThreshold">Threshold</string>
+>>>>>>> thresholding
 </resources>
