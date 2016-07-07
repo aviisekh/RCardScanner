@@ -9,6 +9,77 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.scanner.cardreader.MainActivity">
 
+<<<<<<< Updated upstream
+=======
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.4">
+
+        <ImageView
+            android:id="@+id/ivbefore"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/desc_image_beforeThresholding"
+            android:foregroundGravity="center" />
+    </TableRow>
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+        android:weightSum="1">
+
+        <ImageView
+            android:id="@+id/ivafter"
+            android:contentDescription="@string/desc_image_afterThresholding"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+<!--
+        <ImageView
+            android:id="@+id/ivafter_framwork"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/desc_image_afterThresholding" />-->
+
+    </TableRow>
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"
+        style="?android:buttonBarStyle"
+        >
+
+        <Button
+            android:id="@+id/bgrayscale"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/desc_button_grayScale"
+            style="?android:buttonBarButtonStyle"
+            />
+
+        <Button
+            android:id="@+id/bthreshold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/desc_button_threshold"
+            style="?android:buttonBarButtonStyle"
+            />
+
+    </TableRow>
+
+</TableLayout>
+
+>>>>>>> Stashed changes
 
     <ImageView
         android:id="@+id/ivbefore"
