@@ -2,20 +2,18 @@ package com.scanner.cardreader;
 
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private Button proceedBtn;
 
 
     public static String SIM = "NTC"; //Global Variable to define the network carrier : NTC/NCELL
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,12 +30,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                String carrier = tm.getLine1Number().substring(0,3);
-                if(carrier.equals("984")){
-                    SIM = "NTC";
-                }
-                else {
-                    SIM = "NCELL";
+                if (tm.getSimState() == TelephonyManager.SIM_STATE_READY) {
+                    String carrier = tm.getLine1Number().substring(0, 3);
+                    if (carrier.equals("984")) {
+                        SIM = "NTC";
+                    } else {
+                        SIM = "NCELL";
+                    }
+                } else {
+                    SIM = "Unknown";
                 }
 
 
@@ -49,11 +50,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 startActivity(new Intent(getBaseContext(), CameraActivity.class));
-        }
+            }
         });
-
-
-
 
 
     }
