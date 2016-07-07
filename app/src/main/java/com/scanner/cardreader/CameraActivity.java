@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.TextView;
+
 import java.io.ByteArrayOutputStream;
 import java.security.Policy;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
 // deprecated setting, but required on Android versions prior to 3.0
 
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
@@ -80,15 +81,16 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
                         BitmapFactory.Options opt;
                         opt = new BitmapFactory.Options();
-                        opt.inTempStorage = new byte[16*1024];
+                        opt.inTempStorage = new byte[16 * 1024];
                         Camera.Parameters parameters = camera.getParameters();
                         Camera.Size size = parameters.getPictureSize();
                         int height = size.height;
                         int width = size.width;
-                           opt.inSampleSize = 8;
+                        opt.inSampleSize = 8;
                         Log.i("imageSize", height + "" + width);
 
 //                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, new ByteArrayOutputStream());
+
 
                         setBitmapImage(bitmap);
                         startActivity(i);
@@ -96,7 +98,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
                         camera.release();
                         camera.setPreviewCallback(null);
                         camera = null;
-  }
+                    }
                 } catch (Exception e) {
                     System.out.println(e);
                 }
@@ -106,10 +108,9 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         };
 
 
-
 //Take a picture on button click
 
-        assert button!=null;
+        assert button != null;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
