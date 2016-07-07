@@ -7,11 +7,6 @@
     android:weightSum="1"
     tools:context="com.scanner.cardreader.MainActivity">
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> thresholding
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -47,56 +42,31 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="@string/desc_image_afterThresholding" />-->
-<<<<<<< HEAD
 
-=======
->>>>>>> thresholding
     </TableRow>
 
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-<<<<<<< HEAD
-        android:layout_weight="0"
-        style="?android:buttonBarStyle"
-        >
-=======
+
         android:layout_weight="0">
->>>>>>> thresholding
 
         <Button
             android:id="@+id/bgrayscale"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-<<<<<<< HEAD
-            android:text="@string/desc_button_grayScale"
-            style="?android:buttonBarButtonStyle"
-            />
-=======
             android:text="@string/desc_button_grayScale" />
->>>>>>> thresholding
 
         <Button
             android:id="@+id/bthreshold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-<<<<<<< HEAD
-            android:text="@string/desc_button_threshold"
-            style="?android:buttonBarButtonStyle"
-            />
-=======
             android:text="@string/desc_button_threshold" />
->>>>>>> thresholding
 
     </TableRow>
 
 </TableLayout>
-
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> thresholding
 
