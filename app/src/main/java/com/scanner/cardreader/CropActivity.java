@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.internal.ForegroundLinearLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -60,7 +61,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void handleMessage(Message msg) {
                 capturedImage.setImageBitmap((Bitmap) msg.obj);
-                //Log.d("thread", String.valueOf(time));
             }
         };
 
@@ -105,8 +105,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void instantiate() {
-        image = CameraActivity.getBitmapImage();
-        //image = BitmapFactory.decodeResource(getResources(),R.drawable.horizontal);
+        image = getRotatedImage(CameraActivity.getBitmapImage());
+
         scanBtn = (Button) findViewById(R.id.scanBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
@@ -114,7 +114,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
         capturedImage = (ImageView) findViewById(R.id.imageView);
         capturedImage.setImageBitmap(image);
-
 
         clippingWindow = (ClippingWindow) findViewById(R.id.clipping);
         clippingWindow.setVisibility(View.VISIBLE);
@@ -124,7 +123,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
-
 
     }
 
@@ -140,5 +138,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-
+    Bitmap getRotatedImage(Bitmap bmp)
+    {
+        Matrix returnImage = new Matrix();
+        returnImage.postRotate(90);
+        return Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),returnImage,true);
+    }
 }
