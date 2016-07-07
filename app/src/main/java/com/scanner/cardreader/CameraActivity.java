@@ -1,5 +1,7 @@
 package com.scanner.cardreader;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -7,25 +9,31 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.TextView;
+import java.io.ByteArrayOutputStream;
+import java.security.Policy;
+import java.util.List;
 
-
-public class CameraActivity extends AppCompatActivity implements SurfaceHolder.Callback{
+public class CameraActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     @SuppressWarnings("deprecation")
-    private static final String tag = "CameraActivity";
     private Camera camera;
     SurfaceView surfaceView;
 
     SurfaceHolder surfaceHolder;
+    TextView simInfo;
+
 
     Camera.PictureCallback jpegCallBack;
+    public static Bitmap bitmap;
+
 
     private int cameraId = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,38 +45,59 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         // underlying surface is created and destroyed.
 
         surfaceHolder.addCallback(this);
+        simInfo = (TextView) findViewById(R.id.simInfo);
+        simInfo.setText(MainActivity.SIM);
+
 
 // deprecated setting, but required on Android versions prior to 3.0
 
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        ImageButton button  = (ImageButton) findViewById(R.id.imageButton);
+
+        ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         //        Check if there is a camera on the device
 
-        if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            Toast.makeText(this,"No camera present on this device", Toast.LENGTH_LONG).show();
-        }
-        else{
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            Toast.makeText(this, "No camera present on this device", Toast.LENGTH_LONG).show();
+        } else {
             cameraId = findRearFacingCamera();
-            if(cameraId < 0){
+            if (cameraId < 0) {
                 Toast.makeText(this, "Rear facing camera not found", Toast.LENGTH_LONG).show();
-            }
-            else{
+            } else {
                 camera = Camera.open(cameraId);
             }
         }
 
+
         jpegCallBack = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                try{
-                    if(bytes != null){
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        Log.d(tag,Integer.toString(bitmap.getByteCount()));
+                try {
+                    if (bytes != null) {
 
-                    }
-                }
-                catch(Exception e){
+                        Intent i = new Intent(getApplicationContext(), CropActivity.class);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                        BitmapFactory.Options opt;
+                        opt = new BitmapFactory.Options();
+                        opt.inTempStorage = new byte[16*1024];
+                        Camera.Parameters parameters = camera.getParameters();
+                        Camera.Size size = parameters.getPictureSize();
+                        int height = size.height;
+                        int width = size.width;
+                           opt.inSampleSize = 8;
+                        Log.i("imageSize", height + "" + width);
+
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, new ByteArrayOutputStream());
+
+                        setBitmapImage(bitmap);
+                        startActivity(i);
+                        camera.stopPreview();
+                        camera.release();
+                        camera.setPreviewCallback(null);
+                        camera = null;
+  }
+                } catch (Exception e) {
                     System.out.println(e);
                 }
 
@@ -78,8 +107,9 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
 
 
-
 //Take a picture on button click
+
+        assert button!=null;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,8 +119,16 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         });
     }
 
+    public static Bitmap getBitmapImage() {
+        return bitmap;
+    }
+
+    public void setBitmapImage(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
     //    Reinitialize the camera API
-    public void refreshCamera(){
+    public void refreshCamera() {
         if (surfaceHolder.getSurface() == null) {
             // preview surface does not exist
             return;
@@ -114,15 +152,16 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         }
 
     }
+
     //Check if a rear camera is available
     private int findRearFacingCamera() {
         int cameraId = 0;
 //        Searching for the rear facing camera
         int noOfCameras = Camera.getNumberOfCameras();
-        for(int i = 0; i<noOfCameras; i++){
+        for (int i = 0; i < noOfCameras; i++) {
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(i, info);
-            if(info.facing == Camera.CameraInfo.CAMERA_FACING_BACK){
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 cameraId = i;
                 break;
             }
@@ -130,19 +169,21 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         }
         return cameraId;
     }
+
     //Called when app is paused by android
     @Override
     protected void onPause() {
-        if(camera != null){
+        if (camera != null) {
             camera.release();
             camera = null;
         }
         super.onPause();
     }
+
     //Called when app is resumed
     @Override
     protected void onPostResume() {
-        if(camera == null){
+        if (camera == null) {
             camera = Camera.open(findRearFacingCamera());
 
         }
@@ -151,12 +192,10 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        try{
+        try {
             Camera.open(findRearFacingCamera());
 
-        }
-        catch(RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             System.out.println(e);
             return;
         }
@@ -166,18 +205,25 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 //        Modify camera surface parameters
         param.set("orientation", "portrait");
 
-        param.setPreviewSize( surfaceView.getWidth(), surfaceView.getHeight());
 
+        param.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
+
+
+//        List<Camera.Size> sizes = param.getSupportedPictureSizes();
+//        String sizeArray = sizes.toString();
+
+
+        param.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
         camera.setParameters(param);
 
-        try{
+
+        try {
 //            The surfaceView has created a surface,
 //            Now tell the camera where to draw the picture
 
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return;
 
@@ -189,7 +235,15 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
+
+        if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            camera.setDisplayOrientation(90);
+
+        } else {
+            camera.setDisplayOrientation(0);
+        }
         refreshCamera();
+
     }
 
     @Override
@@ -199,9 +253,8 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
             camera.release();
             camera.setPreviewCallback(null);
             camera = null;
-        }
-        catch(Exception e){
-            Log.v(tag, String.valueOf(e));
+        } catch (Exception e) {
+
         }
 
 

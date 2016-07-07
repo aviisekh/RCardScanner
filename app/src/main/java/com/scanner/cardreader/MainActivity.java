@@ -1,17 +1,59 @@
 package com.scanner.cardreader;
 
+
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    private Button proceedBtn;
 
+    public static String SIM = "NTC"; //Global Variable to define the network carrier : NTC/NCELL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(getApplicationContext(),CameraActivity.class);
-        startActivity(intent);
+        proceedBtn = (Button) findViewById(R.id.proceedBtn);
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), CameraActivity.class);
+                startActivity(i);
+            }
+        });
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                String carrier = tm.getLine1Number().substring(0,3);
+                if(carrier.equals("984")){
+                    SIM = "NTC";
+                }
+                else {
+                    SIM = "NCELL";
+                }
+
+
+            }
+        });
+        t.start();
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+        }
+        });
+
+
+
+
     }
+
 }

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CardScanner.iml" filepath="$PROJECT_DIR$/CardScanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RCardScanner.iml" filepath="$PROJECT_DIR$/RCardScanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RCardScanner-dev.iml" filepath="$PROJECT_DIR$/RCardScanner-dev.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
