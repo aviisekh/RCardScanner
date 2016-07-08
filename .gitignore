@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 .idea/*
-=======
-<<<<<<< HEAD
-.idea/*
-=======
-.idea/
->>>>>>> CS1
->>>>>>> origin/dev
+
 # Built application files
 *.apk
 *.ap_
