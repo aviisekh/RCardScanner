@@ -10,45 +10,46 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import java.util.Calendar;
 
 
 public class ClippingWindow extends ImageView {
 
-
-    private final int paintColor = Color.argb(100, 255, 0, 0);
-
     private Paint drawRect;
+    private Paint drawCircle;
+    private Paint drawLineBoundary;
+    private Paint drawLineGrid;
 
     Rect rect = new Rect();
+    Rect rectTop = new Rect();       //dark overlay on the top of clipping window
+    Rect rectBottom = new Rect();
+    Rect rectLeft = new Rect();
+    Rect rectRight = new Rect();
 
-    boolean draggable;
+
+    boolean draggable, topDraggable, leftDraggable, rightDraggable, bottomDraggable;
     boolean croppable, topCroppable, bottomCroppable, rightCroppable, leftCroppable;
+    
 
-    private static final int MIN_CLICK_DURATION = 1000;
-
-    static int parentWidth;
+    static int parentWidth;         //The View's Width
     static int parentHeight;
-    final int TOLERENCE = 20;
+    final int TOLERANCE = 30;       //Tolerence of Touch
 
-    int pointX;
-    int pointY;
-    int prevX;
-    int prevY;
-    int moveX;
-    int moveY;
-    static int left, top, right, bottom;
+    public int pointX;
+    public int pointY;
+    public int prevX;
+    public int prevY;
+    public int moveX;               //Movement of touch along X-axis
+    public int moveY;
+    static int left, top, right, bottom; //Coordinates of the clipping window
+    static int imageLeft, imageRight, imageTop, imageBottom;    //Coordinates of image in imageview
 
     public ClippingWindow(Context context, AttributeSet attrs) {
         super(context, attrs);
-        //setFocusable(true);
-        //setFocusableInTouchMode(false);
+//        setFocusable(false);
+//        setFocusableInTouchMode(false);
+
         setupPaint();
     }
 
@@ -60,26 +61,40 @@ public class ClippingWindow extends ImageView {
         this.setMeasuredDimension(parentWidth, parentHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         init();
+        getImageLocation();
     }
 
 
-    void init() {
+    public void init() {
         left = parentWidth / 2 - 200;
-        top = parentHeight / 2 - 100;
+        top = parentHeight / 2 - 200;
         right = parentWidth / 2 + 200;
-        bottom = parentHeight / 2 + 100;
+        bottom = parentHeight / 2 + 200;
         rect.set(left, top, right, bottom);
+
     }
 
     private void setupPaint() {
         // Setup paint with color and stroke styles
         drawRect = new Paint();
-        drawRect.setColor(paintColor);
+        drawCircle = new Paint();
+        drawLineBoundary = new Paint();
+        drawLineGrid = new Paint();
+
+        drawRect.setColor(Color.argb(200,0,0,0));
         drawRect.setAntiAlias(true);
         drawRect.setStrokeWidth(5);
         drawRect.setStyle(Paint.Style.FILL);
         drawRect.setStrokeJoin(Paint.Join.ROUND);
         drawRect.setStrokeCap(Paint.Cap.ROUND);
+
+        drawCircle.setColor(Color.argb(220,255,255,255));
+
+        drawLineBoundary.setColor(Color.argb(255,255,255,255));
+        drawLineBoundary.setStrokeWidth(5);
+
+        drawLineGrid.setColor(Color.argb(200,255,255,255));
+        drawLineGrid.setStrokeWidth(2);
 
     }
 
@@ -94,30 +109,32 @@ public class ClippingWindow extends ImageView {
                 croppable = topCroppable = bottomCroppable = leftCroppable = rightCroppable = false;
                 prevX = pointX;
                 prevY = pointY;
-                if (prevX > left & prevX < right) {
-                    if (prevY < top + TOLERENCE & prevY > top - TOLERENCE) {
+                if (prevX > left-30 & prevX < right+30) {       //FOR TOLERANCE
+                    if (prevY < top + TOLERANCE & prevY > top - TOLERANCE) {
                         topCroppable = true;
                         croppable = true;
-                    } else if (prevY < bottom + TOLERENCE & prevY > bottom - TOLERENCE) {
+                    } else if (prevY < bottom + TOLERANCE & prevY > bottom - TOLERANCE) {
                         bottomCroppable = true;
                         croppable = true;
                     }
                 }
 
-                if (prevY > top & prevY < bottom) {
-                    if (prevX < left + TOLERENCE & prevX > left - TOLERENCE) {
+                if (prevY > top-30 & prevY < bottom+30) {
+                    if (prevX < left + TOLERANCE & prevX > left - TOLERANCE) {
                         leftCroppable = true;
                         croppable = true;
                     }
 
-                    if (prevX < right + TOLERENCE & prevX > right - TOLERENCE) {
+                    if (prevX < right + TOLERANCE & prevX > right - TOLERANCE) {
                         rightCroppable = true;
                         croppable = true;
                     }
                 }
 
                 if (rect.contains(prevX, prevY) & !croppable) {
-                    draggable = true;               //if touch begins from outside the crop window
+                    //if touch begins from outside the crop window
+                    draggable = topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
+
                 } else if (!rect.contains(prevX, prevY) | croppable) {
                     draggable = false;
                 }
@@ -128,15 +145,48 @@ public class ClippingWindow extends ImageView {
                 moveX = (pointX - prevX); // find the direction of movement with units of movement
                 moveY = (pointY - prevY);
                 // Log.d("move", Integer.toString(moveX));
+                topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
+               // if (left<=imageLeft | right >= imageRight | top <=imageTop | bottom >= imageBottom){
+                    if (left <= imageLeft+10 & moveX<0) {
+                        leftDraggable = false;
+                        rightDraggable = false;
+                        leftCroppable = false;
+                        //draggable = true;
+                    }
+
+                    if (right >=imageRight-10 & moveX>0){
+                        rightDraggable = false;
+                        leftDraggable = false;
+                        rightCroppable = false;
+                        //draggable = true;
+                    }
+                    if (top <= imageTop+10 & moveY<0){
+                        topDraggable = false;
+                        bottomDraggable = false;
+                        topCroppable = false;
+                    }
+                    if (bottom >= imageBottom-10 & moveY>0){
+                        bottomDraggable = false;
+                        topDraggable = false;
+                        bottomCroppable = false;
+                    }
+
+               // }
+                //conditions for minimal cropping window
+                if (left + TOLERANCE + 30>= right & moveX > 0) leftCroppable = false;
+                if (right - TOLERANCE - 30<= left & moveX < 0) rightCroppable = false;
+                if (top + TOLERANCE + 30>= bottom & moveY > 0) topCroppable = false;
+                if (bottom- TOLERANCE -30<= top & moveY <0) bottomCroppable = false;
+                //if (right TOLERANCE >= right & moveX > 0) rightCroppable = false;
 
                 if (draggable) {
-                    left = left + moveX;
-                    right = right + moveX;
-                    top = top + moveY;
-                    bottom = bottom + moveY;
-                    rect.set(left, top, right, bottom);
+                    if (leftDraggable) left = left + moveX;
+                    if (rightDraggable) right = right + moveX;
+                    if (topDraggable) top = top + moveY;
+                    if (bottomDraggable) bottom = bottom + moveY;
+                    //rect.set(left, top, right, bottom);
                     //Log.d("area:", "inside");
-                } else {
+                } else if (croppable){
                     if (topCroppable) {
                         top = top + moveY;
                     }
@@ -150,6 +200,7 @@ public class ClippingWindow extends ImageView {
                         left = left + moveX;
                     }
                 }
+
                 rect.set(left, top, right, bottom);
                 prevX = pointX;  // Remember this touch position for the next move event
                 prevY = pointY;
@@ -171,12 +222,84 @@ public class ClippingWindow extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
         drawRectangle(canvas);
+        drawCircle(canvas);
+        drawLine(canvas);
     }
 
     public void drawRectangle(Canvas canvas) {
-        canvas.drawRect(rect, drawRect);
+
+        rectTop.set(0,0,parentWidth,top);
+        rectBottom.set(0,bottom,parentWidth,parentHeight);
+        rectLeft.set(0,top,left,bottom);
+        rectRight.set(right,top,parentWidth,bottom);
+
+        canvas.drawRect(rectTop, drawRect);
+        canvas.drawRect(rectBottom, drawRect);
+        canvas.drawRect(rectLeft,drawRect);
+        canvas.drawRect(rectRight,drawRect);
+    }
+
+    public  void drawLine(Canvas canvas)
+    {
+        canvas.drawLine(left+(right-left)/3, top,left+(right-left)/3, bottom,drawLineGrid);
+        canvas.drawLine(left+2*(right-left)/3, top,left+2*(right-left)/3, bottom,drawLineGrid);
+        canvas.drawLine(left,top+(bottom-top)/3,right, top+(bottom-top)/3,drawLineGrid);
+        canvas.drawLine(left,top+2*(bottom-top)/3,right, top+2*(bottom-top)/3,drawLineGrid);
+
+        canvas.drawLine(left,top,right,top,drawLineBoundary);
+        canvas.drawLine(left,top,left,bottom,drawLineBoundary);
+        canvas.drawLine(left,bottom,right,bottom,drawLineBoundary);
+        canvas.drawLine(left,bottom,right,bottom,drawLineBoundary);
+        canvas.drawLine(right,top,right,bottom,drawLineBoundary);
+
+
+    }
+    public void drawCircle(Canvas canvas)
+    {
+        //circle points of the top
+        //canvas.drawCircle(left,top,20,drawCircle);
+        canvas.drawCircle((left+right)/2,top,20,drawCircle);
+        //canvas.drawCircle(right,top,20,drawCircle);
+
+        //circle points on the bottom
+        //canvas.drawCircle(left,bottom,20,drawCircle);
+        canvas.drawCircle((left+right)/2,bottom,20,drawCircle);
+        //canvas.drawCircle(right,bottom,20,drawCircle);
+
+        //circle on left
+        canvas.drawCircle(left,(top+bottom)/2, 20, drawCircle);
+        canvas.drawCircle(right,(top+bottom)/2, 20, drawCircle);
+
+    }
+
+
+    public void getImageLocation()
+    {
+        final Drawable drawable = CropActivity.capturedImage.getDrawable();
+
+        // Get image matrix values and place them in an array.
+        final float[] matrixValues = new float[9];
+        CropActivity.capturedImage.getImageMatrix().getValues(matrixValues);
+
+        // Extract the scale and translation values. Note, we currently do not handle any other transformations (e.g. skew).
+        final float scaleX = matrixValues[Matrix.MSCALE_X];
+        final float scaleY = matrixValues[Matrix.MSCALE_Y];
+        final float transX = matrixValues[Matrix.MTRANS_X];
+        final float transY = matrixValues[Matrix.MTRANS_Y];
+
+        final int originalWidth = drawable.getIntrinsicWidth();
+        final int originalHeight = drawable.getIntrinsicHeight();
+
+        //Scaled dimensions in imageview
+        final int scaledWidth = Math.round(originalWidth * scaleX);
+        final int scaledHeight = Math.round(originalHeight * scaleY);
+
+        imageLeft =(int) Math.max(transX, 0);
+        imageTop = (int) Math.max(transY, 0);
+        imageRight =  Math.min(imageLeft + scaledWidth, getWidth());
+        imageBottom = Math.min(imageTop + scaledHeight, getHeight());
 
     }
 
@@ -207,6 +330,8 @@ public class ClippingWindow extends ImageView {
 
 
     }
+
+
 }
 
 

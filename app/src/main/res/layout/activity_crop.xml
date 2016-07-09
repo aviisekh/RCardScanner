@@ -50,8 +50,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:text="@string/scan"
-                android:id="@+id/scanBtn"
+                android:text="@string/threshold"
+                android:id="@+id/threshBtn"
                 android:textSize="22sp"
                 android:visibility="invisible"
                 />

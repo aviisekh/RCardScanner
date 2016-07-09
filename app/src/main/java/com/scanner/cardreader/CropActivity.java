@@ -39,7 +39,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public static ImageView capturedImage;
     public ClippingWindow clippingWindow;
 
-    public Button scanBtn, rechargeBtn, redoButton, cropButton;
+    public Button threshBtn, rechargeBtn, redoButton, cropButton;
 
     public Bitmap image;
     Bitmap croppedImage;
@@ -78,36 +78,19 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.rechargeBtn:
+                break;
 
-                Thread grayScaleThread;
-                //TODO see if you can avoid creating threads yourself. acquire form somewhere
-                grayScaleThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                        GrayScale grayScale = new ITURGrayScale(croppedImage);
-                        //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
-                        Bitmap bmResult = grayScale.grayScale();
-                        //Log.d("thread", Thread.currentThread().toString());
-
-                        Threshold threshold = new BradleyThreshold();
-                        bmResult = threshold.threshold(bmResult);
-
-                        Message msgToUIThread = Message.obtain();
-                        msgToUIThread.obj = bmResult;
-                        handler.sendMessage(msgToUIThread);
-                    }
-                });
-                grayScaleThread.start();
+            case R.id.threshBtn:
+                threshold();
                 break;
 
         }
     }
 
     public void instantiate() {
-        image = getRotatedImage(CameraActivity.getBitmapImage());
-
-        scanBtn = (Button) findViewById(R.id.scanBtn);
+        //image = getRotatedImage(CameraActivity.getBitmapImage());
+        image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+        threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
         cropButton = (Button) findViewById(R.id.cropBtn);
@@ -119,7 +102,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         clippingWindow.setVisibility(View.VISIBLE);
 
 
-        scanBtn.setOnClickListener(this);
+        threshBtn.setOnClickListener(this);
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
@@ -130,9 +113,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void crop() {
         rechargeBtn.setVisibility(View.VISIBLE);
+        threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
-         croppedImage = clippingWindow.getCroppedImage();
+        croppedImage = clippingWindow.getCroppedImage();
         capturedImage.setImageBitmap(croppedImage);
     }
 
@@ -143,5 +127,31 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         Matrix returnImage = new Matrix();
         returnImage.postRotate(90);
         return Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),returnImage,true);
+    }
+
+    public void threshold()
+    {
+        threshBtn.setVisibility(View.INVISIBLE);
+        rechargeBtn.setVisibility(View.VISIBLE);
+        Thread grayScaleThread;
+        //TODO see if you can avoid creating threads yourself. acquire form somewhere
+        grayScaleThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                GrayScale grayScale = new ITURGrayScale(croppedImage);
+                //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
+                Bitmap bmResult = grayScale.grayScale();
+                //Log.d("thread", Thread.currentThread().toString());
+
+                Threshold threshold = new BradleyThreshold();
+                bmResult = threshold.threshold(bmResult);
+
+                Message msgToUIThread = Message.obtain();
+                msgToUIThread.obj = bmResult;
+                handler.sendMessage(msgToUIThread);
+            }
+        });
+        grayScaleThread.start();
     }
 }
