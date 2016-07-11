@@ -88,8 +88,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void instantiate() {
-        //image = getRotatedImage(CameraActivity.getBitmapImage());
-        image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+        image = getRotatedImage(CameraActivity.getBitmapImage());
+        //image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
         threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
