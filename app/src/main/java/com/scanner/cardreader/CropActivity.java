@@ -112,7 +112,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void crop() {
-        rechargeBtn.setVisibility(View.VISIBLE);
+        rechargeBtn.setVisibility(View.INVISIBLE);
         threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);

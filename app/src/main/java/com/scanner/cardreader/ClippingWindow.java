@@ -81,7 +81,7 @@ public class ClippingWindow extends ImageView {
         drawLineBoundary = new Paint();
         drawLineGrid = new Paint();
 
-        drawRect.setColor(Color.argb(200,0,0,0));
+        drawRect.setColor(Color.argb(150,0,0,0));
         drawRect.setAntiAlias(true);
         drawRect.setStrokeWidth(5);
         drawRect.setStyle(Paint.Style.FILL);
@@ -144,8 +144,13 @@ public class ClippingWindow extends ImageView {
             case MotionEvent.ACTION_MOVE:
                 moveX = (pointX - prevX); // find the direction of movement with units of movement
                 moveY = (pointY - prevY);
+
+                if (rect.contains(prevX, prevY) ) {
+                    topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
+                }
+
                 // Log.d("move", Integer.toString(moveX));
-                topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
+
                // if (left<=imageLeft | right >= imageRight | top <=imageTop | bottom >= imageBottom){
                     if (left <= imageLeft+10 & moveX<0) {
                         leftDraggable = false;
@@ -171,7 +176,6 @@ public class ClippingWindow extends ImageView {
                         bottomCroppable = false;
                     }
 
-               // }
                 //conditions for minimal cropping window
                 if (left + TOLERANCE + 30>= right & moveX > 0) leftCroppable = false;
                 if (right - TOLERANCE - 30<= left & moveX < 0) rightCroppable = false;
@@ -184,8 +188,7 @@ public class ClippingWindow extends ImageView {
                     if (rightDraggable) right = right + moveX;
                     if (topDraggable) top = top + moveY;
                     if (bottomDraggable) bottom = bottom + moveY;
-                    //rect.set(left, top, right, bottom);
-                    //Log.d("area:", "inside");
+
                 } else if (croppable){
                     if (topCroppable) {
                         top = top + moveY;
@@ -207,7 +210,6 @@ public class ClippingWindow extends ImageView {
                 break;
 
             case MotionEvent.ACTION_UP:
-                //Log.d("mouse", "Uped");
                 return false;
 
             default:
