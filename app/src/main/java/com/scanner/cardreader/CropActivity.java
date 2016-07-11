@@ -1,36 +1,14 @@
 package com.scanner.cardreader;
 
-import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.internal.ForegroundLinearLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-import android.graphics.drawable.Drawable;
-import android.support.annotation.FloatRange;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
-import java.util.Arrays;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
@@ -81,6 +59,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
                 Thread grayScaleThread;
                 //TODO see if you can avoid creating threads yourself. acquire form somewhere
+
                 grayScaleThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -89,9 +68,28 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                         //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
                         Bitmap bmResult = grayScale.grayScale();
                         //Log.d("thread", Thread.currentThread().toString());
-
                         Threshold threshold = new BradleyThreshold();
                         bmResult = threshold.threshold(bmResult);
+                        bmResult = PrepareImage.addBackgroundPixels(bmResult);
+                        int width = bmResult.getWidth();
+                        int height = bmResult.getHeight();
+                        boolean[] main = new boolean[width*height];
+                        int[] pixels = createPixelArray(width,height,bmResult);
+
+//                        Create a binary array called main using pixel values in threshold bitmap
+                        int count = 0;
+                        for(int pixel : pixels){
+
+                            if(pixel == -1){
+                                main[count] = false;
+                            }
+                            else {
+                                main[count] = true;
+                            }
+                            count++;
+                        }
+                        CcLabeling ccLabeling = new CcLabeling();
+//                        ccLabeling.ccLabels(main, width);
 
                         Message msgToUIThread = Message.obtain();
                         msgToUIThread.obj = bmResult;
@@ -143,5 +141,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         Matrix returnImage = new Matrix();
         returnImage.postRotate(90);
         return Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),returnImage,true);
+    }
+
+    int[] createPixelArray(int width, int height,Bitmap thresholdImage){
+
+        int[] pixels = new int[width*height];
+        thresholdImage.getPixels(pixels, 0, width, 0, 0, width, height);
+        return pixels;
     }
 }
