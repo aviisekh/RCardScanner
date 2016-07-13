@@ -1,11 +1,13 @@
 package com.scanner.cardreader;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -65,31 +67,34 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                         GrayScale grayScale = new ITURGrayScale(croppedImage);
+//                        GrayScale grayScale = new ITURGrayScale(BitmapFactory.decodeResource(getResources(),R.drawable.screen));
+
                         //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
                         Bitmap bmResult = grayScale.grayScale();
                         //Log.d("thread", Thread.currentThread().toString());
                         Threshold threshold = new BradleyThreshold();
                         bmResult = threshold.threshold(bmResult);
                         bmResult = PrepareImage.addBackgroundPixels(bmResult);
-                        int width = bmResult.getWidth();
                         int height = bmResult.getHeight();
-                        boolean[] main = new boolean[width*height];
+                        int width = bmResult.getWidth();
+
+//                        get value of pixels from binary image
                         int[] pixels = createPixelArray(width,height,bmResult);
 
-//                        Create a binary array called main using pixel values in threshold bitmap
-                        int count = 0;
+//                       Create a binary array called booleanImage using pixel values in threshold bitmap
+                        boolean[] booleanImage = new boolean[width*height];
+//                      false if pixel is a background pixel, else true
+                        int index = 0;
                         for(int pixel : pixels){
 
-                            if(pixel == -1){
-                                main[count] = false;
+                            if(pixel != -1){
+                                booleanImage[index] = true;
                             }
-                            else {
-                                main[count] = true;
-                            }
-                            count++;
+
+                            index++;
                         }
-                        CcLabeling ccLabeling = new CcLabeling();
-//                        ccLabeling.ccLabels(main, width);
+
+
 
                         Message msgToUIThread = Message.obtain();
                         msgToUIThread.obj = bmResult;
@@ -103,8 +108,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void instantiate() {
-        image = getRotatedImage(CameraActivity.getBitmapImage());
-
+//        image = getRotatedImage(CameraActivity.getBitmapImage());
+        image = BitmapFactory.decodeResource(getResources(),R.drawable.noiseimage);
         scanBtn = (Button) findViewById(R.id.scanBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
