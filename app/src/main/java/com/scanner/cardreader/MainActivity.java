@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     SIM = "Unknown";
                 }
-
-
             }
         });
         t.start();
@@ -49,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+//                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+                startActivity(new Intent(getBaseContext(), CropActivity.class));
             }
         });
 
