@@ -40,3 +40,4 @@ captures/
 
 # Keystore files
 *.jks
+*.pyc
