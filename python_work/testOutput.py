@@ -1,4 +1,3 @@
-
 import numpy as np
 import cv2
 import os 
@@ -21,7 +20,7 @@ def sigmoid(z):
     return 1.0/(1.0+np.exp(-z))	
 
 
-home=os.getcwd()+"/testSets"
+home=os.getcwd()+"/testImages"
 for paths,subdirs,content_files in os.walk(home):
 	files = content_files
 

@@ -1,7 +1,7 @@
 import os,math
 import numpy as np
 import cv2
-home=os.getcwd()+"/trainingSets"
+home=os.getcwd()+"/trainingImages"
 path = []
 for paths,subdirs,content_files in os.walk(home):
 	path.append(paths)
