@@ -1,36 +1,17 @@
 package com.scanner.cardreader;
 
-import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.internal.ForegroundLinearLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.graphics.drawable.Drawable;
-import android.support.annotation.FloatRange;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
-import java.util.Arrays;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
@@ -88,8 +69,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void instantiate() {
-        image = getRotatedImage(CameraActivity.getBitmapImage());
-        //image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+        //image = getRotatedImage(CameraActivity.getBitmapImage());
+
+        image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
         threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
@@ -112,6 +94,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void crop() {
+        //weightReader.read(this.getApplicationContext());'
+        generateOutput();
+
         rechargeBtn.setVisibility(View.INVISIBLE);
         threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
@@ -154,4 +139,14 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         });
         grayScaleThread.start();
     }
+
+
+    void generateOutput()
+    {
+        NeuralNetwork net = new NeuralNetwork();
+        MeroMatrix input = new MeroMatrix(new double[][]{{1},{1}});
+        MeroMatrix output= net.FeedForward(input);
+        output.show();
+    }
+
 }
