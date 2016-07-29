@@ -30,7 +30,7 @@ public class ClippingWindow extends ImageView {
 
     boolean draggable, topDraggable, leftDraggable, rightDraggable, bottomDraggable;
     boolean croppable, topCroppable, bottomCroppable, rightCroppable, leftCroppable;
-    
+
 
     static int parentWidth;         //The View's Width
     static int parentHeight;

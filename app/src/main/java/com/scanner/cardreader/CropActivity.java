@@ -32,17 +32,17 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_crop);
         instantiate();
 
-        //linked with message queue of main thread
+
+//        linked with message queue of main thread
         handler = new Handler() {
             //executed when msg arrives from thread
             @Override
             public void handleMessage(Message msg) {
                 Log.d("imageview", String.valueOf(capturedImage.getWidth()));
                 Bitmap result = (Bitmap) msg.obj;
-//                capturedImage.setX(result.getWidth());
-//                capturedImage.setY(result.getHeight());
+//                capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE,new Paint(0xFFFFFF));
+//                Log.d("drawable", String.valueOf(capturedImage.getDrawable().getIntrinsicWidth()));
                 capturedImage.setImageBitmap(result);
-                Log.d("drawable", String.valueOf(capturedImage.getDrawable().getIntrinsicWidth()));
             }
         };
 
@@ -63,107 +63,35 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.threshBtn:
-                //remove jar which is not for android
-//              GrayScale grayScale = new ITURGrayScales(croppedImage);
-//              bmResult = grayScale.grayScale();
+//                remove jar which is not for android
+//                GammaCorrection gc = new GammaCorrection(4.5);
 
-//                com.scanner.cardreader.FastBitmap fb = new com.scanner.cardreader.FastBitmap(croppedImage);
-//                GammaCorrection gc = new GammaCorrection(1.5);
-//                gc.applyInPlace(fb);
-
-
-                //Log.d("angle", Double.toString(angle));
-//                Bitmap temp = fb.toBitmap();
+//                gc.applyInPlace(croppedImage);
+//                Deskew d = new Deskew();
+//                double angle = d.doIt(croppedImage);
+//
+//                Median m = new Median(2);
+//                m.applyInPlace(bmResult);
 
                 GrayScale grayScale = new ITURGrayScale(croppedImage);
                 Bitmap bmResult = grayScale.grayScale();
 
-                //fb.toGrayscale();
-//                System.out.println("grayscaled values");
-                int width = bmResult.getWidth();
-                int height = bmResult.getHeight();
-//
-//                for (int i = 0; i < height; i++) {
-//                    for (int j = 0; j < width; j++) {
-//
-//                        System.out.println("after gray(" + i + "," + j + ")"
-//                                + Integer.toHexString(bmResult.getPixel(i, j)));
-//                    }
-//                }
 
-
-//                Deskew d = new Deskew();
-//                double angle = d.doIt(croppedImage);
-//
-                DocumentSkewChecker ds = new DocumentSkewChecker();
-                double angle = ds.getSkewAngle(bmResult);
-
-                Log.d("angle", String.valueOf(angle));
-
-                Median m = new Median(3);
-                m.applyInPlace(bmResult);
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
+
+                ImageSkewChecker ds = new ImageSkewChecker();
+                double angle = ds.getSkewAngle(croppedImage);
+                Log.d("angle", String.valueOf(angle));
+
 //
-//                RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
-//                bmResult = rn.applyInPlace(bmResult);
+//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
+//                bmResult = rotate.applyInPlace(bmResult);
 
+                RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
+                bmResult = rn.applyInPlace(bmResult);
 
-                int newWidth = capturedImage.getWidth();
-                int newHeight = capturedImage.getHeight();
-
-                // calculate the scale - in this case = 0.4f
-                float scaleWidth = ((float) newWidth) / width;
-                float scaleHeight = ((float) newHeight) / height;
-
-                // createa matrix for the manipulation
-                Matrix matrix = new Matrix();
-                // resize the bit map
-                //matrix.preScale(scaleWidth, scaleHeight);
-                // rotate the Bitmap
-                matrix.preRotate((float) angle);
-
-                // recreate the new Bitmap
-                Bitmap resizedBitmap = Bitmap.createBitmap(bmResult, 0, 0,
-                        width, height, matrix, true);
-                bmResult=resizedBitmap;
 //
-//                System.out.println("rotated values");
-//                int w = resizedBitmap.getWidth();
-//                int h = resizedBitmap.getHeight();
-//
-//                for (int i = 0; i < h; i++) {
-//                    for (int j = 0; j < w; j++) {
-//                        System.out.println("rotated(" + i + "," + j + ")" + Integer.toHexString(resizedBitmap.getPixel(i, j)));
-//                    }
-//                }
-
-
-                // center the Image
-//                capturedImage.setScaleType(ImageView.ScaleType.CENTER);
-
-
-//                RotateBicubic rb = new RotateBicubic(-angle, true);
-//                RotateBilinear rbi = new RotateBilinear(-angle, true);
-//                Log.d("bitmapbefore",String.valueOf(beforeSkew.getWidth()));
-//
-//                Log.d("bitmapafter",String.valueOf(fb.getWidth()));
-
-
-//                Mean me= new Mean(3);
-//                me.applyInPlace(fb);
-
-//                ImageNormalization im = new ImageNormalization(100, 150);
-//                im.applyInPlace(fb);
-
-       /*         BradleyLocalThreshold bradley = new BradleyLocalThreshold();
-                  bradley.applyInPlace(fb);
-*/
-
-//                AdaptiveContrastEnhancement ac= new AdaptiveContrastEnhancement(4,1,1,0.4,0.9);
-//                ac.applyInPlace(fb);
-
-
                 Message msgToUIThread = Message.obtain();
                 msgToUIThread.obj = bmResult;
                 handler.sendMessage(msgToUIThread);
@@ -177,8 +105,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public void instantiate() {
 
 //        image = getRotatedImage(CameraActivity.getBitmapImage());
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.topleft);
-
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
 
         threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
@@ -191,10 +118,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         clippingWindow = (ClippingWindow) findViewById(R.id.clipping);
         clippingWindow.setVisibility(View.VISIBLE);
 
+
         threshBtn.setOnClickListener(this);
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
+        crop();
 
     }
 
@@ -204,8 +133,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
 //        croppedImage = clippingWindow.getCroppedImage();
-        croppedImage = BitmapFactory.decodeResource(getResources(), R.drawable.skewtext);
-        capturedImage.setImageBitmap(croppedImage);
+
+        croppedImage = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
+//        capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//        capturedImage.setImageBitmap(croppedImage);
+
     }
 
 
@@ -224,9 +156,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run() {
                 //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-
                 GrayScale grayScale = new ITURGrayScale(croppedImage);
-                //ITURGrayScales grayScale= new ITURGrayScales(sourceImageBitmap,MainActivity.this);
+                //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
                 Bitmap bmResult = grayScale.grayScale();
                 //Log.d("thread", Thread.currentThread().toString());
 
