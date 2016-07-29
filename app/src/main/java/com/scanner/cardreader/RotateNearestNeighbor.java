@@ -1,7 +1,10 @@
 package com.scanner.cardreader;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
 /**
  * Created by anush on 7/19/2016.
@@ -124,9 +127,44 @@ public class RotateNearestNeighbor {
 //        }
 
 //        rotatedBitmap.setPixels(resultImagePixels, 0, newWidth, 0, 0, newWidth, newHeight);
+        Bitmap whiteBitmap= Bitmap.createBitmap(newWidth,newHeight, Bitmap.Config.ARGB_8888);
+        whiteBitmap.eraseColor(Color.WHITE);
+        Bitmap resultBitmap =Bitmap.createBitmap(newWidth,newHeight, Bitmap.Config.ARGB_8888);
 
 
-        return rotatedBitmap;
+        Canvas c = new Canvas(resultBitmap);
+
+//        c.drawBitmap(whiteBitmap,0f,0f,null);
+//        c.drawBitmap(rotatedBitmap,newWidth,newHeight,null);
+
+
+        Drawable d1= new BitmapDrawable(whiteBitmap);
+        Drawable d2= new BitmapDrawable(rotatedBitmap);
+
+        d1.setBounds(0,0,newWidth,newHeight);
+        d2.setBounds(1,1,newWidth-1,newHeight-1);
+        d1.draw(c);
+        d2.draw(c);
+
+
+        float scaleWidth = ((float) newWidth) / 2;
+        float scaleHeight = ((float) newHeight) / 2;
+
+        // createa matrix for the manipulation
+
+
+//         resize the bit map
+//
+//         rotate the Bitmap
+//        Matrix matrix = new Matrix();
+//        matrix.setScale(scaleWidth, scaleHeight);
+//        Bitmap lastBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0,
+//                newWidth, newHeight, matrix, false);
+
+//        Bitmap lastBitmap = Bitmap.createScaledBitmap(sourceBitmap,sourceBitmap.getWidth()-200,sourceBitmap.getHeight()-200, true);
+
+
+        return resultBitmap;
         //rotatedBitmap.recycle();
 
     }
