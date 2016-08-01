@@ -1,5 +1,6 @@
 package com.scanner.cardreader;
 
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -15,10 +16,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
+
+    public static ArrayList<Bitmap> componentBitmaps;
 
 
     public static ImageView capturedImage;
@@ -29,7 +36,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public Bitmap image;
     Bitmap croppedImage;
     private static Handler handler;
-
 
 
     @Override
@@ -75,8 +81,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public void instantiate() {
         //image = getRotatedImage(CameraActivity.getBitmapImage());
 
-        image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+        image = BitmapFactory.decodeResource(getResources(),R.drawable.try2);
         threshBtn = (Button) findViewById(R.id.threshBtn);
+
+
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
         cropButton = (Button) findViewById(R.id.cropBtn);
@@ -96,11 +104,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     public void crop() {
         //weightReader.read(this.getApplicationContext());'
-        generateOutput();
-
         rechargeBtn.setVisibility(View.INVISIBLE);
         threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
@@ -110,16 +115,21 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-    Bitmap getRotatedImage(Bitmap bmp)
-    {
+    Bitmap getRotatedImage(Bitmap bmp) {
         Matrix returnImage = new Matrix();
         returnImage.postRotate(90);
-        return Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),returnImage,true);
+        return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), returnImage, true);
     }
 
-    public void threshold()
-    {
+    int[] createPixelArray(int width, int height, Bitmap thresholdImage) {
+
+        int[] pixels = new int[width * height];
+        thresholdImage.getPixels(pixels, 0, width, 0, 0, width, height);
+        return pixels;
+
+    }
+
+    public void threshold() {
         threshBtn.setVisibility(View.INVISIBLE);
         rechargeBtn.setVisibility(View.VISIBLE);
         Thread grayScaleThread;
@@ -129,6 +139,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 GrayScale grayScale = new ITURGrayScale(croppedImage);
+
+
                 //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
                 Bitmap bmResult = grayScale.grayScale();
                 //Log.d("thread", Thread.currentThread().toString());
@@ -136,6 +148,42 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
 
+                bmResult = PrepareImage.addBackgroundPixels(bmResult);
+                int height = bmResult.getHeight();
+                int width = bmResult.getWidth();
+                Log.d("width" , String.valueOf(width));
+
+//                        get value of pixels from binary image
+                int[] pixels = createPixelArray(width, height, bmResult);
+
+//                       Create a binary array called booleanImage using pixel values in threshold bitmap
+                boolean[] booleanImage = new boolean[width * height];
+                if (Arrays.asList(booleanImage).contains(false)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(CropActivity.this, "Numbers Unreadable. Please, scan again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+
+//                      false if pixel is a background pixel, else true
+                    int index = 0;
+                    for (int pixel : pixels) {
+
+                        if (pixel != -1) {
+                            booleanImage[index] = true;
+                        }
+
+                        index++;
+                    }
+                    CcLabeling ccLabeling = new CcLabeling();
+                    componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
+                    List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
+                    for (double[][] binarySegment: binarySegmentList)
+                        generateOutput(binarySegment);
+
+                }
                 Message msgToUIThread = Message.obtain();
                 msgToUIThread.obj = bmResult;
                 handler.sendMessage(msgToUIThread);
@@ -145,16 +193,16 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    void generateOutput()
+    void generateOutput(double[][] binarySegment)
     {
+
         WeightReader.setWeights(this.getApplicationContext());// reader = new WeightReader();
-        //reader.read(this.getApplicationContext());
-        //Log.d("content", Arrays.deepToString(WeightReader.input) );
         NeuralNetwork net = new NeuralNetwork();
-        MeroMatrix input = new MeroMatrix(WeightReader.input);
+        MeroMatrix input = new MeroMatrix(binarySegment);
         MeroMatrix output= net.FeedForward(input);
-        output.showOutputArray();
+        //output.showOutputArray();
         output.showOutput();
     }
+
 
 }

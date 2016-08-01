@@ -262,17 +262,21 @@ public class ClippingWindow extends ImageView {
     {
         //circle points of the top
         //canvas.drawCircle(left,top,20,drawCircle);
+
         canvas.drawCircle((left+right)/2,top,20,drawCircle);
+
         //canvas.drawCircle(right,top,20,drawCircle);
 
         //circle points on the bottom
         //canvas.drawCircle(left,bottom,20,drawCircle);
+
         canvas.drawCircle((left+right)/2,bottom,20,drawCircle);
         //canvas.drawCircle(right,bottom,20,drawCircle);
 
         //circle on left
         canvas.drawCircle(left,(top+bottom)/2, 20, drawCircle);
         canvas.drawCircle(right,(top+bottom)/2, 20, drawCircle);
+
 
     }
 

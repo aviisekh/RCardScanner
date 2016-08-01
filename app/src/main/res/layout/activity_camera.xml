@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageButton"
         android:layout_marginTop="20px"
-        android:src="@drawable/dispositivos"
+        android:src="@drawable/test5b"
         android:contentDescription="@string/cameraclick"
         android:background="@null"
         android:layout_alignParentBottom="true"

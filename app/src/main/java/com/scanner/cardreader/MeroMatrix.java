@@ -98,7 +98,7 @@ final public class MeroMatrix {
             }
         }
         Log.d("OutputValue", Integer.toString(largestIndex) + " with probability " +Double.toString(largest));
-        Log.d("OutputValue", Integer.toString(second_largestIndex) + " with probability " +Double.toString(second_largest));
+       // Log.d("OutputValue", Integer.toString(second_largestIndex) + " with probability " +Double.toString(second_largest));
     }
 
             //double maxValue = 0;
