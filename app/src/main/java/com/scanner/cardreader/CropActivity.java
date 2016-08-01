@@ -63,40 +63,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.threshBtn:
-//                remove jar which is not for android
-//                GammaCorrection gc = new GammaCorrection(4.5);
-
-//                gc.applyInPlace(croppedImage);
-//                Deskew d = new Deskew();
-//                double angle = d.doIt(croppedImage);
-//
-//                Median m = new Median(2);
-//                m.applyInPlace(bmResult);
-
-                GrayScale grayScale = new ITURGrayScale(croppedImage);
-                Bitmap bmResult = grayScale.grayScale();
-
-
-                Threshold threshold = new BradleyThreshold();
-                bmResult = threshold.threshold(bmResult);
-
-                ImageSkewChecker ds = new ImageSkewChecker();
-                double angle = ds.getSkewAngle(croppedImage);
-                Log.d("angle", String.valueOf(angle));
-
-//
-//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
-//                bmResult = rotate.applyInPlace(bmResult);
-
-                RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
-                bmResult = rn.applyInPlace(bmResult);
-
-//
-                Message msgToUIThread = Message.obtain();
-                msgToUIThread.obj = bmResult;
-                handler.sendMessage(msgToUIThread);
-
-                //threshold();
+                threshold();
                 break;
         }
     }
@@ -155,18 +122,52 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         grayScaleThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                GrayScale grayScale = new ITURGrayScale(croppedImage);
-                //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
-                Bitmap bmResult = grayScale.grayScale();
-                //Log.d("thread", Thread.currentThread().toString());
+//              remove jar which is not for android
+                Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
 
+                long startGamma = System.currentTimeMillis()/1000;
+                GammaCorrection gc = new GammaCorrection(4.5);
+                Bitmap bmResult = gc.applyInPlace(sourceBitmap);
+                long stopGamma= System.currentTimeMillis()/1000;
+                System.out.println("gamma:"+(stopGamma-startGamma));
+
+                long startMedian = System.currentTimeMillis()/1000;
+                Median m = new Median(3);
+                bmResult = m.applyInPlace(bmResult);
+                long stopMedian= System.currentTimeMillis()/1000;
+                System.out.println("median:"+(stopMedian-startMedian));
+
+                long startGrayscale = System.currentTimeMillis()/1000;
+                GrayScale grayScale = new ITURGrayScale(bmResult);
+                bmResult = grayScale.grayScale();
+                long stopGrayscale= System.currentTimeMillis()/1000;
+                System.out.println("grayscale:"+(stopGrayscale-startGrayscale));
+
+                long startThreshold = System.currentTimeMillis()/1000;
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
+                long stopThreshold= System.currentTimeMillis()/1000;
+                System.out.println("threshold:"+(stopThreshold-startThreshold));
 
+                long startSkew = System.currentTimeMillis()/1000;
+                ImageSkewChecker ds = new ImageSkewChecker();
+                double angle = ds.getSkewAngle(croppedImage);
+                long stopSkew= System.currentTimeMillis()/1000;
+                System.out.println("angle:"+angle+" skew time:"+(stopSkew-startSkew));
+
+                long startRotate = System.currentTimeMillis()/1000;
+                RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
+                bmResult = rn.applyInPlace(bmResult);
+                long stopRotate= System.currentTimeMillis()/1000;
+                System.out.println("rotate:"+(stopRotate-startRotate));
+
+//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
+//                bmResult = rotate.applyInPlace(bmResult);
+//
                 Message msgToUIThread = Message.obtain();
                 msgToUIThread.obj = bmResult;
                 handler.sendMessage(msgToUIThread);
+
             }
         });
         grayScaleThread.start();

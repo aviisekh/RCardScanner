@@ -3,7 +3,10 @@ package com.scanner.cardreader;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by anush on 7/20/2016.
@@ -34,8 +37,17 @@ public class Median {
         int noOfPixels = framePixels.length;
         //sort the array in increasing order
 
-        Arrays.sort(framePixels);
+//        Arrays.sort(framePixels,0,noOfPixels);
 
+
+//        //sort the array in increasing order
+//        for (int i = 0; i < noOfPixels; i++)
+//            for (int j = i+1; j < noOfPixels; j++)
+//                if (framePixels[i] > framePixels[j]) {
+//                    int temp = framePixels[i];
+//                    framePixels[i] = framePixels[j];
+//                    framePixels[j] = temp;
+//                }
         //if it's odd
         if (noOfPixels % 2 == 1)
             return framePixels[noOfPixels / 2];
@@ -43,9 +55,9 @@ public class Median {
             return ((framePixels[noOfPixels / 2] + framePixels[noOfPixels / 2 - 1]) / 2);
     }
 
-    public int[] getFramePixels(Bitmap bitmap, int x, int y) {
+    public ArrayList<Integer> getFramePixels(Bitmap bitmap, int x, int y) {
         //array must be initialized.
-        int[] framePixels = new int[9];
+        ArrayList<Integer> framePixels = new ArrayList<Integer>();
 
         int height = bitmap.getHeight();
         int width = bitmap.getWidth();
@@ -67,63 +79,76 @@ public class Median {
         //the actual number of pixels to be considered
         int noOfPixelsFrame = (xmax - xmin + 1) * (ymax - ymin + 1);
 
-
         int counter = 0;
-
+        String a = "";
         for (int i = xmin; i < xmax; i++) {
-            counter=0;
+            a = "";
             for (int j = ymin; j < ymax; j++) {
-                framePixels[counter] = bitmap.getPixel(i, j);
+                framePixels.add(counter, bitmap.getPixel(i, j));
+
+//                a = a + bitmap.getPixel(i, j) + ",";
                 counter++;
             }
+
         }
+
+//        System.out.println(counter);
         return framePixels;
 
     }
 
 
-    public Bitmap applyInPlace(Bitmap sourceBitmap) {
-        copy = Bitmap.createBitmap(sourceBitmap.getWidth(), sourceBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
+    public Bitmap applyInPlace(final Bitmap sourceBitmap) {
+//        copy = Bitmap.createBitmap(sourceBitmap.getWidth(), sourceBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        copy=sourceBitmap;
         width = sourceBitmap.getWidth();
         height = sourceBitmap.getHeight();
-        //ThreadPoolExecutor tpe= new ThreadPoolExecutor();
 
-//        copy2 = sourceBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        int cores = Runtime.getRuntime().availableProcessors();
+        ThreadPoolExecutor executor= new ThreadPoolExecutor(cores*2,cores*2,50L, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
 
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int row = 0; row < width; row++) {
+                    for (int column = 0; column < height; column++) {
 
-        for (int row = 0; row < width; row++) {
-            for (int column = 0; column < height; column++) {
+                        ArrayList<Integer> framePixels = getFramePixels(sourceBitmap, row, column);
 
-                int[] framePixels = getFramePixels(sourceBitmap, row, column);
+                        int[] red = new int[framePixels.size()];
+                        int[] green = new int[framePixels.size()];
+                        int[] blue = new int[framePixels.size()];
 
-                int []red= new int [framePixels.length];
-                int []green = new int [framePixels.length];
-                int []blue = new int [framePixels.length];
-                String a= "";
-                for (int i = 0; i < framePixels.length; i++) {
-                  a= a+ framePixels[i]+",";
+                        for (int i = 0; i < framePixels.size(); i++) {
 
-                    red[i] = Color.red( framePixels[i] );
-                    green[i] = Color.green( framePixels[i] );
-                    blue[i] = Color.blue( framePixels[i] );
-                }
-
-                System.out.println(a);
-                //find the median for each color
-                int R = calculateMedian(red);
-                int G = calculateMedian(green);
-                int B = calculateMedian(blue);
+                            red[i] = Color.red(framePixels.get(i));
+                            green[i] = Color.green(framePixels.get(i));
+                            blue[i] = Color.blue(framePixels.get(i));
+                        }
+                        //find the median for each color
+                        int R = calculateMedian(red);
+                        int G = calculateMedian(green);
+                        int B = calculateMedian(blue);
 
 //                System.out.println("median"+R+","+G+","+B);
-                copy.setPixel(row, column, Color.rgb(R,G,B));
-            }
-        }
+                        copy.setPixel(row, column, Color.rgb(R, G, B));
+                    }
 
+
+                }
+            }
+
+
+
+        });
         return copy;
 
     }
 
 }
+
+
+
+
 
 
