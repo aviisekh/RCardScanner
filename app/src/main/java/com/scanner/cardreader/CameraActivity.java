@@ -235,14 +235,16 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder)
+    {
         try {
             camera.stopPreview();
             camera.release();
             camera.setPreviewCallback(null);
             camera = null;
-        } catch (Exception e) {
-
+        }
+        catch (Exception e) {
+e.printStackTrace();
         }
 
 

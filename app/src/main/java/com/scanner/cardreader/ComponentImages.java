@@ -3,17 +3,126 @@ package com.scanner.cardreader;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * Created by mandy on 7/12/16.
  */
 public class ComponentImages {
-    private static String TAG = "ComponentImagesClass";
+//    private static String TAG = "ComponentImagesClass";
 
+private static void componentSort(int[][][] componentArray) {
+    int[][] temp;
+
+    boolean swapped;
+    int len = componentArray.length;
+    for(int u = 0; u < len - 1; u++){
+        swapped = false;
+        for(int v = 0; v < len - 1 - u ; v++){
+            System.out.println("Items compared " + componentArray[v] + ", " + componentArray[v + 1]);
+
+            if(MinXY(componentArray[v])[0] > MinXY(componentArray[v+1])[0]){
+                temp = componentArray[v];
+                componentArray[v] = componentArray[v+1];
+                componentArray[v + 1] = temp;
+
+                swapped = true;
+
+                System.out.println("swapped"  + componentArray[v] + ", " + componentArray[v + 1]);
+
+
+            }
+            else{
+                System.out.println("not swapped");
+            }
+
+
+        }
+
+        if(!swapped){
+            break;
+        }
+
+
+
+    }
+
+
+    for(int i = 0; i < componentArray.length; i++){
+        System.out.println(MinXY(componentArray[i])[0]);
+    }
+
+
+
+
+
+//    for (int i = 0; i < componentArray.length; i++) {
+//        System.out.println(MinXY(componentArray[i])[0]);
+//    }
+//    int minX = (MinXY(componentArray[0])[0]);
+//    for (int i = 0; i < componentArray.length - 1; i++)
+//    {
+//        int componentX1 = MinXY(componentArray[i + 1])[0];
+//        if (minX > componentX1)
+//        {
+//            temp = componentArray[i];
+//            componentArray[i] = componentArray[i + 1];
+//            componentArray[i + 1] = temp;
+//            minX = componentArray[i][0][0];
+//
+//        }
+//
+//
+//
+//
+//}
+//    for (int i = 0; i < componentArray.length; i++) {
+//        System.out.println(MinXY(componentArray[i])[0]);
+//    }
+////        int temp[][];
+//        for(int i = 0; i < componentArray.length; i++){
+//            for(int j = 1; j < (componentArray.length - i); j++){
+//
+//
+//
+//        }
+
+//
+    }
+//    return componentArray;
+
+
+
+    public static void sort(int[] array) {
+        boolean swapped;
+        do {
+            swapped = false;
+            for (int i = 0; i <= array.length - 2; i++) {
+                if (array[i] > array[i + 1]) {
+                    int temp = array[i];
+                    array[i] = array[i + 1];
+                    array[i + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) {
+                break;
+            }
+            swapped = false;
+            for (int i = array.length - 2; i >= 0; i--) {
+                if (array[i] > array[i + 1]) {
+                    int temp = array[i];
+                    array[i] = array[i + 1];
+                    array[i + 1] = temp;
+                    swapped = true;
+                }
+            }
+        } while (swapped);
+    }
 
     private static int[] MaxXY(int[][] componentPixels) {
         int maxXY[] = new int[2];
@@ -23,8 +132,10 @@ public class ComponentImages {
 
         for (int i = 0; i < componentPixels.length; i++) {
 
-            maxX = (maxX < componentPixels[i][0]) ? componentPixels[i][0] : maxX;
-            maxY = (maxY < componentPixels[i][1]) ? componentPixels[i][1] : maxY;
+//            maxX = (maxX < componentPixels[i][0]) ? componentPixels[i][0] : maxX;
+            maxX = Math.max(maxX, componentPixels[i][0]);
+//            maxX = (maxX < componentPixels[i][0]) ? componentPixels[i][0] : maxX;
+            maxY = Math.max(maxY, componentPixels[i][1]);
         }
 
         maxXY[0] = maxX;
@@ -40,8 +151,12 @@ public class ComponentImages {
         int minY = componentPixels[0][1];
 
         for (int i = 0; i < componentPixels.length; i++) {
-            minX = (minX > componentPixels[i][0]) ? componentPixels[i][0] : minX;
-            minY = (minY > componentPixels[i][1]) ? componentPixels[i][1] : minY;
+//            minX = (minX > componentPixels[i][0]) ? componentPixels[i][0] : minX;
+            minX = Math.min(minX, componentPixels[i][0]);
+
+//            minY = (minY > componentPixels[i][1]) ? componentPixels[i][1] : minY;
+            minY = Math.min(minY, componentPixels[i][1]);
+
         }
 
         minXY[0] = minX;
@@ -55,7 +170,31 @@ public class ComponentImages {
     public static ArrayList<Bitmap> CreateImageFromComponents(int[][][] componentArray) {
 
         ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
+//componentArray[0] = componentArray[3];
+//        Log.d("XCoordinate", String.valueOf(MinXY(componentArray[0])[0]));
+//        for (int[][] ci:
+//            componentArray   ) {
+//            System.out.println(MinXY(ci)[0]);
+//        }
 
+        ArrayList<Integer> toBeSorted = new ArrayList<>();
+        for(int i = 0; i<componentArray.length;i++){
+            toBeSorted.add(MinXY(componentArray[i])[0]);
+        }
+        int min = toBeSorted.get(0);
+        for(int i : toBeSorted){
+            min = min < i ? min : i;
+        }
+        componentSort(componentArray);
+//        for (int[][] ci:
+//                componentArray   ) {
+//            System.out.println(MinXY(ci)[0]);
+//        }
+
+//        Log.d("XCoordinate", String.valueOf(MinXY(componentArray[0])[0]));
+//        for (int i = 0; i < componentArray.length; i++) {
+//            System.out.println(MinXY(componentArray[i])[0]);
+//        }
         for (int component = 0; component < componentArray.length; component++) {
             int minX = MinXY(componentArray[component])[0];
             int minY = MinXY(componentArray[component])[1];
@@ -63,10 +202,10 @@ public class ComponentImages {
             int maxY = MaxXY(componentArray[component])[1];
             int componentHeight = maxY - minY + 1;
             int componentWidth = maxX - minX + 1;
+
+//            System.out.println("component" + component + "=" + componentHeight);
 //            Log.d(TAG, String.valueOf(componentHeight));
 //            Log.d(TAG, String.valueOf(componentWidth));
-
-
             Bitmap componentSegment = Bitmap.createBitmap(componentWidth, componentHeight, Bitmap.Config.RGB_565);
             Canvas c = new Canvas(componentSegment);
             c.drawColor(Color.WHITE);
@@ -74,13 +213,19 @@ public class ComponentImages {
             for (int pixel = 0; pixel < componentArray[component].length; pixel++) {
                 int x = componentArray[component][pixel][0] - minX;
                 int y = componentArray[component][pixel][1] - minY;
-
-                System.out.println(x + "," + y);
+//                System.out.println(x + "," + y);
                 componentSegment.setPixel(x, y, Color.BLACK);
             }
             bitmapArrayList.add(componentSegment);
 //                    Bitmap resizedImage = Bitmap.createBitmap(img, 0,0,w+2,h+2);
         }
+//        for(int i = 0; i<toBeSorted.length; i++){
+//            System.out.println(toBeSorted[i]);
+//        }
+//        sort(toBeSorted);
+//        for(int i = 0; i<toBeSorted.length; i++){
+//            System.out.println(toBeSorted[i]);
+//        }
 
 
 //              Bitmap resizedImage = Bitmap.createBitmap(w+2, h+2, Bitmap.Config.RGB_565);
