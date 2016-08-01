@@ -6,12 +6,16 @@ import android.graphics.Matrix;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.util.Arrays;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
@@ -143,10 +147,14 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     void generateOutput()
     {
+        WeightReader.setWeights(this.getApplicationContext());// reader = new WeightReader();
+        //reader.read(this.getApplicationContext());
+        //Log.d("content", Arrays.deepToString(WeightReader.input) );
         NeuralNetwork net = new NeuralNetwork();
-        MeroMatrix input = new MeroMatrix(new double[][]{{1},{1}});
+        MeroMatrix input = new MeroMatrix(WeightReader.input);
         MeroMatrix output= net.FeedForward(input);
-        output.show();
+        output.showOutputArray();
+        output.showOutput();
     }
 
 }
