@@ -77,7 +77,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 //        image = getRotatedImage(CameraActivity.getBitmapImage());
 
 
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.joker_leto);
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.man);
 
 
         threshBtn = (Button) findViewById(R.id.threshBtn);
@@ -175,6 +175,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     CcLabeling ccLabeling = new CcLabeling();
                     componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
+                    BinaryArray.CreateBinaryArray(componentBitmaps);
+
 //
 //                    Intent viewSegmentIntent = new Intent(getApplicationContext(),ViewSegments.class);
 //                    startActivity(viewSegmentIntent);
