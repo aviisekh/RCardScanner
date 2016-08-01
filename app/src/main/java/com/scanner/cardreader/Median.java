@@ -105,7 +105,7 @@ public class Median {
         height = sourceBitmap.getHeight();
 
         int cores = Runtime.getRuntime().availableProcessors();
-        ThreadPoolExecutor executor= new ThreadPoolExecutor(cores*2,cores*2,50L, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor executor= new ThreadPoolExecutor(cores*16,cores*16,300L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
 
         executor.execute(new Runnable() {
             @Override
@@ -133,13 +133,8 @@ public class Median {
 //                System.out.println("median"+R+","+G+","+B);
                         copy.setPixel(row, column, Color.rgb(R, G, B));
                     }
-
-
                 }
             }
-
-
-
         });
         return copy;
 

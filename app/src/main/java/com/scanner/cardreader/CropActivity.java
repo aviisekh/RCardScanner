@@ -126,16 +126,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
 
                 long startGamma = System.currentTimeMillis()/1000;
-                GammaCorrection gc = new GammaCorrection(4.5);
+                GammaCorrection gc = new GammaCorrection(1.75);
                 Bitmap bmResult = gc.applyInPlace(sourceBitmap);
                 long stopGamma= System.currentTimeMillis()/1000;
                 System.out.println("gamma:"+(stopGamma-startGamma));
-
-                long startMedian = System.currentTimeMillis()/1000;
-                Median m = new Median(3);
-                bmResult = m.applyInPlace(bmResult);
-                long stopMedian= System.currentTimeMillis()/1000;
-                System.out.println("median:"+(stopMedian-startMedian));
 
                 long startGrayscale = System.currentTimeMillis()/1000;
                 GrayScale grayScale = new ITURGrayScale(bmResult);
@@ -160,6 +154,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 bmResult = rn.applyInPlace(bmResult);
                 long stopRotate= System.currentTimeMillis()/1000;
                 System.out.println("rotate:"+(stopRotate-startRotate));
+
+                long startMedian = System.currentTimeMillis()/1000;
+                Median m = new Median(3);
+                bmResult = m.applyInPlace(bmResult);
+                long stopMedian= System.currentTimeMillis()/1000;
+                System.out.println("median:"+(stopMedian-startMedian));
 
 //                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyInPlace(bmResult);
