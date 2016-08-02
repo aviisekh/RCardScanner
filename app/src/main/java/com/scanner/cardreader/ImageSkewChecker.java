@@ -149,6 +149,8 @@ public class ImageSkewChecker {
         }
         Log.d("theta/relIntensity", String.valueOf(thetaAggregator));
         Log.d("result", String.valueOf(thetaAggregator - 90.0D));
+        if (thetaAggregator==0) return thetaAggregator;
+        else
         return thetaAggregator-90.0D;
 
     }

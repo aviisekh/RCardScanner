@@ -2,6 +2,7 @@ package com.scanner.cardreader;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -55,7 +56,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 
-        ImageButton button = (ImageButton) findViewById(R.id.imageButton);
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.imageButton);
         //        Check if there is a camera on the device
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {

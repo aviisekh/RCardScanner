@@ -3,22 +3,12 @@ package com.scanner.cardreader;
 
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
@@ -26,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -43,10 +34,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public ClippingWindow clippingWindow;
 
     public Button threshBtn, rechargeBtn, redoButton, cropButton;
+    public TextView ocrResultTV;
 
     public Bitmap image;
     private Bitmap croppedImage;
-    private static Handler handler;
+    private static Handler imageHandler,ocrResultHandler;
+
 
 
     @Override
@@ -57,17 +50,29 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 
 //        linked with message queue of main thread
-        handler = new Handler() {
+        imageHandler = new Handler() {
             //executed when msg arrives from thread
             @Override
             public void handleMessage(Message msg) {
-                Log.d("imageview", String.valueOf(capturedImage.getWidth()));
                 Bitmap result = (Bitmap) msg.obj;
 //                capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE,new Paint(0xFFFFFF));
 //                Log.d("drawable", String.valueOf(capturedImage.getDrawable().getIntrinsicWidth()));
                 capturedImage.setImageBitmap(result);
             }
         };
+
+        ocrResultHandler = new Handler() {
+            //executed when msg arrives from thread
+            @Override
+            public void handleMessage(Message msg) {
+                String result = (String) msg.obj;
+//                capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE,new Paint(0xFFFFFF));
+//                Log.d("drawable", String.valueOf(capturedImage.getDrawable().getIntrinsicWidth()));
+                ocrResultTV.setText(result);
+            }
+        };
+
+
 
     }
 
@@ -104,6 +109,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
         cropButton = (Button) findViewById(R.id.cropBtn);
+        ocrResultTV = (TextView) findViewById(R.id.ocrResult);
 
         capturedImage = (ImageView) findViewById(R.id.imageView);
         capturedImage.setImageBitmap(image);
@@ -202,9 +208,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 //                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyInPlace(bmResult);
 
-                Message msgToUIThread = Message.obtain();
-                msgToUIThread.obj = bmResult;
-                handler.sendMessage(msgToUIThread);
+                Message imageToUIThread = Message.obtain();
+                imageToUIThread.obj = bmResult;
+                imageHandler.sendMessage(imageToUIThread);
 
 
                 bmResult = PrepareImage.addBackgroundPixels(bmResult);
@@ -239,7 +245,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     CcLabeling ccLabeling = new CcLabeling();
                     componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
                     List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
-                    generateOutput(binarySegmentList);
+                    String ocrResult = generateOutput(binarySegmentList);
+
+                    Message ocrResultToUIThread = Message.obtain();
+                    ocrResultToUIThread.obj = ocrResult;
+                    ocrResultHandler.sendMessage(ocrResultToUIThread);
 
                 }
 //
@@ -250,7 +260,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    void generateOutput(List<double[][]> binarySegmentList) {
+    String generateOutput(List<double[][]> binarySegmentList) {
 
 
         WeightReader.setWeights(this.getApplicationContext());// reader = new WeightReader();
@@ -268,7 +278,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-        Log.d("output", recognizedList.toString());
+        return recognizedList.toString().trim();
+
+       // Log.d("output", recognizedList.toString());
 
 
     }
