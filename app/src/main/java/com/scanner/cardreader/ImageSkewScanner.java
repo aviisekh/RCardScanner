@@ -11,7 +11,7 @@ import java.util.List;
  * Created by anush on 7/19/2016.
  */
 
-public class ImageSkewChecker {
+public class ImageSkewScanner {
 
     private int stepsPerDegree = 1;
     private int houghHeight;
@@ -48,7 +48,7 @@ public class ImageSkewChecker {
         this.localPeakRadius = Math.max(1, Math.min(10, localPeakRadius));
     }
 
-    public ImageSkewChecker() {
+    public ImageSkewScanner() {
     }
 
     private int[] createPixelArray(int width, int height, Bitmap sourceImage) {
@@ -149,6 +149,8 @@ public class ImageSkewChecker {
         }
         Log.d("theta/relIntensity", String.valueOf(thetaAggregator));
         Log.d("result", String.valueOf(thetaAggregator - 90.0D));
+        if(thetaAggregator==0) return 0;
+        else
         return thetaAggregator-90.0D;
 
     }

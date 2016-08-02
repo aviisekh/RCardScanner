@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * Created by anush on 7/20/2016.
  */
 
-public class Median {
+public class NonLocalMedianFilter {
     private int frameSize = 1;
     private Bitmap copy;
     private int width;
@@ -27,7 +27,7 @@ public class Median {
     }
 
 
-    public Median(int frameSize) {
+    public NonLocalMedianFilter(int frameSize) {
         this.setFrameSize(frameSize);
     }
 
@@ -105,7 +105,7 @@ public class Median {
         height = sourceBitmap.getHeight();
 
         int cores = Runtime.getRuntime().availableProcessors();
-        ThreadPoolExecutor executor= new ThreadPoolExecutor(cores*16,cores*16,300L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor executor= new ThreadPoolExecutor(cores*16,cores*16,200L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
 
         executor.execute(new Runnable() {
             @Override

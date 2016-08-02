@@ -1,7 +1,6 @@
 package com.scanner.cardreader;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
@@ -71,8 +70,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void instantiate() {
 
-//        image = getRotatedImage(CameraActivity.getBitmapImage());
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
+        image = getRotatedImage(CameraActivity.getBitmapImage());
+//        image = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
 
         threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
@@ -90,7 +89,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
-        crop();
+
 
     }
 
@@ -99,11 +98,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
-//        croppedImage = clippingWindow.getCroppedImage();
+        croppedImage = clippingWindow.getCroppedImage();
 
-        croppedImage = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
+//        croppedImage = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
 //        capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-//        capturedImage.setImageBitmap(croppedImage);
+        capturedImage.setImageBitmap(croppedImage);
 
     }
 
@@ -125,43 +124,43 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 //              remove jar which is not for android
                 Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
 
-                long startGamma = System.currentTimeMillis()/1000;
-                GammaCorrection gc = new GammaCorrection(1.75);
+                long startGamma = System.currentTimeMillis() / 1000;
+                GammaCorrection gc = new GammaCorrection(1);
                 Bitmap bmResult = gc.applyInPlace(sourceBitmap);
-                long stopGamma= System.currentTimeMillis()/1000;
-                System.out.println("gamma:"+(stopGamma-startGamma));
+                long stopGamma = System.currentTimeMillis() / 1000;
+                System.out.println("gamma:" + (stopGamma - startGamma));
 
-                long startGrayscale = System.currentTimeMillis()/1000;
+                long startGrayscale = System.currentTimeMillis() / 1000;
                 GrayScale grayScale = new ITURGrayScale(bmResult);
                 bmResult = grayScale.grayScale();
-                long stopGrayscale= System.currentTimeMillis()/1000;
-                System.out.println("grayscale:"+(stopGrayscale-startGrayscale));
+                long stopGrayscale = System.currentTimeMillis() / 1000;
+                System.out.println("grayscale:" + (stopGrayscale - startGrayscale));
 
-                long startThreshold = System.currentTimeMillis()/1000;
+                long startThreshold = System.currentTimeMillis() / 1000;
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
-                long stopThreshold= System.currentTimeMillis()/1000;
-                System.out.println("threshold:"+(stopThreshold-startThreshold));
+                long stopThreshold = System.currentTimeMillis() / 1000;
+                System.out.println("threshold:" + (stopThreshold - startThreshold));
 
-                long startSkew = System.currentTimeMillis()/1000;
-                ImageSkewChecker ds = new ImageSkewChecker();
+                long startSkew = System.currentTimeMillis() / 1000;
+                ImageSkewScanner ds = new ImageSkewScanner();
                 double angle = ds.getSkewAngle(croppedImage);
-                long stopSkew= System.currentTimeMillis()/1000;
-                System.out.println("angle:"+angle+" skew time:"+(stopSkew-startSkew));
+                long stopSkew = System.currentTimeMillis() / 1000;
+                System.out.println("angle:" + angle + " skew time:" + (stopSkew - startSkew));
 
-                long startRotate = System.currentTimeMillis()/1000;
+                long startRotate = System.currentTimeMillis() / 1000;
                 RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
                 bmResult = rn.applyInPlace(bmResult);
-                long stopRotate= System.currentTimeMillis()/1000;
-                System.out.println("rotate:"+(stopRotate-startRotate));
+                long stopRotate = System.currentTimeMillis() / 1000;
+                System.out.println("rotate:" + (stopRotate - startRotate));
 
-                long startMedian = System.currentTimeMillis()/1000;
-                Median m = new Median(3);
+                long startMedian = System.currentTimeMillis() / 1000;
+                NonLocalMedianFilter m = new NonLocalMedianFilter(3);
                 bmResult = m.applyInPlace(bmResult);
-                long stopMedian= System.currentTimeMillis()/1000;
-                System.out.println("median:"+(stopMedian-startMedian));
+                long stopMedian = System.currentTimeMillis() / 1000;
+                System.out.println("median:" + (stopMedian - startMedian));
 
-//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
+//                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyInPlace(bmResult);
 //
                 Message msgToUIThread = Message.obtain();

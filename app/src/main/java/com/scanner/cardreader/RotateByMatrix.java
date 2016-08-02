@@ -9,7 +9,7 @@ import android.graphics.Matrix;
  * Created by anush on 7/18/2016.
  */
 
-public class Rotate {
+public class RotateByMatrix {
     private double angle;
     private boolean keepSize;
     private int newWidth;
@@ -33,7 +33,7 @@ public class Rotate {
     }
 
 
-    public Rotate(int width, int height, double angle) {
+    public RotateByMatrix(int width, int height, double angle) {
         this.angle = angle;
         this.newWidth = width;
         this.newHeight = height;
