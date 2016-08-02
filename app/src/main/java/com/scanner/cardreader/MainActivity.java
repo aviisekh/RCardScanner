@@ -31,17 +31,9 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 if (tm.getSimState() == TelephonyManager.SIM_STATE_READY) {
-                    String carrier = tm.getLine1Number().substring(0, 3);
-                    if (carrier.equals("984")) {
-                        SIM = "NTC";
-                    } else {
-                        SIM = "NCELL";
-                    }
-                } else {
-                    SIM = "Unknown";
+                    SIM = tm.getNetworkOperatorName();
+
                 }
-
-
             }
         });
         t.start();
@@ -49,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+//                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+                startActivity(new Intent(getBaseContext(), CropActivity.class));
             }
         });
 

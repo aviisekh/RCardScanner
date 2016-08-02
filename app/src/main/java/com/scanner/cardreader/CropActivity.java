@@ -1,36 +1,16 @@
 package com.scanner.cardreader;
 
-import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.internal.ForegroundLinearLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-import android.graphics.drawable.Drawable;
-import android.support.annotation.FloatRange;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
-import java.util.Arrays;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
@@ -42,9 +22,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public Button threshBtn, rechargeBtn, redoButton, cropButton;
 
     public Bitmap image;
-    Bitmap croppedImage;
+    private Bitmap croppedImage;
     private static Handler handler;
-
 
 
     @Override
@@ -54,13 +33,16 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         instantiate();
 
 
-        //linked with message queue of main thread
+//        linked with message queue of main thread
         handler = new Handler() {
-
             //executed when msg arrives from thread
             @Override
             public void handleMessage(Message msg) {
-                capturedImage.setImageBitmap((Bitmap) msg.obj);
+                Log.d("imageview", String.valueOf(capturedImage.getWidth()));
+                Bitmap result = (Bitmap) msg.obj;
+//                capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE,new Paint(0xFFFFFF));
+//                Log.d("drawable", String.valueOf(capturedImage.getDrawable().getIntrinsicWidth()));
+                capturedImage.setImageBitmap(result);
             }
         };
 
@@ -83,13 +65,15 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.threshBtn:
                 threshold();
                 break;
-
         }
     }
 
+
     public void instantiate() {
-        image = getRotatedImage(CameraActivity.getBitmapImage());
-        //image = BitmapFactory.decodeResource(getResources(),R.drawable.test);
+
+//        image = getRotatedImage(CameraActivity.getBitmapImage());
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
+
         threshBtn = (Button) findViewById(R.id.threshBtn);
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
@@ -106,31 +90,31 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
+        crop();
 
     }
-
-
 
     public void crop() {
         rechargeBtn.setVisibility(View.INVISIBLE);
         threshBtn.setVisibility(View.VISIBLE);
         cropButton.setVisibility(View.INVISIBLE);
         clippingWindow.setVisibility(View.INVISIBLE);
-        croppedImage = clippingWindow.getCroppedImage();
-        capturedImage.setImageBitmap(croppedImage);
+//        croppedImage = clippingWindow.getCroppedImage();
+
+        croppedImage = BitmapFactory.decodeResource(getResources(), R.drawable.skewtest);
+//        capturedImage.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//        capturedImage.setImageBitmap(croppedImage);
+
     }
 
 
-
-    Bitmap getRotatedImage(Bitmap bmp)
-    {
+    Bitmap getRotatedImage(Bitmap bmp) {
         Matrix returnImage = new Matrix();
         returnImage.postRotate(90);
-        return Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),returnImage,true);
+        return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), returnImage, true);
     }
 
-    public void threshold()
-    {
+    public void threshold() {
         threshBtn.setVisibility(View.INVISIBLE);
         rechargeBtn.setVisibility(View.VISIBLE);
         Thread grayScaleThread;
@@ -138,18 +122,52 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         grayScaleThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                GrayScale grayScale = new ITURGrayScale(croppedImage);
-                //ITURGrayScale grayScale= new ITURGrayScale(sourceImageBitmap,MainActivity.this);
-                Bitmap bmResult = grayScale.grayScale();
-                //Log.d("thread", Thread.currentThread().toString());
+//              remove jar which is not for android
+                Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
 
+                long startGamma = System.currentTimeMillis()/1000;
+                GammaCorrection gc = new GammaCorrection(1.75);
+                Bitmap bmResult = gc.applyInPlace(sourceBitmap);
+                long stopGamma= System.currentTimeMillis()/1000;
+                System.out.println("gamma:"+(stopGamma-startGamma));
+
+                long startGrayscale = System.currentTimeMillis()/1000;
+                GrayScale grayScale = new ITURGrayScale(bmResult);
+                bmResult = grayScale.grayScale();
+                long stopGrayscale= System.currentTimeMillis()/1000;
+                System.out.println("grayscale:"+(stopGrayscale-startGrayscale));
+
+                long startThreshold = System.currentTimeMillis()/1000;
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
+                long stopThreshold= System.currentTimeMillis()/1000;
+                System.out.println("threshold:"+(stopThreshold-startThreshold));
 
+                long startSkew = System.currentTimeMillis()/1000;
+                ImageSkewChecker ds = new ImageSkewChecker();
+                double angle = ds.getSkewAngle(croppedImage);
+                long stopSkew= System.currentTimeMillis()/1000;
+                System.out.println("angle:"+angle+" skew time:"+(stopSkew-startSkew));
+
+                long startRotate = System.currentTimeMillis()/1000;
+                RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
+                bmResult = rn.applyInPlace(bmResult);
+                long stopRotate= System.currentTimeMillis()/1000;
+                System.out.println("rotate:"+(stopRotate-startRotate));
+
+                long startMedian = System.currentTimeMillis()/1000;
+                Median m = new Median(3);
+                bmResult = m.applyInPlace(bmResult);
+                long stopMedian= System.currentTimeMillis()/1000;
+                System.out.println("median:"+(stopMedian-startMedian));
+
+//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
+//                bmResult = rotate.applyInPlace(bmResult);
+//
                 Message msgToUIThread = Message.obtain();
                 msgToUIThread.obj = bmResult;
                 handler.sendMessage(msgToUIThread);
+
             }
         });
         grayScaleThread.start();

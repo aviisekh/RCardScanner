@@ -18,8 +18,6 @@ public class ITURGrayScale implements GrayScale {
         width = sourceImage.getWidth();
         height = sourceImage.getHeight();
 
-    Bitmap bmSource;
-
     }
 
 
