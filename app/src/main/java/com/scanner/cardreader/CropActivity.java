@@ -81,7 +81,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public void instantiate() {
         //image = getRotatedImage(CameraActivity.getBitmapImage());
 
-        image = BitmapFactory.decodeResource(getResources(),R.drawable.try2);
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.test5b);
         threshBtn = (Button) findViewById(R.id.threshBtn);
 
 
@@ -151,7 +151,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 bmResult = PrepareImage.addBackgroundPixels(bmResult);
                 int height = bmResult.getHeight();
                 int width = bmResult.getWidth();
-                Log.d("width" , String.valueOf(width));
+                Log.d("width", String.valueOf(width));
 
 //                        get value of pixels from binary image
                 int[] pixels = createPixelArray(width, height, bmResult);
@@ -180,8 +180,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     CcLabeling ccLabeling = new CcLabeling();
                     componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
                     List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
-                    for (double[][] binarySegment: binarySegmentList)
-                        generateOutput(binarySegment);
+                    generateOutput(binarySegmentList);
 
                 }
                 Message msgToUIThread = Message.obtain();
@@ -193,16 +192,26 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    void generateOutput(double[][] binarySegment)
-    {
+    void generateOutput(List<double[][]> binarySegmentList) {
+
 
         WeightReader.setWeights(this.getApplicationContext());// reader = new WeightReader();
         NeuralNetwork net = new NeuralNetwork();
+        List<Integer> recognizedList = new ArrayList<Integer>();
+        for (double[][] binarySegment : binarySegmentList) {
         MeroMatrix input = new MeroMatrix(binarySegment);
-        MeroMatrix output= net.FeedForward(input);
+            MeroMatrix output = net.FeedForward(input);
         //output.showOutputArray();
-        output.showOutput();
+            int i = output.showOutput();
+
+            if (i != -1 )
+                recognizedList.add(i);
+
+
     }
 
+        Log.d("output", recognizedList.toString());
 
+
+    }
 }

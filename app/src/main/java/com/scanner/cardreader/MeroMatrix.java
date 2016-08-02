@@ -2,7 +2,9 @@ package com.scanner.cardreader;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by aviisekh on 7/29/16.
@@ -75,17 +77,18 @@ final public class MeroMatrix {
         Log.d("OutputMatrix", Arrays.deepToString(this.data));
         }
 
-    public void showOutput() {
+    public int showOutput() {
         int largestIndex = 0;
         int second_largestIndex = -1;
         double largest = this.data[largestIndex][0];
         double second_largest = -1;
 
-        for (int i = 0; i < M; i++) {
+        int i;
+        for (i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
 
                 if (this.data[i][j] > largest) {
-                    second_largestIndex=largestIndex;
+                    second_largestIndex = largestIndex;
                     largestIndex = i;
                     second_largest = largest;
                     largest = this.data[largestIndex][j];
@@ -95,23 +98,17 @@ final public class MeroMatrix {
                     second_largest = this.data[i][j];
 
                 }
+
+
             }
         }
-        Log.d("OutputValue", Integer.toString(largestIndex) + " with probability " +Double.toString(largest));
-       // Log.d("OutputValue", Integer.toString(second_largestIndex) + " with probability " +Double.toString(second_largest));
-    }
+        Log.d("Output",largestIndex+" has probability "+Double.toString(largest));
 
-            //double maxValue = 0;
-            //int maxIndex = 0 ;
-/*        for (int i = 0; i < M; i++) {
-            for (int j = 0; j < N; j++) {
-                //this.data[i][j] =1.0/(1+Math.exp(-this.data[i][j]));
-                if (this.data[i][j] > maxValue) {
-                    maxValue = this.data[i][j];
-                    maxIndex = i;
-                }
-            }
-        }*/
+        if (largest > 0.5)
+            return largestIndex;
+        else return -1;
+
+    }
 
 
 
