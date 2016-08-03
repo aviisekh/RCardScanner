@@ -162,7 +162,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 //              remove jar which is not for android
                 Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
-                ImageWriter imageWriter = new ImageWriter();
+                ImageWriter imageWriter = new ImageWriter(CropActivity.this);
 
                 long startGamma = System.currentTimeMillis() / 1000;
                 GammaCorrection gc = new GammaCorrection(1.75);
@@ -249,8 +249,10 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                         index++;
                     }
                     CcLabeling ccLabeling = new CcLabeling();
-                    componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
+                    ComponentImages componentImages= new ComponentImages(CropActivity.this);
+                    componentBitmaps = componentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
 
+//                    writing segment into media
                     for (int i = 0; i < componentBitmaps.size(); i++) {
                         imageWriter.writeImage(componentBitmaps.get(i), true, "segment" + i, "06_segmentation");
                     }

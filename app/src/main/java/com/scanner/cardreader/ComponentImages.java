@@ -1,5 +1,6 @@
 package com.scanner.cardreader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,7 +11,13 @@ import java.util.ArrayList;
  * Created by mandy on 7/12/16.
  */
 public class ComponentImages {
-    private static void componentSort(int[][][] componentArray) {
+    Context context;
+
+    public ComponentImages(Context context){
+        this.context=context;
+    }
+
+    private  void componentSort(int[][][] componentArray) {
         int[][] temp;
 
         boolean swapped;
@@ -72,7 +79,7 @@ public class ComponentImages {
     }
 
 
-    public static ArrayList<Bitmap> CreateImageFromComponents(int[][][] componentArray) {
+    public  ArrayList<Bitmap> CreateImageFromComponents(int[][][] componentArray) {
 
         ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
         componentSort(componentArray);
@@ -94,7 +101,7 @@ public class ComponentImages {
                 componentSegment.setPixel(x, y, Color.BLACK);
             }
             bitmapArrayList.add(componentSegment);
-            ImageWriter imageWriter= new ImageWriter();
+//            ImageWriter imageWriter= new ImageWriter(context);
 
 //            imageWriter.writeImage(componentSegment, true, "aftersegment", "06_segmentation");
         }
