@@ -54,6 +54,8 @@ public class GammaCorrection {
                 pixels[i] = Color.rgb(r,g,b);
             }
         afterGammaCorrection.setPixels(pixels, 0, width, 0, 0, width, height);
+
+
         return afterGammaCorrection;
         }
 

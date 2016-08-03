@@ -27,6 +27,29 @@ final class BinaryArray {
         }
         return binaryArrays;
     }
+    public static ArrayList<int[]> CreateBinaryArrayOneD(ArrayList<Bitmap> comBitmaps) {
+        ArrayList<int[]> binaryArrays = new ArrayList<>();
+        for (Bitmap comBitmap : comBitmaps) {
+            int[] binaryArray = new int[256];
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(comBitmap, 16, 16, true);
+            int pixels[] = createPixelArray(scaledBitmap.getWidth(), scaledBitmap.getHeight(), scaledBitmap);
+//            Log.d("size", String.valueOf(pixels.length));
+            for (int i = 0; i < pixels.length; i++) {
+                if (pixels[i] == -1) {
+                    pixels[i] = 1;
+                } else {
+                    pixels[i] = 0;
+                }
+                binaryArray[i] = pixels[i];
+            }
+            binaryArrays.add(binaryArray);
+        }
+        return binaryArrays;
+    }
+
+
+
+
 
 
     static int[] createPixelArray(int width, int height, Bitmap bitmap) {

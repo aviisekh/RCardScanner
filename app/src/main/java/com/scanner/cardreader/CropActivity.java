@@ -1,21 +1,16 @@
 package com.scanner.cardreader;
 
 
-
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-
-
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.scanner.cardreader.R.id.ocrResult;
 
 
 public class CropActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,8 +34,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public Bitmap image;
     private Bitmap croppedImage;
-    private static Handler imageHandler,ocrResultHandler;
-
+    private static Handler imageHandler, ocrResultHandler;
 
 
     @Override
@@ -71,7 +66,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 ocrResultTV.setText(result);
             }
         };
-
 
 
     }
@@ -109,7 +103,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
         redoButton = (Button) findViewById(R.id.redoBtn);
         cropButton = (Button) findViewById(R.id.cropBtn);
-        ocrResultTV = (TextView) findViewById(R.id.ocrResult);
+        ocrResultTV = (TextView) findViewById(ocrResult);
 
         capturedImage = (ImageView) findViewById(R.id.imageView);
         capturedImage.setImageBitmap(image);
@@ -168,42 +162,54 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 //              remove jar which is not for android
                 Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
+                ImageWriter imageWriter = new ImageWriter();
 
-                long startGamma = System.currentTimeMillis()/1000;
+                long startGamma = System.currentTimeMillis() / 1000;
                 GammaCorrection gc = new GammaCorrection(1.75);
                 Bitmap bmResult = gc.applyInPlace(sourceBitmap);
-                long stopGamma= System.currentTimeMillis()/1000;
-                System.out.println("gamma:"+(stopGamma-startGamma));
+                long stopGamma = System.currentTimeMillis() / 1000;
+                System.out.println("gamma:" + (stopGamma - startGamma));
+                imageWriter.writeImage(bmResult, false, "aftergamma", "01_gamma");
 
-                long startGrayscale = System.currentTimeMillis()/1000;
+
+                long startGrayscale = System.currentTimeMillis() / 1000;
                 GrayScale grayScale = new ITURGrayScale(bmResult);
                 bmResult = grayScale.grayScale();
-                long stopGrayscale= System.currentTimeMillis()/1000;
-                System.out.println("grayscale:"+(stopGrayscale-startGrayscale));
+                long stopGrayscale = System.currentTimeMillis() / 1000;
+                System.out.println("grayscale:" + (stopGrayscale - startGrayscale));
+                imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
 
-                long startThreshold = System.currentTimeMillis()/1000;
+
+                long startThreshold = System.currentTimeMillis() / 1000;
                 Threshold threshold = new BradleyThreshold();
                 bmResult = threshold.threshold(bmResult);
-                long stopThreshold= System.currentTimeMillis()/1000;
-                System.out.println("threshold:"+(stopThreshold-startThreshold));
+                long stopThreshold = System.currentTimeMillis() / 1000;
+                System.out.println("threshold:" + (stopThreshold - startThreshold));
+                imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
 
-                long startSkew = System.currentTimeMillis()/1000;
+
+                long startSkew = System.currentTimeMillis() / 1000;
                 ImageSkewChecker ds = new ImageSkewChecker();
                 double angle = ds.getSkewAngle(croppedImage);
-                long stopSkew= System.currentTimeMillis()/1000;
-                System.out.println("angle:"+angle+" skew time:"+(stopSkew-startSkew));
+                long stopSkew = System.currentTimeMillis() / 1000;
+                System.out.println("angle:" + angle + " skew time:" + (stopSkew - startSkew));
 
-                long startRotate = System.currentTimeMillis()/1000;
+
+                long startRotate = System.currentTimeMillis() / 1000;
                 RotateNearestNeighbor rn = new RotateNearestNeighbor(angle);
                 bmResult = rn.applyInPlace(bmResult);
-                long stopRotate= System.currentTimeMillis()/1000;
-                System.out.println("rotate:"+(stopRotate-startRotate));
+                long stopRotate = System.currentTimeMillis() / 1000;
+                System.out.println("rotate:" + (stopRotate - startRotate));
+                imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
 
-                long startMedian = System.currentTimeMillis()/1000;
+
+                long startMedian = System.currentTimeMillis() / 1000;
                 NonLocalMedianFilter m = new NonLocalMedianFilter(3);
                 bmResult = m.applyInPlace(bmResult);
-                long stopMedian= System.currentTimeMillis()/1000;
-                System.out.println("median:"+(stopMedian-startMedian));
+                long stopMedian = System.currentTimeMillis() / 1000;
+                System.out.println("median:" + (stopMedian - startMedian));
+                imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
+
 
 //                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyInPlace(bmResult);
@@ -244,7 +250,26 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     CcLabeling ccLabeling = new CcLabeling();
                     componentBitmaps = ComponentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
+
+                    for (int i = 0; i < componentBitmaps.size(); i++) {
+                        imageWriter.writeImage(componentBitmaps.get(i), true, "segment" + i, "06_segmentation");
+                    }
+
                     List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
+                    List<int[]> binarySegmentList1D = BinaryArray.CreateBinaryArrayOneD(componentBitmaps);
+
+                    int counter=0;
+                    for(int[]segment:binarySegmentList1D){
+                        for (int i =0;i<256;i++)
+                        {
+                            if (segment[i]==1) segment[i]=-1;
+                            else segment[i] = -16777216;
+                        }
+                        Bitmap bitmap = Bitmap.createBitmap(segment,16,16, Bitmap.Config.RGB_565);
+                        imageWriter.writeImage(bitmap, false, "segment"+counter++, "07_binarysegment");
+
+                    }
+
                     String ocrResult = generateOutput(binarySegmentList);
 
                     Message ocrResultToUIThread = Message.obtain();
@@ -267,20 +292,20 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         NeuralNetwork net = new NeuralNetwork();
         List<Integer> recognizedList = new ArrayList<Integer>();
         for (double[][] binarySegment : binarySegmentList) {
-        NNMatrix input = new NNMatrix(binarySegment);
+            NNMatrix input = new NNMatrix(binarySegment);
             NNMatrix output = net.FeedForward(input);
-        //output.showOutputArray();
+            //output.showOutputArray();
             int i = output.showOutput();
 
-            if (i != -1 )
+            if (i != -1)
                 recognizedList.add(i);
 
 
-    }
+        }
 
         return recognizedList.toString().trim();
 
-       // Log.d("output", recognizedList.toString());
+        // Log.d("output", recognizedList.toString());
 
 
     }

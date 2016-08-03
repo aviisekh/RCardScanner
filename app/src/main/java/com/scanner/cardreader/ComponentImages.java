@@ -3,11 +3,8 @@ package com.scanner.cardreader;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Created by mandy on 7/12/16.
@@ -97,6 +94,9 @@ public class ComponentImages {
                 componentSegment.setPixel(x, y, Color.BLACK);
             }
             bitmapArrayList.add(componentSegment);
+            ImageWriter imageWriter= new ImageWriter();
+
+//            imageWriter.writeImage(componentSegment, true, "aftersegment", "06_segmentation");
         }
 
 
