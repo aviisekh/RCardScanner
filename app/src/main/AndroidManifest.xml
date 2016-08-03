@@ -26,10 +26,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CameraActivity"
+            android:name=".camera.CameraActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".CropActivity"></activity>
+        <activity android:name=".camera.CropActivity"></activity>
 
     </application>
 

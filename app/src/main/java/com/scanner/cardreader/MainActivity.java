@@ -4,11 +4,12 @@ package com.scanner.cardreader;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
+
+import com.scanner.cardreader.camera.CameraActivity;
 
 public class MainActivity extends AppCompatActivity {
     private Uri fileUri;
@@ -34,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                if (tm.getSimState() == TelephonyManager.SIM_STATE_READY) {
-                    if(tm.getNetworkOperatorName().toUpperCase().trim() == "NCELL"){
+                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
+                    if(telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL"){
 
                         SIM = "NCELL";
 

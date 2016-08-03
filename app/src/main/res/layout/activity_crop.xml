@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.scanner.cardreader.CropActivity"
+    tools:context="com.scanner.cardreader.camera.CropActivity"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -68,7 +68,7 @@
             android:id="@+id/imageView"
             android:contentDescription="@string/image_from_camera"/>
 
-        <com.scanner.cardreader.ClippingWindow
+        <com.scanner.cardreader.camera.ClippingWindow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/clipping"
