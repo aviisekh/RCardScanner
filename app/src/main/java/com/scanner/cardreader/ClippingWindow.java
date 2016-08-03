@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -36,8 +37,8 @@ public class ClippingWindow extends ImageView {
     static int parentHeight;
     final int TOLERANCE = 30;       //Tolerence of Touch
 
-    public int pointX;
-    public int pointY;
+    private int pointX;
+    private int pointY;
     public int prevX;
     public int prevY;
     public int moveX;               //Movement of touch along X-axis
@@ -145,34 +146,36 @@ public class ClippingWindow extends ImageView {
                 moveX = (pointX - prevX); // find the direction of movement with units of movement
                 moveY = (pointY - prevY);
 
-                if (rect.contains(prevX, prevY) ) {
-                    topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
+                if (rect.contains(prevX, prevY) &!croppable ) {
+                   draggable =  topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
                 }
+                else draggable = false;
+
 
                 // Log.d("move", Integer.toString(moveX));
 
                // if (left<=imageLeft | right >= imageRight | top <=imageTop | bottom >= imageBottom){
-                    if (left <= imageLeft+10 & moveX<0) {
-                        leftDraggable = false;
-                        rightDraggable = false;
+                    if (left <= imageLeft & moveX<0) {
+                        //leftDraggable = false;
+                        //rightDraggable = false;
                         leftCroppable = false;
                         //draggable = true;
                     }
 
-                    if (right >=imageRight-10 & moveX>0){
-                        rightDraggable = false;
-                        leftDraggable = false;
+                    if (right >=imageRight & moveX>0){
+                        //rightDraggable = false;
+                        //leftDraggable = false;
                         rightCroppable = false;
                         //draggable = true;
                     }
-                    if (top <= imageTop+10 & moveY<0){
-                        topDraggable = false;
-                        bottomDraggable = false;
+                    if (top <= imageTop & moveY<0){
+                      //  topDraggable = false;
+                       // bottomDraggable = false;
                         topCroppable = false;
                     }
-                    if (bottom >= imageBottom-10 & moveY>0){
-                        bottomDraggable = false;
-                        topDraggable = false;
+                    if (bottom >= imageBottom & moveY>0){
+                        //bottomDraggable = false;
+                        //topDraggable = false;
                         bottomCroppable = false;
                     }
 
@@ -182,25 +185,30 @@ public class ClippingWindow extends ImageView {
                 if (top + TOLERANCE + 30>= bottom & moveY > 0) topCroppable = false;
                 if (bottom- TOLERANCE -30<= top & moveY <0) bottomCroppable = false;
                 //if (right TOLERANCE >= right & moveX > 0) rightCroppable = false;
-
+                int height = bottom-top;
+                int width = right-left;
                 if (draggable) {
-                    if (leftDraggable) left = left + moveX;
-                    if (rightDraggable) right = right + moveX;
-                    if (topDraggable) top = top + moveY;
-                    if (bottomDraggable) bottom = bottom + moveY;
+                    if (leftDraggable) {left = Math.max(left + moveX,imageLeft); if (left==imageLeft) {right = left+ width;rightDraggable = false;}}
+                    if (rightDraggable) {right = Math.min(right + moveX,imageRight);if (right==imageRight) {left = right- width;leftDraggable = false;}}
+                    if (topDraggable) {top = Math.max(top + moveY,imageTop); if (top==imageTop) {bottom = top+ height;bottomDraggable= false;}}
+                    if (bottomDraggable){ bottom = Math.min(bottom + moveY,imageBottom);if (bottom==imageBottom) {top = bottom-height;topDraggable = false; }}
 
-                } else if (croppable){
+                    Log.d("topCroppable",Boolean.toString(topDraggable));
+                    Log.d("movey",Integer.toString(moveY));
+                    Log.d("croppable",Boolean.toString(croppable));
+
+                } else if (croppable ){
                     if (topCroppable) {
-                        top = top + moveY;
+                        top =  Math.max(top + moveY,imageTop);
                     }
                     if (bottomCroppable) {
-                        bottom = bottom + moveY;
+                        bottom = Math.min(bottom + moveY,imageBottom);
                     }
                     if (rightCroppable) {
-                        right = right + moveX;
+                        right = Math.min(right + moveX,imageRight);
                     }
                     if (leftCroppable) {
-                        left = left + moveX;
+                        left = Math.max(left + moveX,imageLeft);
                     }
                 }
 
@@ -325,10 +333,10 @@ public class ClippingWindow extends ImageView {
         final float transX = matrixValues[Matrix.MTRANS_X];
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
-        float mappedLeft = (left - transX) / scaleX;  //Since Image is translated and scaled in Imageview
-        float mappedRight = (right - transX) / scaleX;
-        float mappedTop = (top - transY) / scaleY;
-        float mappedBottom = (bottom - transY) / scaleY;
+        float mappedLeft = Math.max((left - transX) / scaleX,0);  //Since Image is translated and scaled in Imageview
+        float mappedRight = Math.min((right - transX) / scaleX,drawable.getIntrinsicWidth());
+        float mappedTop = Math.max((top - transY) / scaleY,0);
+        float mappedBottom = Math.min((bottom - transY) / scaleY,drawable.getIntrinsicHeight());
 
         // Get the original bitmap object.
         final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -336,6 +344,9 @@ public class ClippingWindow extends ImageView {
 
 
     }
+
+
+
 
 
 }

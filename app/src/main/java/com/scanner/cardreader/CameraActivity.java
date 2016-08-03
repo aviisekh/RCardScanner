@@ -30,7 +30,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     SurfaceHolder surfaceHolder;
     TextView simInfo;
 
-
+    CameraOverlay cameraOverlay;
     Camera.PictureCallback jpegCallBack;
     public static Bitmap bitmap;
 
@@ -46,6 +46,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
 
+        cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
         surfaceHolder.addCallback(this);
         simInfo = (TextView) findViewById(R.id.simInfo);
         simInfo.setText(MainActivity.SIM);
