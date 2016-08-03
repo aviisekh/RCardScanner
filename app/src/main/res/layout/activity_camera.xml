@@ -7,22 +7,35 @@
     android:keepScreenOn="true">
 
 
+
+
     <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/surfaceView"
         android:layout_alignParentTop="true"
-        android:layout_below="@+id/simInfo" />
+         />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/simInfo"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/surfaceView"/>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton"
-        android:layout_marginTop="20px"
+        android:layout_margin="40dp"
         android:src="@drawable/ic_linked_camera_black_24dp"
         android:contentDescription="@string/cameraclick"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        />
 
 
 <!--
@@ -38,19 +51,10 @@
 -->
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/simInfo"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/surfaceView" />
-
     <com.scanner.cardreader.CameraOverlay
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/overlay"
-        android:visibility="visible"  />
+          />
 
 </RelativeLayout>

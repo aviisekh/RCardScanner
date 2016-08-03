@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
  * Created by anush on 7/18/2016.
  */
 
-public class Deskew {
+public class DeskewFromPlugin {
     public double doIt(Bitmap image) {
         final double skewRadians;
         Bitmap black = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.RGB_565);

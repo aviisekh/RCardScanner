@@ -73,9 +73,9 @@ public class CameraOverlay extends View {
     public void init()
     {
         left = parentWidth / 2 - 400;
-        top = parentHeight / 2 - 100;
+        top = parentHeight / 4 - 100;
         right = parentWidth / 2 + 400;
-        bottom = parentHeight / 2 + 100;
+        bottom = parentHeight / 4 + 100;
     }
 
     public void drawRectangle(Canvas canvas) {

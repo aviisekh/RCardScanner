@@ -200,12 +200,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("rotate:"+(stopRotate-startRotate));
 
                 long startMedian = System.currentTimeMillis()/1000;
-                Median m = new Median(3);
+                NonLocalMedianFilter m = new NonLocalMedianFilter(3);
                 bmResult = m.applyInPlace(bmResult);
                 long stopMedian= System.currentTimeMillis()/1000;
                 System.out.println("median:"+(stopMedian-startMedian));
 
-//                Rotate rotate = new Rotate(croppedImage.getWidth(), croppedImage.getHeight(), angle);
+//                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyInPlace(bmResult);
 
                 Message imageToUIThread = Message.obtain();
@@ -267,8 +267,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         NeuralNetwork net = new NeuralNetwork();
         List<Integer> recognizedList = new ArrayList<Integer>();
         for (double[][] binarySegment : binarySegmentList) {
-        MeroMatrix input = new MeroMatrix(binarySegment);
-            MeroMatrix output = net.FeedForward(input);
+        NNMatrix input = new NNMatrix(binarySegment);
+            NNMatrix output = net.FeedForward(input);
         //output.showOutputArray();
             int i = output.showOutput();
 

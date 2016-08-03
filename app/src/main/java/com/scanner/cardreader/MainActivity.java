@@ -36,7 +36,14 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 if (tm.getSimState() == TelephonyManager.SIM_STATE_READY) {
-                    SIM = tm.getNetworkOperatorName();
+                    if(tm.getNetworkOperatorName().toUpperCase().trim() == "NCELL"){
+
+                        SIM = "NCELL";
+
+                    }
+                    else{
+                        SIM = "NTC";
+                    }
                 }
             }
         });
