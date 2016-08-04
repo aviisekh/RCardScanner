@@ -29,7 +29,14 @@
             android:name=".camera.CameraActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".camera.CropActivity"></activity>
+        <activity android:name=".camera.CameraAccess"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".camera.CropActivity"
+            android:screenOrientation="portrait"/>
+
+
+
 
     </application>
 
