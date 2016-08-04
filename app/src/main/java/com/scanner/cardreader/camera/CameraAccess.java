@@ -16,7 +16,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.scanner.cardreader.MainActivity;
 import com.scanner.cardreader.R;
@@ -83,11 +82,11 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
             @Override
             public void onClick(View view) {
                 if(camera == null){
-                    Toast.makeText(CameraAccess.this, "no camera", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(CameraAccess.this, "No camera", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     camera.takePicture(null,null,null,jpegPictureCallBack);
-                    Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
                 }
             }
         });
