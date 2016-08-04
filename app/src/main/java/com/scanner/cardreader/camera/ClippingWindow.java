@@ -61,16 +61,17 @@ public class ClippingWindow extends ImageView {
         parentHeight = MeasureSpec.getSize(heightMeasureSpec);
         this.setMeasuredDimension(parentWidth, parentHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        init();
+
         getImageLocation();
+        init();
     }
 
 
     public void init() {
-        left = parentWidth / 2 - 200;
-        top = parentHeight / 2 - 200;
-        right = parentWidth / 2 + 200;
-        bottom = parentHeight / 2 + 200;
+        left = imageLeft;
+        right = imageRight;
+        top = imageTop;
+        bottom = imageBottom;
         rect.set(left, top, right, bottom);
 
     }

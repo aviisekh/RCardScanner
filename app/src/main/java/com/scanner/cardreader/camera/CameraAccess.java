@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
@@ -40,7 +41,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera2);
+        setContentView(R.layout.activity_camera);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         cameraId = findRearFacingCamera();
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
@@ -98,7 +99,12 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 takePicture.setEnabled(false);
-                camera.autoFocus(autoFocusCallback);
+                try {
+                    camera.autoFocus(autoFocusCallback);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
                 return true;
             }
 
@@ -125,7 +131,23 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
 
     public static Bitmap getBitmapImage()
     {
-        return bitmap;
+        bitmap=getRotatedImage(bitmap);
+        int left = (bitmap.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
+        int right  = (bitmap.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
+        int top  = (bitmap.getHeight()*CameraOverlay.top)/CameraOverlay.parentHeight;
+        int bottom  = (bitmap.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
+
+        Bitmap bmp = Bitmap.createBitmap(bitmap, left,top,right-left,bottom-top);
+
+        return bmp;
+
+    }
+
+    static Bitmap getRotatedImage(Bitmap bmp) {
+        Matrix returnImage = new Matrix();
+        returnImage.postRotate(90);
+        return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), returnImage, true);
+
     }
 
     public void setBitmapImage(Bitmap bitmap) {

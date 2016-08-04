@@ -114,7 +114,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void instantiate() {
 
-        image = getRotatedImage(CameraAccess.getBitmapImage());
+        image = CameraAccess.getBitmapImage();
 
         //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
 
@@ -157,12 +157,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    Bitmap getRotatedImage(Bitmap bmp) {
-        Matrix returnImage = new Matrix();
-        returnImage.postRotate(90);
-        return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), returnImage, true);
-
-    }
 
     int[] createPixelArray(int width, int height, Bitmap thresholdImage) {
 

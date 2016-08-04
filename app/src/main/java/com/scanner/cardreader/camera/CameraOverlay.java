@@ -23,7 +23,7 @@ public class CameraOverlay extends View {
     private Rect rectLeft = new Rect();
     private Rect rectRight = new Rect();
 
-    private int parentWidth,parentHeight,top,left,bottom,right;
+    static public int parentWidth,parentHeight,top,left,bottom,right;
     public CameraOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
 //        setFocusable(false);
@@ -72,10 +72,10 @@ public class CameraOverlay extends View {
 
     public void init()
     {
-        left = parentWidth / 2 - 400;
-        top = parentHeight / 4 - 100;
-        right = parentWidth / 2 + 400;
-        bottom = parentHeight / 4 + 100;
+        left = parentWidth / 7;
+        top = parentHeight / 6;
+        right = 6*parentWidth / 7;
+        bottom = parentHeight / 4;
     }
 
     public void drawRectangle(Canvas canvas) {

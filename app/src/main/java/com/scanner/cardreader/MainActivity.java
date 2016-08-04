@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.scanner.cardreader.camera.CameraAccess;
-import com.scanner.cardreader.camera.CameraActivity;
 
 public class MainActivity extends AppCompatActivity {
     private Uri fileUri;
@@ -24,14 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button proceedBtn = (Button) findViewById(R.id.proceedBtn);
-        assert proceedBtn != null;
-        proceedBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), CameraActivity.class);
-                startActivity(i);
-            }
-        });
+
 
         Thread t = new Thread(new Runnable() {
             @Override
