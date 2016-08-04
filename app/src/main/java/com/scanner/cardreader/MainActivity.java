@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 
+import com.scanner.cardreader.camera.CameraAccess;
 import com.scanner.cardreader.camera.CameraActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(getBaseContext(), CameraActivity.class));
+                startActivity(new Intent(getBaseContext(), CameraAccess.class));
                 //startActivity(new Intent(getBaseContext(), CropActivity.class));
             }
         });

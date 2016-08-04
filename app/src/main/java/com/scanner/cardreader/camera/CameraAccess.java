@@ -10,6 +10,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -94,13 +95,14 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
 
         RelativeLayout previewBackground = (RelativeLayout) findViewById(R.id.cameraBackground);
 
-        previewBackground.setOnClickListener(new View.OnClickListener() {
+        previewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View v, MotionEvent event) {
                 takePicture.setEnabled(false);
                 camera.autoFocus(autoFocusCallback);
-
+                return true;
             }
+
         });
 
 

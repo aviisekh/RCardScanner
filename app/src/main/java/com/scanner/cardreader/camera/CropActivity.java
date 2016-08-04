@@ -114,7 +114,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void instantiate() {
 
-        image = getRotatedImage(CameraActivity.getBitmapImage());
+        image = getRotatedImage(CameraAccess.getBitmapImage());
 
         //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
 
@@ -186,7 +186,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 ImageWriter imageWriter = new ImageWriter(CropActivity.this);
 
                 long startGamma = System.currentTimeMillis() / 1000;
-                GammaCorrection gc = new GammaCorrection(1.75);
+                GammaCorrection gc = new GammaCorrection(1.0);
                 Bitmap bmResult = gc.correctGamma(sourceBitmap);
                 long stopGamma = System.currentTimeMillis() / 1000;
                 System.out.println("gamma:" + (stopGamma - startGamma));
