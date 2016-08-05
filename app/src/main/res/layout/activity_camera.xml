@@ -9,6 +9,37 @@
 
 
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottomBar">
+
+        <com.scanner.cardreader.camera.BottomBorderOverlay
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/bottomBorder"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/takepicture"
+            android:src="@drawable/ic_linked_camera_black_24dp"
+            android:contentDescription="@string/cameraclick"
+            android:layout_centerInParent="true"/>
+
+<!--        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:src="@drawable/simbutton"
+            android:background="@android:color/transparent"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@+id/takepicture"
+            android:layout_marginLeft="50dp"/>-->
+
+    </RelativeLayout>
+
     <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,8 +47,17 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/bottomBar"
+        />
 
+
+    <com.scanner.cardreader.camera.CameraOverlay
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/overlay"
+        android:layout_above="@id/bottomBar"
+        />
 
 
     <TextView
@@ -31,21 +71,18 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/takepicture"
-        android:src="@drawable/ic_linked_camera_black_24dp"
-        android:contentDescription="@string/cameraclick"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="55dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
 
-    <com.scanner.cardreader.camera.CameraOverlay
+<!--    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/overlay"
+        android:layout_height="70dp"></RelativeLayout>
+    -->
+
+    <com.scanner.cardreader.camera.BottomBorderOverlay
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/animate"
+        android:visibility="invisible"
         />
+
 
 </RelativeLayout>

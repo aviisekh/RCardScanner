@@ -1,6 +1,8 @@
 package com.scanner.cardreader.camera;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -15,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,8 +31,9 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
     SurfaceHolder surfaceHolder;
     SurfaceView surfaceView;
     boolean isPreviewing = false;
-
+    static int count = 1;
     CameraOverlay cameraOverlay;
+    BottomBorderOverlay bottomBorderOverlay,animateView;
 
     android.support.design.widget.FloatingActionButton takePicture;
     TextView simInfo;
@@ -51,8 +55,14 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
 
         cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
 
+        bottomBorderOverlay = (BottomBorderOverlay) findViewById(R.id.bottomBorder);
+        animateView = (BottomBorderOverlay) findViewById(R.id.animate);
+
+
         simInfo = (TextView) findViewById(R.id.simInfo);
         simInfo.setText(MainActivity.SIM);
+
+
 
 
         final PictureCallback jpegPictureCallBack = new PictureCallback() {
@@ -93,20 +103,47 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
         });
 
 
-        RelativeLayout previewBackground = (RelativeLayout) findViewById(R.id.cameraBackground);
+        CameraOverlay previewBackground =  (CameraOverlay) findViewById(R.id.overlay);
+
+
 
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 takePicture.setEnabled(false);
-                try {
-                    camera.autoFocus(autoFocusCallback);
+                if (event.getAction() == event.ACTION_DOWN) {
+                    try {
+                        camera.autoFocus(autoFocusCallback);
+
+                        if (count % 2 == 0) {
+                            TranslateAnimation animate = new TranslateAnimation(0,0 - animateView.getWidth(), 0, 0);
+                            animate.setDuration(500);
+                            animate.setFillAfter(true);
+                            animateView.startAnimation(animate);
+                            animateView.setVisibility(View.GONE);
+                            count++;
+                        }
+                        else
+                        {
+                            TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
+
+                            animate.setDuration(500);
+                            //animate.setFillAfter(true);
+                            animateView.startAnimation(animate);
+                            animateView.setVisibility(View.VISIBLE);
+                            count++;
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return true;
                 }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-                return true;
+                return false;
+
             }
+
 
         });
 
@@ -138,7 +175,9 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
         int bottom  = (bitmap.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
 
         Bitmap bmp = Bitmap.createBitmap(bitmap, left,top,right-left,bottom-top);
-
+/*        Log.d("bitmapWidth",Integer.toString(bitmap.getWidth()));
+        Log.d("bitmapHeight",Integer.toString(bitmap.getHeight()));
+        Log.d("left,right",Integer.toString(left)+" "+Integer.toString(right));*/
         return bmp;
 
     }
