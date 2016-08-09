@@ -57,6 +57,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     private Bitmap croppedImage;
     private static Handler imageHandler, ocrResultHandler;
 
+    public Bitmap bmResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +182,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
                 long startGamma = System.currentTimeMillis() / 1000;
                 GammaCorrection gc = new GammaCorrection(1.0);
-                Bitmap bmResult = gc.correctGamma(sourceBitmap);
+                bmResult = gc.correctGamma(sourceBitmap);
                 long stopGamma = System.currentTimeMillis() / 1000;
                 System.out.println("gamma:" + (stopGamma - startGamma));
                 imageWriter.writeImage(bmResult, false, "aftergamma", "01_gamma");
@@ -218,6 +219,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
 
 
+/*
                 long startMedian = System.currentTimeMillis() / 1000;
                 MedianFilter medianFilter = new NonLocalMedianFilter(3);
                 bmResult = medianFilter.applyMedianFilter(bmResult);
@@ -225,6 +227,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("median:" + (stopMedian - startMedian));
                 imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
 
+*/
 
 //                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyMedianFilter(bmResult);

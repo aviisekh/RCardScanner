@@ -18,95 +18,71 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.scanner.cardreader.MainActivity;
 import com.scanner.cardreader.R;
+import com.scanner.cardreader.Splash;
+
+import java.security.spec.ECField;
 
 
-public class CameraAccess extends Activity implements SurfaceHolder.Callback {
+public class CameraAccess extends Activity implements SurfaceHolder.Callback,View.OnClickListener{
 
     private Camera camera;
     SurfaceHolder surfaceHolder;
     SurfaceView surfaceView;
     boolean isPreviewing = false;
     static int count = 1;
-    CameraOverlay cameraOverlay;
-    BottomBorderOverlay bottomBorderOverlay,animateView;
-
+    RelativeLayout animateView;
+    ImageButton simSelector;
     android.support.design.widget.FloatingActionButton takePicture;
     TextView simInfo;
-
     public static Bitmap bitmap;
-
     int cameraId;
+
+    final PictureCallback jpegPictureCallBack = new PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] bytes, Camera camera) {
+            try {
+                if (bytes != null)
+                {
+                    Intent i = new Intent(getApplicationContext(), CropActivity.class);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 4;
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                    setBitmapImage(bitmap);
+                    startActivity(i);
+                    camera.stopPreview();
+                    camera.release();
+                    camera.setPreviewCallback(null);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        instantiate();
+
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         cameraId = findRearFacingCamera();
-        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
-
-        bottomBorderOverlay = (BottomBorderOverlay) findViewById(R.id.bottomBorder);
-        animateView = (BottomBorderOverlay) findViewById(R.id.animate);
-
-
-        simInfo = (TextView) findViewById(R.id.simInfo);
-        simInfo.setText(MainActivity.SIM);
-
-
-
-
-        final PictureCallback jpegPictureCallBack = new PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                try {
-                    if (bytes != null)
-                    {
-                        Intent i = new Intent(getApplicationContext(), CropActivity.class);
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 4;
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        setBitmapImage(bitmap);
-                        startActivity(i);
-                        camera.stopPreview();
-                        camera.release();
-                        camera.setPreviewCallback(null);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-
-            }
-        };
-
-        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
-        takePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(camera == null){
-//                    Toast.makeText(CameraAccess.this, "No camera", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    camera.takePicture(null,null,null,jpegPictureCallBack);
-//                    Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+        //cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
 
         CameraOverlay previewBackground =  (CameraOverlay) findViewById(R.id.overlay);
-
-
-
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -115,24 +91,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
                     try {
                         camera.autoFocus(autoFocusCallback);
 
-                        if (count % 2 == 0) {
-                            TranslateAnimation animate = new TranslateAnimation(0,0 - animateView.getWidth(), 0, 0);
-                            animate.setDuration(500);
-                            animate.setFillAfter(true);
-                            animateView.startAnimation(animate);
-                            animateView.setVisibility(View.GONE);
-                            count++;
-                        }
-                        else
-                        {
-                            TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
-
-                            animate.setDuration(500);
-                            //animate.setFillAfter(true);
-                            animateView.startAnimation(animate);
-                            animateView.setVisibility(View.VISIBLE);
-                            count++;
-                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -148,6 +106,68 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
         });
 
 
+    }
+
+    public void instantiate()
+    {
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        //animateView = (RelativeLayout) findViewById(R.id.animateBar);
+        //simSelector = (ImageButton) findViewById(R.id.simSelect);
+        simInfo = (TextView) findViewById(R.id.simInfo);
+        simInfo.setText(Splash.SIM);
+        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
+
+        //simSelector.setOnClickListener(this);
+        takePicture.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            //case R.id.simSelect:
+              //  displaySimMenu();
+                //break;
+
+            case R.id.takepicture:
+                capturePicture();
+                break;
+        }
+
+
+    }
+
+    void capturePicture()
+    {
+        try{
+            camera.takePicture(null,null,null,jpegPictureCallBack);
+            //Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void displaySimMenu()
+    {
+        if (count % 2 == 0) {
+            TranslateAnimation animate = new TranslateAnimation(0,0 - animateView.getWidth(), 0, 0);
+            animate.setDuration(500);
+            animate.setFillAfter(true);
+            animateView.startAnimation(animate);
+            animateView.setVisibility(View.GONE);
+            count++;
+        }
+        else
+        {
+            TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
+
+            animate.setDuration(500);
+            //animate.setFillAfter(true);
+            animateView.startAnimation(animate);
+            animateView.setVisibility(View.VISIBLE);
+            count++;
+        }
     }
 
     Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {

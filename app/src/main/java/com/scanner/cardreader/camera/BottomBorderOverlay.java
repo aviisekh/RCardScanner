@@ -47,7 +47,7 @@ public class BottomBorderOverlay extends View {
         // Setup paint with color and stroke styles
         drawRect = new Paint();
 
-        drawRect.setColor(Color.argb(200, 0, 0, 0));
+        drawRect.setColor(Color.argb(50, 219, 188, 188));
         drawRect.setAntiAlias(true);
         drawRect.setStrokeWidth(5);
         drawRect.setStyle(Paint.Style.FILL);

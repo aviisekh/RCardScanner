@@ -5,12 +5,13 @@
 
 
     <ImageView android:id="@+id/splashscreen" android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:src="@drawable/logo"
         android:layout_gravity="center"/>
 
     <TextView android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World, splash"/>
+        android:id="@+id/splashSimInfo"
+        android:gravity="center"/>
 
 </LinearLayout>
