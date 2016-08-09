@@ -292,7 +292,7 @@ public class ClippingWindow extends ImageView {
 
     public void getImageLocation()
     {
-        final Drawable drawable = CropActivity.capturedImage.getDrawable();
+         Drawable drawable = CropActivity.capturedImage.getDrawable();
 
         // Get image matrix values and place them in an array.
         final float[] matrixValues = new float[9];
@@ -319,7 +319,7 @@ public class ClippingWindow extends ImageView {
     }
 
     public Bitmap getCroppedImage() {
-        final Drawable drawable = CropActivity.capturedImage.getDrawable();
+        Drawable drawable = CropActivity.capturedImage.getDrawable();
         if (drawable == null || !(drawable instanceof BitmapDrawable)) {
             return null;
         }

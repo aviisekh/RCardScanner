@@ -3,13 +3,23 @@ import numpy as np
 import dataExtractor
 import codecs,json
 
+import os
+
 class Network(object):
 
     def __init__(self, sizes):
         self.num_layers = len(sizes)
         self.sizes = sizes
-        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+        if not os.path.exists("weights.json"):
+            self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+            self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+
+        else:
+            print "Previous weights retraining"
+            json_data=open("weights.json").read() #Loads the required weights from json file 
+            data = json.loads(json_data)
+            self.weights=[np.reshape(data["layer_1_weight"],(len(data["layer_1_weight"]),len(data["layer_1_weight"][0]))),np.reshape(data["layer_2_weight"],(len(data["layer_2_weight"]),len(data["layer_2_weight"][0])))]
+            self.biases=[np.reshape(data["layer_1_bias"],(len(data["layer_1_bias"]),len(data["layer_1_bias"][0]))),np.reshape(data["layer_2_bias"],(len(data["layer_2_bias"]),len(data["layer_2_bias"][0])))]
 
 
     def feedforward(self, a):

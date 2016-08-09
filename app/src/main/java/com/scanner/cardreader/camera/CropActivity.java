@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +51,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     public static ImageView capturedImage;
     public ClippingWindow clippingWindow;
 
-    public Button threshBtn, rechargeBtn, redoButton, cropButton;
+    public Button threshBtn;
+    public ImageButton redoButton,cropButton,rechargeBtn;
     public TextView ocrResultTV;
 
     public Bitmap image;
@@ -122,9 +124,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         threshBtn = (Button) findViewById(R.id.threshBtn);
 
 
-        rechargeBtn = (Button) findViewById(R.id.rechargeBtn);
-        redoButton = (Button) findViewById(R.id.redoBtn);
-        cropButton = (Button) findViewById(R.id.cropBtn);
+        rechargeBtn = (ImageButton) findViewById(R.id.rechargeBtn);
+        redoButton = (ImageButton) findViewById(R.id.redoBtn);
+        cropButton = (ImageButton) findViewById(R.id.cropBtn);
         ocrResultTV = (TextView) findViewById(ocrResult);
 
         capturedImage = (ImageView) findViewById(R.id.imageView);
@@ -196,14 +198,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
 
 
-                long startThreshold = System.currentTimeMillis() / 1000;
-                Threshold threshold = new BradleyThreshold();
-                bmResult = threshold.threshold(bmResult);
-                long stopThreshold = System.currentTimeMillis() / 1000;
-                System.out.println("threshold:" + (stopThreshold - startThreshold));
-                imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
-
-
                 long startSkew = System.currentTimeMillis() / 1000;
                 SkewChecker skewChecker = new HoughLineSkewChecker();
                 double angle = skewChecker.getSkewAngle(croppedImage);
@@ -219,7 +213,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
 
 
-/*
                 long startMedian = System.currentTimeMillis() / 1000;
                 MedianFilter medianFilter = new NonLocalMedianFilter(3);
                 bmResult = medianFilter.applyMedianFilter(bmResult);
@@ -227,10 +220,16 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("median:" + (stopMedian - startMedian));
                 imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
 
-*/
 
 //                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyMedianFilter(bmResult);
+
+                long startThreshold = System.currentTimeMillis() / 1000;
+                Threshold threshold = new BradleyThreshold();
+                bmResult = threshold.threshold(bmResult);
+                long stopThreshold = System.currentTimeMillis() / 1000;
+                System.out.println("threshold:" + (stopThreshold - startThreshold));
+                imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
 
                 Message imageToUIThread = Message.obtain();
                 imageToUIThread.obj = bmResult;
@@ -260,7 +259,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     int index = 0;
                     for (int pixel : pixels) {
 
-                        if (pixel != -1) {
+                        if (pixel == -16777216) {
                             booleanImage[index] = true;
                         }
 

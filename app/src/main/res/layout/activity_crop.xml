@@ -6,56 +6,72 @@
     tools:context="com.scanner.cardreader.camera.CropActivity"
     android:orientation="vertical">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/relativeLayout"
-        >
+        android:background="#DBBCBC">
+
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:background="@android:color/transparent"
+            android:text="@string/redo"
+            android:id="@+id/redoBtn"
+            android:tint="#FFFF"
+            android:visibility="visible"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:focusable="true"
+            android:clickable="true"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="#FFFF"
+            android:background="@android:color/transparent"
+            android:id="@+id/cropBtn"
+            android:visibility="visible"
+            android:layout_marginRight="@dimen/fab_margin"
+            />
 
         <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_alignParentStart="true"
-                android:textSize="22sp"
-                android:text="@string/redo"
-                android:id="@+id/redoBtn"
-                android:visibility="visible"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:text="@string/threshold"
+            android:id="@+id/threshBtn"
+            android:textSize="22sp"
+            android:visibility="invisible"
+            android:layout_marginRight="@dimen/fab_margin"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="#FFFF"
+            android:background="@android:color/transparent"
+            android:id= "@+id/rechargeBtn"
+            android:visibility="invisible"
+            android:layout_marginRight="@dimen/fab_margin"
 
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:textSize="22sp"
-                android:text="@string/recharge"
-                android:id="@+id/rechargeBtn"
-                android:visibility="invisible"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:textSize="22sp"
-                android:text="@string/crop"
-                android:id="@+id/cropBtn"
-                android:visibility="visible"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:text="@string/threshold"
-                android:id="@+id/threshBtn"
-                android:textSize="22sp"
-                android:visibility="invisible"
-                />
-        </RelativeLayout>
+            />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
