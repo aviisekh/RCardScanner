@@ -21,22 +21,39 @@ public class ImageWriter {
         this.context = context;
     }
 
-    public boolean writeImage(Bitmap printImage, boolean scale, String imageName, String folderName) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        if (scale) {
-            Bitmap scaled = Bitmap.createScaledBitmap(printImage, 16, 16, true);
-            scaled.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        } else {
-            printImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        }
+    private String getFolderPath(String folderName){
         File folder = new File(Environment.getExternalStorageDirectory() + File.separator + folderName);
         if (!folder.exists()) {
             folder.mkdir();
         }
         String folderPath = Environment.getExternalStorageDirectory() + File.separator + folderName;
+        return folderPath;
+    }
 
-        File imageFile = new File(folderPath + File.separator + imageName + "_" + System.currentTimeMillis() / 1000 + ".jpg");
+
+    private ByteArrayOutputStream getScaledImage(Bitmap printImage,ByteArrayOutputStream byteArrayOutputStream){
+        Bitmap scaled = Bitmap.createScaledBitmap(printImage, 16, 16, true);
+        scaled.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        return byteArrayOutputStream;
+    }
+
+
+    public void writeImage(Bitmap printImage, boolean scale, String imageName, String folderName) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        if (scale) {
+          byteArrayOutputStream= getScaledImage(printImage,byteArrayOutputStream);
+        } else {
+            printImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        }
+
+        File imageFile = new File(getFolderPath(folderName) + File.separator + imageName + "_" + System.currentTimeMillis() / 1000 + ".jpg");
+
+        writeStream(imageFile,byteArrayOutputStream,imageName);
+
+    }
+
+    private boolean writeStream(File imageFile, ByteArrayOutputStream byteArrayOutputStream, String imageName){
         try {
             if (imageFile.createNewFile()) {
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
@@ -58,6 +75,5 @@ public class ImageWriter {
         }
         return false;
     }
-
 
 }

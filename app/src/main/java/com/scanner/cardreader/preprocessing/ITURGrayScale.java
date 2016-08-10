@@ -14,6 +14,10 @@ public class ITURGrayScale implements GrayScale {
     private final Bitmap sourceImageBitmap;
     private final int width;
     private final int height;
+    //ITU-R recommendation value
+    final double GS_RED = 0.299;
+    final double GS_GREEN = 0.587;
+    final double GS_BLUE = 0.114;
 
     public ITURGrayScale(Bitmap sourceImage) {
         sourceImageBitmap = sourceImage;
@@ -22,29 +26,17 @@ public class ITURGrayScale implements GrayScale {
 
     }
 
-
     @Override
     public Bitmap grayScale() {
-        //ITU-R recommendation value
-        final double GS_RED = 0.299;
-        final double GS_GREEN = 0.587;
-        final double GS_BLUE = 0.114;
-
         Bitmap afterGrayScaleImage = Bitmap.createBitmap(sourceImageBitmap.getWidth(), sourceImageBitmap.getHeight(), sourceImageBitmap.getConfig());
-
         int A, R, G, B;
         int pixel;
-
-        //image size
-
-        //Log.d("pixel value", Integer.toString(sourceImageBitmap.getPixel(50, 50)));
 
         //scan pixel
         for (int row = 0; row < width; ++row) {
             for (int column = 0; column < height; ++column) {
                 // get one pixel color
                 pixel = sourceImageBitmap.getPixel(row, column);
-
                 // retrieve color of all channels
                 A = Color.alpha(pixel);
                 R = Color.red(pixel);

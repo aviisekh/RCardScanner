@@ -4,8 +4,10 @@ package com.scanner.cardreader;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,6 +15,7 @@ import com.scanner.cardreader.camera.CameraAccess;
 
 public class MainActivity extends AppCompatActivity {
     private Uri fileUri;
+
 
 
     public static String SIM; //Global Variable to define the network carrier : NTC/NCELL
@@ -47,6 +50,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+
+
+
+                view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 startActivity(new Intent(getBaseContext(), CameraAccess.class));
                 //startActivity(new Intent(getBaseContext(), CropActivity.class));
             }

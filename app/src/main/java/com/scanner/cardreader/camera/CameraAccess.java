@@ -1,17 +1,15 @@
 package com.scanner.cardreader.camera;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,14 +21,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.scanner.cardreader.MainActivity;
 import com.scanner.cardreader.R;
 import com.scanner.cardreader.Splash;
 
-import java.security.spec.ECField;
 
-
-public class CameraAccess extends Activity implements SurfaceHolder.Callback,View.OnClickListener{
+public class CameraAccess extends Activity implements SurfaceHolder.Callback, View.OnClickListener, View.OnLongClickListener {
+    private Vibrator heptics;
 
     private Camera camera;
     SurfaceHolder surfaceHolder;
@@ -48,8 +44,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
         @Override
         public void onPictureTaken(byte[] bytes, Camera camera) {
             try {
-                if (bytes != null)
-                {
+                if (bytes != null) {
                     Intent i = new Intent(getApplicationContext(), CropActivity.class);
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 4;
@@ -82,7 +77,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
 
         //cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
 
-        CameraOverlay previewBackground =  (CameraOverlay) findViewById(R.id.overlay);
+        CameraOverlay previewBackground = (CameraOverlay) findViewById(R.id.overlay);
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -108,25 +103,28 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
 
     }
 
-    public void instantiate()
-    {
+    public void instantiate() {
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         //animateView = (RelativeLayout) findViewById(R.id.animateBar);
         //simSelector = (ImageButton) findViewById(R.id.simSelect);
         simInfo = (TextView) findViewById(R.id.simInfo);
         simInfo.setText(Splash.SIM);
         takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
+        heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         //simSelector.setOnClickListener(this);
         takePicture.setOnClickListener(this);
+        takePicture.setOnLongClickListener(this);
     }
+
 
     @Override
     public void onClick(View v) {
+        heptics.vibrate(50);
         switch (v.getId()) {
             //case R.id.simSelect:
-              //  displaySimMenu();
-                //break;
+            //  displaySimMenu();
+            //break;
 
             case R.id.takepicture:
                 capturePicture();
@@ -136,30 +134,36 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
 
     }
 
-    void capturePicture()
-    {
-        try{
-            camera.takePicture(null,null,null,jpegPictureCallBack);
-            //Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.takepicture:
+                Toast.makeText(this, "Capture Image", Toast.LENGTH_LONG).show();
+                break;
         }
-        catch (Exception e)
-        {
+        return true;
+    }
+
+    void capturePicture() {
+        try {
+            camera.takePicture(null, null, null, jpegPictureCallBack);
+            //Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void displaySimMenu()
-    {
+    public void displaySimMenu() {
         if (count % 2 == 0) {
-            TranslateAnimation animate = new TranslateAnimation(0,0 - animateView.getWidth(), 0, 0);
+            TranslateAnimation animate = new TranslateAnimation(0, 0 - animateView.getWidth(), 0, 0);
             animate.setDuration(500);
             animate.setFillAfter(true);
             animateView.startAnimation(animate);
             animateView.setVisibility(View.GONE);
             count++;
-        }
-        else
-        {
+        } else {
             TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
 
             animate.setDuration(500);
@@ -178,7 +182,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
     };
 
 
-
 //    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
 //        @Override
 //        public void onShutter() {
@@ -186,15 +189,14 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
 //        }
 //    };
 
-    public static Bitmap getBitmapImage()
-    {
-        bitmap=getRotatedImage(bitmap);
-        int left = (bitmap.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
-        int right  = (bitmap.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
-        int top  = (bitmap.getHeight()*CameraOverlay.top)/CameraOverlay.parentHeight;
-        int bottom  = (bitmap.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
+    public static Bitmap getBitmapImage() {
+        bitmap = getRotatedImage(bitmap);
+        int left = (bitmap.getWidth() * CameraOverlay.left) / CameraOverlay.parentWidth;
+        int right = (bitmap.getWidth() * CameraOverlay.right) / CameraOverlay.parentWidth;
+        int top = (bitmap.getHeight() * CameraOverlay.top) / CameraOverlay.parentHeight;
+        int bottom = (bitmap.getHeight() * CameraOverlay.bottom) / CameraOverlay.parentHeight;
 
-        Bitmap bmp = Bitmap.createBitmap(bitmap, left,top,right-left,bottom-top);
+        Bitmap bmp = Bitmap.createBitmap(bitmap, left, top, right - left, bottom - top);
 /*        Log.d("bitmapWidth",Integer.toString(bitmap.getWidth()));
         Log.d("bitmapHeight",Integer.toString(bitmap.getHeight()));
         Log.d("left,right",Integer.toString(left)+" "+Integer.toString(right));*/
@@ -281,4 +283,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
         }
         return cameraId;
     }
+
+
 }

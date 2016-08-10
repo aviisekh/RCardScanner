@@ -27,7 +27,7 @@ public class WeightReader {
     public static void setWeights(Context context)  {  // throws IOException //throws IOException
         String jsonContent = loadJSONFromRaw(context);
 
-        String inputString = loadJSONFromRawInput(context);
+        String inputString = loadJSONFromRawInput(context,R.raw.raw);
         try {
             JSONObject jsonRootObject = new JSONObject(jsonContent);
             JSONArray jsonBiasArray_1 = jsonRootObject.optJSONArray("layer_1_bias");
@@ -109,11 +109,11 @@ public class WeightReader {
         return null;
     }
 
-    public static String loadJSONFromRawInput( Context context) {
+    public static String loadJSONFromRawInput( Context context,int resourceID) {
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
-            InputStream inputFile = context.getResources().openRawResource(R.raw.raw);
+            InputStream inputFile = context.getResources().openRawResource(resourceID);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputFile));
 
             String line;

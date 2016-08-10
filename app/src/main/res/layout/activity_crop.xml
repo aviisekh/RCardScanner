@@ -54,7 +54,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/fab_margin"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
             android:visibility="visible" />
@@ -67,7 +67,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/fab_margin"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
             android:visibility="invisible"

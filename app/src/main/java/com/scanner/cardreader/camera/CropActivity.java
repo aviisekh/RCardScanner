@@ -2,25 +2,22 @@ package com.scanner.cardreader.camera;
 
 
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.scanner.cardreader.R;
 import com.scanner.cardreader.Splash;
 import com.scanner.cardreader.classifier.NNMatrix;
 import com.scanner.cardreader.classifier.NeuralNetwork;
-import com.scanner.cardreader.classifier.WeightReader;
 import com.scanner.cardreader.interfaces.GrayScale;
 import com.scanner.cardreader.interfaces.MedianFilter;
 import com.scanner.cardreader.interfaces.Rotate;
@@ -43,16 +40,16 @@ import java.util.Arrays;
 import java.util.List;
 
 
-
-public class CropActivity extends AppCompatActivity implements View.OnClickListener {
+public class CropActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
 
     public static ArrayList<Bitmap> componentBitmaps;
 
+    private Vibrator heptics;
 
     public static ImageView capturedImage;
     public ClippingWindow clippingWindow;
 
-    public ImageButton redoButton,cropButton,rechargeBtn;
+    public ImageButton redoButton, cropButton, rechargeBtn;
     public EditText ocrResultEV;
 
     public Bitmap image;
@@ -97,6 +94,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        heptics.vibrate(50);
         switch (v.getId()) {
             case R.id.cropBtn:
                 crop();
@@ -116,6 +114,25 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.cropBtn:
+                Toast.makeText(this, "Crop", Toast.LENGTH_LONG).show();
+                break;
+
+            case R.id.redoBtn:
+                Toast.makeText(this, "Redo", Toast.LENGTH_LONG).show();
+                break;
+
+            case R.id.rechargeBtn:
+                Toast.makeText(this, "Recharge", Toast.LENGTH_LONG).show();
+                break;
+        }
+        return true;
+    }
+
 
     public void instantiate() {
 
@@ -124,11 +141,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
 
 
-
         rechargeBtn = (ImageButton) findViewById(R.id.rechargeBtn);
         redoButton = (ImageButton) findViewById(R.id.redoBtn);
         cropButton = (ImageButton) findViewById(R.id.cropBtn);
         ocrResultEV = (EditText) findViewById(R.id.ocrResult);
+        heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         capturedImage = (ImageView) findViewById(R.id.imageView);
         capturedImage.setImageBitmap(image);
@@ -142,17 +159,12 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         cropButton.setOnClickListener(this);
 //        crop();
 
-        if (Splash.SIM=="NTC")
-        {
-            outputRechargeString= "*412*";
-        }
-        else if (Splash.SIM=="NCELL")
-        {
-            outputRechargeString= "*102*";
-        }
-        else
-        {
-            outputRechargeString="*505*";
+        if (Splash.SIM == "NTC") {
+            outputRechargeString = "*412*";
+        } else if (Splash.SIM == "NCELL") {
+            outputRechargeString = "*102*";
+        } else {
+            outputRechargeString = "*505*";
         }
 
     }
@@ -288,12 +300,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
 
-                    List<Integer>  ocrResult = generateOutput(binarySegmentList);
-                    for (int a : ocrResult)
-                    {
+                    List<Integer> ocrResult = generateOutput(binarySegmentList);
+                    for (int a : ocrResult) {
                         outputRechargeString = outputRechargeString + Integer.toString(a);
                     }
-                    outputRechargeString=outputRechargeString+"#";
+                    outputRechargeString = outputRechargeString + "#";
 
                     Message ocrResultToUIThread = Message.obtain();
                     ocrResultToUIThread.obj = outputRechargeString;
@@ -309,7 +320,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     int[] createPixelArray(int width, int height, Bitmap thresholdImage) {
 
         int[] pixels = new int[width * height];
@@ -323,7 +333,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    List<Integer>  generateOutput(List<double[][]> binarySegmentList) {
+    List<Integer> generateOutput(List<double[][]> binarySegmentList) {
 
 
         //WeightReader.setWeights(this.getApplicationContext());// reader = new WeightReader();
@@ -347,4 +357,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
+
+
 }
