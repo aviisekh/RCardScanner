@@ -4,6 +4,7 @@ package com.scanner.cardreader;
  * Created by aviisekh on 8/5/16.
  */
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.telephony.TelephonyManager;
 import android.widget.TextView;
 
 import com.scanner.cardreader.camera.CameraAccess;
+import com.scanner.cardreader.classifier.WeightReader;
 
 public class Splash extends Activity {
     public static String SIM;
@@ -28,21 +30,26 @@ public class Splash extends Activity {
        siminfo = (TextView)findViewById(R.id.splashSimInfo) ;
 
 
+
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
         new Handler().postDelayed(new Runnable(){
+
+
             @Override
             public void run() {
+
+                WeightReader.setWeights(getApplicationContext());
 
                 TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
                     if(telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL"){
 
-                        SIM = "NCELL SIM detected";
+                        SIM = "NCELL";
 
                     }
                     else{
-                        SIM = "NTC SIM etected";
+                        SIM = "NTC";
                     }
                 }
                 else
@@ -51,11 +58,14 @@ public class Splash extends Activity {
                 }
 
                 siminfo.setText(SIM);
+
                 /* Create an Intent that will start the Menu-Activity. */
                 Intent mainIntent = new Intent(Splash.this,CameraAccess.class);
                 Splash.this.startActivity(mainIntent);
                 Splash.this.finish();
             }
+
+
         }, SPLASH_DISPLAY_LENGTH);
     }
 }

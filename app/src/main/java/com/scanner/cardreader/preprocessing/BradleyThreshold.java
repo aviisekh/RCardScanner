@@ -1,6 +1,7 @@
 package com.scanner.cardreader.preprocessing;
 
 import android.graphics.Bitmap;
+import android.support.annotation.IntegerRes;
 
 import com.scanner.cardreader.interfaces.Threshold;
 
@@ -96,6 +97,7 @@ public class BradleyThreshold implements Threshold {
         int currentPixel, noPixelInFrame, sumOfLocalPixels;
         int negativeXValue, positiveXValue, negativeYValue, positiveYValue;
         int halfFrameSize = getHalfOfFrame(width);
+        int blackPixelCounter=0,whitePixelCounter=0;
 
         for (int row = 0; row < width; ++row) {
             for (int column = 0; column < height; ++column) {
@@ -113,11 +115,38 @@ public class BradleyThreshold implements Threshold {
                         - integralImage[positiveYValue * width + negativeXValue]
                         + integralImage[negativeYValue * width + negativeXValue];
 
-                pixels[currentPixel] = ((pixels[currentPixel] & 0xFF) * noPixelInFrame) < (sumOfLocalPixels * (1.0F - PIXEL_BRIGHTNESS_DIFF_LIMIT)) ? 0x00 : 0xFFFFFF;
+
+                if(((pixels[currentPixel] & 0xFF) * noPixelInFrame) < (sumOfLocalPixels * (1.0F - PIXEL_BRIGHTNESS_DIFF_LIMIT))){
+                  pixels[currentPixel]= 0x00;
+                    //blackPixelCounter++;
+                }else{
+                    pixels[currentPixel] =0xFFFFFF;
+                    //whitePixelCounter++;
+                }
+
+
+
                 //pixels[currentPixel] = -16777216 | pixels[currentPixel]<< 16 | pixels[currentPixel] << 8 | pixels[currentPixel];
             }
         }
+
+/*        System.out.println("white:"+whitePixelCounter+",black:"+blackPixelCounter);
+        if(whitePixelCounter>blackPixelCounter){
+            System.out.println("white more");
+            afterThresholding.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        }else{
+            System.out.println("black more");
+            for(int i=0;i<pixels.length;i++){
+                if(Integer.toHexString(pixels[i]).equals("0x00")) pixels[i]=0xFFFFFF;
+                else pixels[i]=0x00;
+            }
+            afterThresholding.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        }*/
+
         afterThresholding.setPixels(pixels, 0, width, 0, 0, width, height);
+
         return afterThresholding;
     }
 }

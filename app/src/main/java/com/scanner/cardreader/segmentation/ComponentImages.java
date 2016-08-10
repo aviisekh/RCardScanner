@@ -13,9 +13,9 @@ import java.util.ArrayList;
 public class ComponentImages {
     Context context;
 
-    public ComponentImages(Context context){
-        this.context=context;
-    }
+    //public ComponentImages(Context context){
+    //    this.context=context;
+    //}
 
     private  void componentSort(int[][][] componentArray) {
         int[][] temp;

@@ -3,71 +3,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.scanner.cardreader.camera.CropActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.scanner.cardreader.camera.CropActivity">
 
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:id="@+id/relativeLayout"
-        android:background="#DBBCBC">
-
+        android:background="@color/pink">
 
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_alignParentStart="true"
-            android:src="@drawable/ic_arrow_back_black_24dp"
-            android:background="@android:color/transparent"
-            android:text="@string/redo"
             android:id="@+id/redoBtn"
-            android:tint="#FFFF"
-            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
             android:layout_marginLeft="@dimen/fab_margin"
-            android:focusable="true"
+            android:background="@android:color/transparent"
             android:clickable="true"
-            />
+            android:focusable="true"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:text="@string/redo"
+            android:tint="#FFFF"
+            android:visibility="visible" />
+
+        <!--        <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentStart="true"
+                    android:src="@drawable/ic_arrow_back_black_24dp"
+                    android:text="@string/redo"
+                    android:background="@android:color/transparent"
+                    android:id="@+id/backToCrop"
+                    android:tint="#FFFF"
+                    android:visibility="invisible"
+                    android:layout_marginLeft="@dimen/fab_margin"
+                    android:focusable="true"
+                    android:clickable="true"
+                    />-->
+
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_check_black_24dp"
-            android:tint="#FFFF"
-            android:background="@android:color/transparent"
             android:id="@+id/cropBtn"
-            android:visibility="visible"
-            android:layout_marginRight="@dimen/fab_margin"
-            />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
-            android:text="@string/threshold"
-            android:id="@+id/threshBtn"
-            android:textSize="22sp"
-            android:visibility="invisible"
             android:layout_marginRight="@dimen/fab_margin"
-            />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
-            android:background="@android:color/transparent"
-            android:id= "@+id/rechargeBtn"
-            android:visibility="invisible"
+            android:visibility="visible" />
+
+
+        <ImageButton
+            android:id="@+id/rechargeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/fab_margin"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="#FFFF"
+            android:visibility="invisible"
 
 
             />
@@ -79,25 +82,26 @@
         android:layout_above="@id/relativeLayout">
 
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/imageView"
-            android:contentDescription="@string/image_from_camera"/>
+            android:contentDescription="@string/image_from_camera" />
 
         <com.scanner.cardreader.camera.ClippingWindow
+            android:id="@+id/clipping"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/clipping"
-            android:visibility="visible"
-            />
+            android:visibility="visible" />
 
-        <TextView
+
+
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ocrResult"
-            android:visibility="visible"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
+            android:id="@+id/ocrResult"
+            android:visibility="invisible"
+            />
     </RelativeLayout>
 </RelativeLayout>
 
