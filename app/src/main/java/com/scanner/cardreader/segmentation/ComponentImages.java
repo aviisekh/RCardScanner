@@ -203,7 +203,7 @@ public class ComponentImages {
         return bitmapArrayList;
     }
 
-    public ArrayList<Bitmap> ComponentImages(int[][][] componentArray) {
+    public ArrayList<Bitmap> CreateComponentImages(int[][][] componentArray) {
         System.out.println(componentArray.length);
         ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
         HeightSorting(componentArray);
