@@ -2,6 +2,7 @@ package com.scanner.cardreader.camera;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
@@ -114,9 +115,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
 
     public void instantiate() {
 
-        image = CameraAccess.getBitmapImage();
+//        image = CameraAccess.getBitmapImage();
 
-        //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
 
         threshBtn = (Button) findViewById(R.id.threshBtn);
 
@@ -157,7 +158,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     int[] createPixelArray(int width, int height, Bitmap thresholdImage) {
 
         int[] pixels = new int[width * height];
@@ -176,7 +176,9 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
 
 //              remove jar which is not for android
-                Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
+//                Bitmap sourceBitmap = Bitmap.createBitmap(croppedImage);
+                Bitmap sourceBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.croppedtest);
+
                 ImageWriter imageWriter = new ImageWriter(CropActivity.this);
 
                 long startGamma = System.currentTimeMillis() / 1000;
@@ -194,21 +196,11 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("grayscale:" + (stopGrayscale - startGrayscale));
                 imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
 
-
-                long startThreshold = System.currentTimeMillis() / 1000;
-                Threshold threshold = new BradleyThreshold();
-                bmResult = threshold.threshold(bmResult);
-                long stopThreshold = System.currentTimeMillis() / 1000;
-                System.out.println("threshold:" + (stopThreshold - startThreshold));
-                imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
-
-
                 long startSkew = System.currentTimeMillis() / 1000;
                 SkewChecker skewChecker = new HoughLineSkewChecker();
-                double angle = skewChecker.getSkewAngle(croppedImage);
+                double angle = skewChecker.getSkewAngle(bmResult);
                 long stopSkew = System.currentTimeMillis() / 1000;
                 System.out.println("angle:" + angle + " skew time:" + (stopSkew - startSkew));
-
 
                 long startRotate = System.currentTimeMillis() / 1000;
                 Rotate rotator = new RotateNearestNeighbor(angle);
@@ -217,7 +209,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("rotate:" + (stopRotate - startRotate));
                 imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
 
-
                 long startMedian = System.currentTimeMillis() / 1000;
                 MedianFilter medianFilter = new NonLocalMedianFilter(3);
                 bmResult = medianFilter.applyMedianFilter(bmResult);
@@ -225,26 +216,31 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("median:" + (stopMedian - startMedian));
                 imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
 
-
+                long startThreshold = System.currentTimeMillis() / 1000;
+                Threshold threshold = new BradleyThreshold();
+                bmResult = threshold.threshold(bmResult);
+                long stopThreshold = System.currentTimeMillis() / 1000;
+                System.out.println("threshold:" + (stopThreshold - startThreshold));
+                imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
+//
+//
 //                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
 //                bmResult = rotate.applyMedianFilter(bmResult);
 
                 Message imageToUIThread = Message.obtain();
                 imageToUIThread.obj = bmResult;
                 imageHandler.sendMessage(imageToUIThread);
-
-
                 bmResult = PrepareImage.addBackgroundPixels(bmResult);
                 int height = bmResult.getHeight();
                 int width = bmResult.getWidth();
                 Log.d("width", String.valueOf(width));
 
 //                        get value of pixels from binary image
-                int[] pixels = createPixelArray(width, height, bmResult);
+              int pixels[]  = createPixelArray(width, height, bmResult);
 
 //                       Create a binary array called booleanImage using pixel values in threshold bitmap
                 boolean[] booleanImage = new boolean[width * height];
-                if (Arrays.asList(booleanImage).contains(false)) {
+                if (Arrays.asList(booleanImage).contains(true)) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -253,28 +249,26 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     });
                 } else {
 
+
 //                      false if pixel is a background pixel, else true
                     int index = 0;
                     for (int pixel : pixels) {
-
-                        if (pixel != -1) {
+                        if (pixel == -16777216) {
                             booleanImage[index] = true;
-                        }
 
+                        }
                         index++;
                     }
                     CcLabeling ccLabeling = new CcLabeling();
                     ComponentImages componentImages = new ComponentImages(CropActivity.this);
-                    componentBitmaps = componentImages.CreateImageFromComponents(ccLabeling.CcLabels(booleanImage, width));
-
+                    componentBitmaps = componentImages.ComponentImages(ccLabeling.CcLabels(booleanImage, width));
 //                    writing segment into media
-                    for (int i = 0; i < componentBitmaps.size(); i++) {
+                    for (int i = 0; i < componentBitmaps.size(); i++)
+                    {
                         imageWriter.writeImage(componentBitmaps.get(i), true, "segment" + i, "06_segmentation");
                     }
-
                     List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
                     List<int[]> binarySegmentList1D = BinaryArray.CreateBinaryArrayOneD(componentBitmaps);
-
                     int counter = 0;
                     for (int[] segment : binarySegmentList1D) {
                         for (int i = 0; i < 256; i++) {
@@ -283,7 +277,6 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         Bitmap bitmap = Bitmap.createBitmap(segment, 16, 16, Bitmap.Config.RGB_565);
                         imageWriter.writeImage(bitmap, false, "segment" + counter++, "07_binarysegment");
-
                     }
 
                     String ocrResult = generateOutput(binarySegmentList);
