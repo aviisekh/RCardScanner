@@ -42,7 +42,7 @@ public class CameraOverlay extends View {
         drawRect.setColor(Color.argb(50, 0, 0, 0));
 
 
-        drawLineBoundary.setColor(Color.argb(255, 255, 255, 255));
+        drawLineBoundary.setColor(Color.argb(255, 12, 139, 86));
         drawLineBoundary.setStrokeWidth(5);
 
         drawLineGrid.setColor(Color.argb(50, 255, 255, 255));

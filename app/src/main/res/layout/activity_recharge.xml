@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#000000"
-
+    android:orientation="vertical"
     tools:context="com.scanner.cardreader.camera.CropActivity">
 
 
     <RelativeLayout
-        android:id="@+id/relativeLayout0"
+        android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
@@ -17,7 +17,7 @@
 
 
         <ImageButton
-            android:id="@+id/redoFromCrop"
+            android:id="@+id/redoFromRecharge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -31,9 +31,8 @@
             android:tint="#FFFF"
             android:visibility="visible" />
 
-
         <ImageButton
-            android:id="@+id/cropBtn"
+            android:id="@+id/rechargeBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -49,57 +48,30 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/relativeLayout2"
+        android:id="@+id/relativeLayout3"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_above="@id/relativeLayout0"
-        android:id="@+id/relativeLayout1">
+        android:layout_marginTop="10dp">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/image_from_camera" />
 
 
-        <com.scanner.cardreader.camera.ClippingWindow
-            android:id="@+id/clipping"
+        <EditText
+            android:id="@+id/ocrResult"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-
-
-        <!--        <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spinner"
-                    android:layout_alignParentBottom="true"
-                    android:layou   t_alignParentStart="true"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:visibility="invisible"/>
-
-
-                <NumberPicker
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/np"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentStart="true"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:visibility="visible"></NumberPicker>-->
-        <!--        <EditText
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:id="@+id/rechargePrefix"
-                    android:textColor="@android:color/white"
-                    android:visibility="invisible"
-                    android:layout_marginBottom="5dp"
-                    android:singleLine="true"
-                    android:background="#646262"/>-->
-
-
-
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:background="#646262"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:visibility="visible" />
 
     </RelativeLayout>
 </RelativeLayout>

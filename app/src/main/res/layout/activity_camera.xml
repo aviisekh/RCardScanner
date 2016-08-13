@@ -2,10 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cameraBackground"
+    android:id="@+id/cameraLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.scanner.cardreader.camera.CameraAccess"
+    android:background="@color/darkTheme"
     android:weightSum="1">
 
 
@@ -15,24 +16,23 @@
         android:layout_height="90dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/bottomBar"
-        android:background="@color/pink">
+        android:background="@color/darkTheme">
 
 
 
         <android.support.design.widget.FloatingActionButton
 
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:contextClickable="true"
             app:rippleColor="@color/pink"
-            android:layout_height="wrap_content"
             android:id="@+id/takepicture"
-            android:contentDescription="@string/cameraclick"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_linked_camera_black_24dp"
         />
 
 
-<!--        <ImageButton
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_drop_up_black_24dp"
@@ -41,13 +41,15 @@
             android:layout_centerInParent="true"
             android:layout_toEndOf="@+id/takepicture"
             android:layout_marginLeft="50dp"
-            android:tint="#FFFF"/>-->
+            android:tint="#FFFF"/>
 
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_above="@+id/bottomBar">
 
 
@@ -82,22 +84,11 @@
             android:layout_alignParentEnd="true" />
 
 
-    <!--    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"></RelativeLayout>
-        -->
 
-<!--        <com.scanner.cardreader.camera.BottomBorderOverlay
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:id="@+id/animateBar"
-            android:visibility="invisible"
-            android:layout_alignParentBottom="true"
-            />-->
 
         </RelativeLayout>
 
-<!--    <RelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#2FFF"
@@ -106,6 +97,6 @@
         android:visibility="invisible"
         >
 
-    </RelativeLayout>-->
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -16,6 +16,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".Splash"
             android:screenOrientation="portrait">
@@ -26,17 +27,20 @@
             </intent-filter>
         </activity>
 
-<!--
-     <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait" />
--->
+
 
         <activity android:name=".camera.CameraAccess"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".camera.CropActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+
+        <activity android:name=".camera.RechargeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
 
 
 

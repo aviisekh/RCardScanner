@@ -2,6 +2,9 @@
 #Python Work
 Python is used to build the neural network. Python has been used because while developing a neural network we have to deal with various matrix operations like getting the array from file as n-dimensional matrix, reshaping the dimensions of matrix, addition, transpose and multiplication of matrix and in python these operations can be performed with an ease that helps give more time in desiging the network.
 
+###Generating Training Sets
+Various Sample Images of digits were collected from segmentation process and were saved under the directory **training images** and subdirectory their digit number. All these 16x16 images are written into trainingssets.txt with black pixel value 0 and white pixel value 1. The row of binary values is finally appended with the actual value of the digit which is required prior during training the model.
+
 ###Neural Network Architecture
 Our neural network consists of 3 layers; input-hidden-output layer. Input layer has 256 nodes that takes the bit values of 16x16 images as 256x1 matrix. Hidden layer has 20 nodes and output layer has 10 nodes that classify between digit 0 to 9. 
 

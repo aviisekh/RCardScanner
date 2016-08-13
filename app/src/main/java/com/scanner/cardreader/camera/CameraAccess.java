@@ -1,11 +1,7 @@
 package com.scanner.cardreader.camera;
 
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -21,28 +17,30 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.scanner.cardreader.MainActivity;
 import com.scanner.cardreader.R;
 import com.scanner.cardreader.Splash;
 
-import java.security.spec.ECField;
+import java.io.ByteArrayOutputStream;
 
 
 public class CameraAccess extends Activity implements SurfaceHolder.Callback,View.OnClickListener{
 
     private Camera camera;
-    SurfaceHolder surfaceHolder;
-    SurfaceView surfaceView;
-    boolean isPreviewing = false;
-    static int count = 1;
-    RelativeLayout animateView;
-    ImageButton simSelector;
-    android.support.design.widget.FloatingActionButton takePicture;
-    TextView simInfo;
+    private SurfaceHolder surfaceHolder;
+    private SurfaceView surfaceView;
+
+    private boolean isPreviewing = false;
+
+    private RelativeLayout animateView;
+    private ImageButton simSelector;
+    private android.support.design.widget.FloatingActionButton takePicture;
+    private TextView simInfo;
+    private int cameraId;
+
+    private static int count = 1;
     public static Bitmap bitmap;
-    int cameraId;
+
 
     final PictureCallback jpegPictureCallBack = new PictureCallback() {
         @Override
@@ -50,12 +48,18 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
             try {
                 if (bytes != null)
                 {
-                    Intent i = new Intent(getApplicationContext(), CropActivity.class);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+
+                    Intent intent = new Intent(getApplicationContext(), CropActivity.class);
+                    intent.putExtra("image",byteArray);
+
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 4;
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
                     setBitmapImage(bitmap);
-                    startActivity(i);
+                    startActivity(intent);
                     camera.stopPreview();
                     camera.release();
                     camera.setPreviewCallback(null);
@@ -80,7 +84,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        //cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
 
         CameraOverlay previewBackground =  (CameraOverlay) findViewById(R.id.overlay);
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
@@ -111,22 +114,22 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
     public void instantiate()
     {
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-        //animateView = (RelativeLayout) findViewById(R.id.animateBar);
-        //simSelector = (ImageButton) findViewById(R.id.simSelect);
+        animateView = (RelativeLayout) findViewById(R.id.animateBar);
+        simSelector = (ImageButton) findViewById(R.id.simSelect);
         simInfo = (TextView) findViewById(R.id.simInfo);
         simInfo.setText(Splash.SIM);
         takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
 
-        //simSelector.setOnClickListener(this);
+        simSelector.setOnClickListener(this);
         takePicture.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //case R.id.simSelect:
-              //  displaySimMenu();
-                //break;
+            case R.id.simSelect:
+                displaySimMenu();
+                break;
 
             case R.id.takepicture:
                 capturePicture();
@@ -153,17 +156,16 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
         if (count % 2 == 0) {
             TranslateAnimation animate = new TranslateAnimation(0,0 - animateView.getWidth(), 0, 0);
             animate.setDuration(500);
-            animate.setFillAfter(true);
             animateView.startAnimation(animate);
             animateView.setVisibility(View.GONE);
             count++;
         }
+
         else
         {
             TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
 
             animate.setDuration(500);
-            //animate.setFillAfter(true);
             animateView.startAnimation(animate);
             animateView.setVisibility(View.VISIBLE);
             count++;
@@ -179,15 +181,9 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
 
 
 
-//    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
-//        @Override
-//        public void onShutter() {
-//
-//        }
-//    };
-
     public static Bitmap getBitmapImage()
     {
+        //Mapping the overlay Coordinates with Bitmap Coordinates Window to ViewPort Transformation
         bitmap=getRotatedImage(bitmap);
         int left = (bitmap.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
         int right  = (bitmap.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
@@ -195,9 +191,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
         int bottom  = (bitmap.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
 
         Bitmap bmp = Bitmap.createBitmap(bitmap, left,top,right-left,bottom-top);
-/*        Log.d("bitmapWidth",Integer.toString(bitmap.getWidth()));
-        Log.d("bitmapHeight",Integer.toString(bitmap.getHeight()));
-        Log.d("left,right",Integer.toString(left)+" "+Integer.toString(right));*/
         return bmp;
 
     }
