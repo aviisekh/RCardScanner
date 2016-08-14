@@ -11,6 +11,7 @@ package com.scanner.cardreader;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
@@ -82,7 +83,7 @@ public class Splash extends Activity {
 
 
                 /* Create an Intent that will start the Camera Activity. */
-                Intent mainIntent = new Intent(Splash.this,CropActivity.class);
+                Intent mainIntent = new Intent(Splash.this,CameraAccess.class);
                 Splash.this.startActivity(mainIntent);
                 Splash.this.finish();
             }

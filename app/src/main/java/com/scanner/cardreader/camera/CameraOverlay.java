@@ -99,15 +99,15 @@ public class CameraOverlay extends View {
         canvas.drawLine(right, top, right, bottom, drawLineBoundary);
 */
 
-        canvas.drawLine(left, top-1, left, top+20, drawLineBoundary);
-        canvas.drawLine(left-1, top, left+20, top, drawLineBoundary);
-        canvas.drawLine(left-1, bottom, left+20, bottom, drawLineBoundary);
-        canvas.drawLine(left, bottom+1, left, bottom-20, drawLineBoundary);
+        canvas.drawLine(left, top-2, left, top+20, drawLineBoundary);
+        canvas.drawLine(left-2, top, left+20, top, drawLineBoundary);
+        canvas.drawLine(left-2, bottom, left+20, bottom, drawLineBoundary);
+        canvas.drawLine(left, bottom+2, left, bottom-20, drawLineBoundary);
 
-        canvas.drawLine(right, top-1, right, top+20, drawLineBoundary);
-        canvas.drawLine(right+1, top, right-20, top, drawLineBoundary);
-        canvas.drawLine(right+1, bottom, right-20, bottom, drawLineBoundary);
-        canvas.drawLine(right, bottom+1, right, bottom-20, drawLineBoundary);
+        canvas.drawLine(right, top-2, right, top+20, drawLineBoundary);
+        canvas.drawLine(right+2, top, right-20, top, drawLineBoundary);
+        canvas.drawLine(right+2, bottom, right-20, bottom, drawLineBoundary);
+        canvas.drawLine(right, bottom+2, right, bottom-20, drawLineBoundary);
 
 
     }

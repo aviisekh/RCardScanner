@@ -49,11 +49,11 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback,Vie
                 if (bytes != null)
                 {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
+                    //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    //byte[] byteArray = stream.toByteArray();
 
                     Intent intent = new Intent(getApplicationContext(), CropActivity.class);
-                    intent.putExtra("image",byteArray);
+                    //intent.putExtra("image",byteArray);
 
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 4;

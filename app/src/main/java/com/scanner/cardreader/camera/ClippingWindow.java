@@ -47,7 +47,7 @@ public class ClippingWindow extends View {
     private int moveX;               //Movement of touch along X-axis
     private int moveY;
 
-    static int left, top, right, bottom; //Coordinates of the clipping window
+    public static int left, top, right, bottom; //Coordinates of the clipping window
     private int leftBoundary, rightBoundary, topBoundary, bottomBoundary;    //Coordinates of image in imageview
 
     public ClippingWindow(Context context, AttributeSet attrs) {
@@ -185,7 +185,7 @@ public class ClippingWindow extends View {
                     draggable =  topDraggable = bottomDraggable = leftDraggable = rightDraggable = true;
                 }
                 else draggable = false;
-                if (Math.abs((VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId)))>50|Math.abs((VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)))>50)
+                if (Math.abs((VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId)))>20|Math.abs((VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)))>20)
                 {
                     leftCroppable=rightCroppable=topCroppable=bottomCroppable=false;
                     draggable = false;
@@ -219,10 +219,10 @@ public class ClippingWindow extends View {
                 }
 
                 //conditions for minimal cropping window
-                if (left + TOLERANCE + 30>= right & moveX > 0) leftCroppable = false;
-                if (right - TOLERANCE - 30<= left & moveX < 0) rightCroppable = false;
-                if (top + TOLERANCE + 30>= bottom & moveY > 0) topCroppable = false;
-                if (bottom- TOLERANCE -30<= top & moveY <0) bottomCroppable = false;
+                if (left + TOLERANCE + 10>= right & moveX > 0) leftCroppable = false;
+                if (right - TOLERANCE - 10<= left & moveX < 0) rightCroppable = false;
+                if (top + TOLERANCE + 10>= bottom & moveY > 0) topCroppable = false;
+                if (bottom- TOLERANCE -10<= top & moveY <0) bottomCroppable = false;
                 //if (right TOLERANCE >= right & moveX > 0) rightCroppable = false;
                 int height = bottom-top;
                 int width = right-left;
@@ -318,21 +318,20 @@ public class ClippingWindow extends View {
         canvas.drawLine(left,top+(bottom-top)/3,right, top+(bottom-top)/3,drawLineGrid);
         canvas.drawLine(left,top+2*(bottom-top)/3,right, top+2*(bottom-top)/3,drawLineGrid);
 
-        canvas.drawLine(left,top,right,top,drawLineBoundary);
-        canvas.drawLine(left,top,left,bottom,drawLineBoundary);
-        canvas.drawLine(left,bottom,right,bottom,drawLineBoundary);
-        canvas.drawLine(left,bottom,right,bottom,drawLineBoundary);
-        canvas.drawLine(right,top,right,bottom,drawLineBoundary);
+        canvas.drawLine(left-2,top,right+2,top,drawLineBoundary);
+        canvas.drawLine(left,top-2,left,bottom+2,drawLineBoundary);
+        canvas.drawLine(left-2,bottom,right+2,bottom,drawLineBoundary);
+        canvas.drawLine(right,top-2,right,bottom+2,drawLineBoundary);
 
 
     }
 
     private void drawCircle(Canvas canvas)
     {
-        canvas.drawCircle((left+right)/2,top,20,drawCircle);
-        canvas.drawCircle((left+right)/2,bottom,20,drawCircle);
-        canvas.drawCircle(left,(top+bottom)/2, 20, drawCircle);
-        canvas.drawCircle(right,(top+bottom)/2, 20, drawCircle);
+        canvas.drawCircle((left+right)/2,top,10,drawCircle);
+        canvas.drawCircle((left+right)/2,bottom,10,drawCircle);
+        canvas.drawCircle(left,(top+bottom)/2, 10, drawCircle);
+        canvas.drawCircle(right,(top+bottom)/2, 10, drawCircle);
     }
 
 

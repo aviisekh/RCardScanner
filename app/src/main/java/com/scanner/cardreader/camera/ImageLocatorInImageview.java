@@ -14,7 +14,7 @@ public class ImageLocatorInImageview {
 
     public  static Rect getImageCoordinates(ImageView imView)
     {
-        Rect r = new Rect();
+        Rect imageCoordinates = new Rect();
         Drawable drawable = imView.getDrawable();
 
         Log.d("drawable bounds",drawable.getBounds().flattenToString());
@@ -36,12 +36,12 @@ public class ImageLocatorInImageview {
         final int scaledHeight = Math.round(originalHeight * scaleY);
 
         //Log.d("new","transx" + Float.toString(scaleX)+"transy"+ Float.toString(scaleY));
-        r.left = (int) Math.max(transX, 0);
-        r.top = (int) Math.max(transY, 0);
-        r.right = Math.min(r.left + scaledWidth, imView.getWidth());
-        r.bottom= Math.min(r.top + scaledHeight, imView.getHeight());
+        imageCoordinates.left = (int) Math.max(transX, 0);
+        imageCoordinates.top = (int) Math.max(transY, 0);
+        imageCoordinates.right = Math.min(imageCoordinates.left + scaledWidth, imView.getWidth());
+        imageCoordinates.bottom= Math.min(imageCoordinates.top + scaledHeight, imView.getHeight());
 
-        return r;
+        return imageCoordinates;
 
 
     }

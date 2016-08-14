@@ -3,7 +3,6 @@ package com.scanner.cardreader.camera;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,6 @@ import com.scanner.cardreader.Splash;
 import com.scanner.cardreader.classifier.NNMatrix;
 import com.scanner.cardreader.classifier.NeuralNetwork;
 import com.scanner.cardreader.interfaces.GrayScale;
-import com.scanner.cardreader.interfaces.MedianFilter;
 import com.scanner.cardreader.interfaces.Rotate;
 import com.scanner.cardreader.interfaces.SkewChecker;
 import com.scanner.cardreader.interfaces.Threshold;
@@ -26,7 +24,6 @@ import com.scanner.cardreader.preprocessing.GammaCorrection;
 import com.scanner.cardreader.preprocessing.HoughLineSkewChecker;
 import com.scanner.cardreader.preprocessing.ITURGrayScale;
 import com.scanner.cardreader.preprocessing.ImageWriter;
-import com.scanner.cardreader.preprocessing.NonLocalMedianFilter;
 import com.scanner.cardreader.preprocessing.RotateNearestNeighbor;
 import com.scanner.cardreader.segmentation.BinaryArray;
 import com.scanner.cardreader.segmentation.CcLabeling;
@@ -261,10 +258,10 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
             NNMatrix input = new NNMatrix(binarySegment);
             NNMatrix output = net.FeedForward(input);
             //output.showOutputArray();
-            int i = output.showOutput();
+            int filteredOutput = output.filterOutput();
 
-            if (i != -1)
-                recognizedList.add(i);
+            if (filteredOutput != -1)
+                recognizedList.add(filteredOutput);
 
 
         }

@@ -84,8 +84,8 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
         redoButton.setOnClickListener(this);
         cropButton.setOnClickListener(this);
 
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_target_test);
-
+        //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_target_test);
+        image = CameraAccess.getBitmapImage();
         cropImView = (ImageView) findViewById(R.id.imageView);
         cropImView.setImageBitmap(image);
 
