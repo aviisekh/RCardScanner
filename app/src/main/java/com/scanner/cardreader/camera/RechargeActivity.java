@@ -3,6 +3,7 @@ package com.scanner.cardreader.camera;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,11 +39,15 @@ import java.util.List;
 *Created by aviisekh on 8/11/16.
 */
 
-public class RechargeActivity extends AppCompatActivity implements View.OnClickListener{
+public class RechargeActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener{
     //public Bitmap image;
     private ImageButton rechargeBtn,redoButton;
     private EditText ocrResultTV;
     private ImageView rechargeImView;
+
+    private Vibrator haptics;
+    private final int HAPTICS_CONSTANT=50;
+
 
     private Bitmap croppedImage;
 
@@ -66,14 +71,12 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
+        haptics.vibrate(HAPTICS_CONSTANT);
         switch (v.getId()) {
             case R.id.redoFromRecharge:
                 onBackPressed();
                 break;
 
-        /*    case R.id.backToCrop:
-                backToCrop();
-                break;*/
 
             case R.id.rechargeBtn:
                 Toast.makeText(RechargeActivity.this, "RechargePressed", Toast.LENGTH_SHORT).show();
@@ -81,6 +84,22 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.cropBtn:
+                Toast.makeText(this, "Crop", Toast.LENGTH_LONG).show();
+                break;
+
+
+            case R.id.redoFromCrop:
+                Toast.makeText(this, "Redo", Toast.LENGTH_LONG).show();
+                break;
+
+        }
+        return true;
     }
 
 
@@ -91,6 +110,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
         rechargeBtn = (ImageButton) findViewById(R.id.rechargeBtn);
         redoButton = (ImageButton) findViewById(R.id.redoFromRecharge);
+        haptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         ocrResultTV = (EditText) findViewById(R.id.ocrResult);
         //rechargePrefix = (EditText) findViewById(R.id.rechargePrefix);

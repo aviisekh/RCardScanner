@@ -53,20 +53,6 @@ public class CropActivity extends Activity implements View.OnClickListener, View
 
 
 
-
-//        linked with message queue of main thread
-//        imageHandler = new Handler() {
-//            //executed when msg arrives from thread
-//            @Override
-//            public void handleMessage(Message msg) {
-//                Bitmap result = (Bitmap) msg.obj;
-//                cropImView.setImageBitmap(result);
-//            }
-//        };
-
-
-
-
     }
 
     @Override

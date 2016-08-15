@@ -40,7 +40,6 @@
             android:layout_toEndOf="@+id/takepicture"
             android:layout_marginLeft="50dp"
             android:tint="#FFFF"/>
-
     </RelativeLayout>
 
     <RelativeLayout
