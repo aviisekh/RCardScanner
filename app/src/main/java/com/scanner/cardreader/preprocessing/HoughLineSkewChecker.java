@@ -15,16 +15,29 @@ import java.util.List;
 
 public class HoughLineSkewChecker implements SkewChecker {
 
+    private final int MASKER = 255;
+    private final int BORDER_COMPARATER = 128;
+    private final double PI = 3.141592653589793D;
+    private final double DOUBLE_MULTIPLIER = 2.0D;
+    private final double ANGLE_NORMALIZER = 180.0D;
+    private final int MINIMUM_HOUGHLINE_INTENSIY_FACTOR = 10;
+
+    private double maxSkewToDetect = 90.0D;
     private int stepsPerDegree = 1;
+    private int localPeakDistance = 4;
+
+    int width;
+    int height;
     private int houghHeight;
     private double thetaStep;
-    private double maxSkewToDetect = 90.0D;
     private double[] sinMap;
     private double[] cosMap;
     private int[][] houghMap;
+    HoughLine[] mostIntensiveLines;
     private int maxMapIntensity = 0;
-    private int localPeakRadius = 4;
     private List<HoughLine> lines = new ArrayList();
+    double thetaAggregator = 0.0D;
+    double relativeIntensityAggregator = 0.0D;
 
     public int getStepsPerDegree() {
         return this.stepsPerDegree;
@@ -42,12 +55,12 @@ public class HoughLineSkewChecker implements SkewChecker {
         this.maxSkewToDetect = Math.max(0.0D, Math.min(45.0D, maxSkewToDetect));
     }
 
-    public int getLocalPeakRadius() {
-        return this.localPeakRadius;
+    public int getLocalPeakDistance() {
+        return this.localPeakDistance;
     }
 
-    public void setLocalPeakRadius(int localPeakRadius) {
-        this.localPeakRadius = Math.max(1, Math.min(10, localPeakRadius));
+    public void setLocalPeakDistance(int localPeakDistance) {
+        this.localPeakDistance = Math.max(1, Math.min(10, localPeakDistance));
     }
 
     public HoughLineSkewChecker() {
@@ -59,12 +72,77 @@ public class HoughLineSkewChecker implements SkewChecker {
         return pixels;
     }
 
+    private boolean isBorderPixel(int pixel, int belowPixel, int index, int imageWidth) {
+        if ((pixel & BORDER_COMPARATER) < MASKER && (belowPixel & BORDER_COMPARATER) >= MASKER)
+            return true;
+        else
+            return false;
+    }
 
-    public double getSkewAngle(Bitmap fastBitmap) {
 
+    private void buildHoughMap(int skewAngle, int houghWidth, int halfHoughWidth, int hls) {
+        for (int theta = 0; theta < this.houghHeight; ++theta) {
+            int sumIntensity = (int) (this.cosMap[theta] * (double) skewAngle - this.sinMap[theta] * (double) hls) + halfHoughWidth;
+            if (sumIntensity >= 0 && sumIntensity < houghWidth) {
+                ++this.houghMap[theta][sumIntensity];
+            }
+        }
+    }
+
+
+    private int getMaxMapIntensity(int hls, int skewAngle, int houghWidth) {
+        int maxMapIntensity = 0;
+        for (hls = 0; hls < this.houghHeight; ++hls) {
+            for (skewAngle = 0; skewAngle < houghWidth; ++skewAngle) {
+//                System.out.println("houghmap("+hls+","+skewAngle+")="+ this.houghMap[hls][skewAngle]);
+                if (this.houghMap[hls][skewAngle] > this.maxMapIntensity) {
+                    maxMapIntensity = this.houghMap[hls][skewAngle];
+                }
+            }
+        }
+        return maxMapIntensity;
+    }
+
+
+    private void aggregateHoughValues(int noOfItntensiveLines) {
+        for (int counter = 0; counter < noOfItntensiveLines; ++counter) {
+            HoughLine houghLine = mostIntensiveLines[counter];
+            if (houghLine.getRelativeIntensity() > 0.5D) {
+//                Log.d("relative intensity>0.5:",
+//                        " theta:" + String.valueOf(houghLine.getTheta())
+//                                + " radius:" + String.valueOf(houghLine.getRadius())
+//                                + " intensity:" + String.valueOf(houghLine.getIntensity())
+//                                + " relative intensity:"
+//                                + String.valueOf((double) houghLine.getIntensity() / (double) this.maxMapIntensity));
+
+                thetaAggregator += houghLine.getTheta() * houghLine.getRelativeIntensity();
+                relativeIntensityAggregator += houghLine.getRelativeIntensity();
+            }
+        }
+        Log.d("aggregated theta ", String.valueOf(thetaAggregator));
+        Log.d("aggregated r-intensity ", String.valueOf(relativeIntensityAggregator));
+    }
+
+    private void normalizeTheta(int noOfItntensiveLines) {
+        aggregateHoughValues(noOfItntensiveLines);
+        if (mostIntensiveLines.length > 0) {
+            thetaAggregator /= relativeIntensityAggregator;
+        }
+        Log.d("theta/relIntensity", String.valueOf(thetaAggregator));
+    }
+
+
+    private double calculateTheta(double thetaAggregator) {
+        Log.d("result", String.valueOf(thetaAggregator - 90.0D));
+        if (thetaAggregator == 0) return thetaAggregator;
+        else
+            return thetaAggregator - 90.0D;
+    }
+
+    public double getSkewAngle(Bitmap sourceBitmap) {
         this.initializeHoughMap();
-        int width = fastBitmap.getWidth();
-        int height = fastBitmap.getHeight();
+        int width = sourceBitmap.getWidth();
+        int height = sourceBitmap.getHeight();
         int halfWidth = width / 2;
         int halfHeight = height / 2;
         int startX = -halfWidth; //column
@@ -73,176 +151,126 @@ public class HoughLineSkewChecker implements SkewChecker {
         int stopY = height - halfHeight - 1;
         int halfHoughWidth = (int) Math.sqrt((double) (halfWidth * halfWidth + halfHeight * halfHeight));
         int houghWidth = halfHoughWidth * 2;
-        this.houghMap = new int[this.houghHeight][houghWidth];
+        houghMap = new int[this.houghHeight][houghWidth];
+
         int indexG = 0;
-
-        int[] pixels = createPixelArray(fastBitmap.getWidth(), fastBitmap.getHeight(), fastBitmap);
-
+        int[] pixels = createPixelArray(sourceBitmap.getWidth(), sourceBitmap.getHeight(), sourceBitmap);
         int hls;//row
-        int skewAngle;//column
-
-        //creating hough map
-        //row
-        System.out.println("Hough map indexG and indexG+width:");
+        int skewAngle = startX;//column
         for (hls = startY; hls < stopY; ++hls) {
             //column
             for (skewAngle = startX; skewAngle < stopX; ++indexG) {
                 //different in same column
-
-                if ((pixels[indexG] & 255) < 128 && (pixels[indexG + width] & 255) >= 128) {
-
-//                    System.out.println("("+hls+","+skewAngle+")"+" pixels indexG ="
-//                            +(pixels[indexG] & 255)
-//                            +" pixels indexG+width="+(pixels[indexG + width] & 255));
-
-                    for (int theta = 0; theta < this.houghHeight; ++theta) {
-                        int sumIntensity = (int) (this.cosMap[theta] * (double) skewAngle - this.sinMap[theta] * (double) hls) + halfHoughWidth;
-                        if (sumIntensity >= 0 && sumIntensity < houghWidth) {
-                            ++this.houghMap[theta][sumIntensity];
-                        }
-                    }
+                if (isBorderPixel(pixels[indexG], pixels[indexG + width], indexG, width)) {
+                    buildHoughMap(skewAngle, houghWidth, halfHoughWidth, hls);
                 }
                 ++skewAngle;
             }
         }
+        maxMapIntensity = getMaxMapIntensity(hls, skewAngle, houghWidth);
+//        System.out.println("max intensity in hough map " + maxMapIntensity);
+        mostIntensiveLines = this.getMostIntensiveLines(5, maxMapIntensity);
+        int noOfItntensiveLines = mostIntensiveLines.length;
+        normalizeTheta(noOfItntensiveLines);
+        return calculateTheta(thetaAggregator);
+    }
 
-        this.maxMapIntensity = 0;
+    private int shiftByOneBit(int number) {
+        return number >> 1;
+    }
 
-        //calculate max intesity
-        //row
-        for (hls = 0; hls < this.houghHeight; ++hls) {
-            for (skewAngle = 0; skewAngle < houghWidth; ++skewAngle) {
-//                System.out.println("houghmap("+hls+","+skewAngle+")="+ this.houghMap[hls][skewAngle]);
-                if (this.houghMap[hls][skewAngle] > this.maxMapIntensity) {
-                    this.maxMapIntensity = this.houghMap[hls][skewAngle];
+    private boolean isHoughLineIntense(int theta, int distance, int intensity) {
+        boolean foundGreater = false;
+        int maxTheta = this.houghMap.length;
+        int maxDistance = this.houghMap[0].length;
+        int thetaMax = theta + this.localPeakDistance;
+        int thetaMin = theta - this.localPeakDistance;
+        //loop from theta-local to theta+local
+        for (int currentTheta = thetaMin; currentTheta < thetaMax; ++currentTheta) {
+            if (currentTheta >= 0) {
+                if (currentTheta >= maxTheta || foundGreater) {
+                    break;
+                }
+                int distanceMax = distance + this.localPeakDistance;
+                for (int currentDistance = distance - this.localPeakDistance; currentDistance < distanceMax; ++currentDistance) {
+                    if (currentDistance >= 0) {
+                        if (currentDistance >= maxDistance) {
+                            break;
+                        }
+
+                        if (this.houghMap[currentTheta][currentDistance] > intensity) {
+                            foundGreater = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
-        System.out.println("max intensity in hough map "+maxMapIntensity);
-
-        this.collectHoughLines(width / 10);
-
-        HoughLine[] mostIntensiveLines = this.getMostIntensiveLines(5);
-        double thetaAggregator = 0.0D;
-        double relativeIntensityAggregator = 0.0D;
-        //HoughLine[] var18 = mostIntensiveLines;
-        int noOfItntensiveLines = mostIntensiveLines.length;
-        //gather total of hough line (theta and intensity) if >0.5d
-        System.out.println("most intensive lines with relative intensity >0.5D");
-        for (int counter = 0; counter < noOfItntensiveLines; ++counter) {
-            HoughLine houghLine = mostIntensiveLines[counter];
-            if (houghLine.getRelativeIntensity() > 0.5D) {
-                Log.d("relative intensity>0.5:",
-                        " theta:" + String.valueOf(houghLine.getTheta())
-                                + " radius:" + String.valueOf(houghLine.getRadius())
-                                + " intensity:" + String.valueOf(houghLine.getIntensity())
-                                + " relative intensity:"
-                                + String.valueOf((double) houghLine.getIntensity() / (double) this.maxMapIntensity));
-
-                thetaAggregator += houghLine.getTheta() * houghLine.getRelativeIntensity();
-                relativeIntensityAggregator += houghLine.getRelativeIntensity();
-            }
-        }
-        Log.d("aggregated theta ", String.valueOf(thetaAggregator));
-        Log.d("aggregated r-intensity ", String.valueOf(relativeIntensityAggregator));
-
-        if (mostIntensiveLines.length > 0) {
-            thetaAggregator /= relativeIntensityAggregator;
-        }
-        Log.d("theta/relIntensity", String.valueOf(thetaAggregator));
-        Log.d("result", String.valueOf(thetaAggregator - 90.0D));
-        if (thetaAggregator==0) return thetaAggregator;
-        else
-        return thetaAggregator-90.0D;
+        return foundGreater;
 
     }
 
     //collect hough lines above minimum threshold
-    private void collectHoughLines(int minLineIntensity) {
+    private void collectHoughLines(int minLineIntensity, int maxMapIntensity) {
         int maxTheta = this.houghMap.length;
-        int maxRadius = this.houghMap[0].length;
-        int halfHoughWidth = maxRadius >> 1;
-        this.lines.clear();
+        int maxDistance = this.houghMap[0].length;
+        int halfHoughWidth = shiftByOneBit(maxDistance);
+        lines.clear();
 
-        System.out.println("hough lines>"+minLineIntensity+" minimum intensity are:");
+        System.out.println("hough lines>" + minLineIntensity + " minimum intensity are:");
         for (int theta = 0; theta < maxTheta; ++theta) {
-            for (int radius = 0; radius < maxRadius; ++radius) {
-                int intensity = this.houghMap[theta][radius];
+            for (int distance = 0; distance < maxDistance; ++distance) {
+                int intensity = this.houghMap[theta][distance];
                 if (intensity >= minLineIntensity) {
-                    boolean foundGreater = false;
-
-                    int tempThetaMax = theta + this.localPeakRadius;
-                    //loop from theta-local to theta+local
-                    for (int tempTheta = theta - this.localPeakRadius; tempTheta < tempThetaMax; ++tempTheta) {
-
-                        if (tempTheta >= 0) {
-                            if (tempTheta >= maxTheta || foundGreater) {
-                                break;
-                            }
-
-                            int tempRadiusMax = radius + this.localPeakRadius;
-                            for (int tempRadius = radius - this.localPeakRadius; tempRadius < tempRadiusMax; ++tempRadius) {
-                                if (tempRadius >= 0) {
-                                    if (tempRadius >= maxRadius) {
-                                        break;
-                                    }
-
-                                    if (this.houghMap[tempTheta][tempRadius] > intensity) {
-                                        foundGreater = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
 
                     //if greater not found so add it to list or greater than min Intensity
-
-                    if (!foundGreater) {
-                        this.lines.add(new HoughLine(90.0D - this.maxSkewToDetect + (double) theta / (double) this.stepsPerDegree,
-                                (double) (radius - halfHoughWidth), intensity, (double) intensity / (double) this.maxMapIntensity));
-                        double th = 90.0D - this.maxSkewToDetect + (double) theta / (double) this.stepsPerDegree;
-                        double ra = (double) (radius - halfHoughWidth);
-                        Log.d("lines:", " theta:" + String.valueOf(th) + " radius:" + String.valueOf(ra) + " intensity:" + String.valueOf(intensity) + " relative intensity:" + String.valueOf((double) intensity / (double) this.maxMapIntensity));
+                    if (isHoughLineIntense(theta, distance, intensity)) {
+                        addHoughLine(theta, distance, halfHoughWidth, intensity, maxMapIntensity);
                     }
                 }
             }
         }
-        System.out.println(lines.size()+" hough lines>"+minLineIntensity+" minimum intensity added.");
-        //max intense line at top
-        Collections.sort(this.lines);
-
+//        System.out.println(lines.size() + " hough lines>" + minLineIntensity + " minimum intensity added.");
+        sortHoughLines();
     }
 
-    private HoughLine[] getMostIntensiveLines(int count) {
+    private void sortHoughLines() {
+        //max intense line at top
+        Collections.sort(this.lines);
+    }
+
+    private void addHoughLine(int theta, int radius, int halfHoughWidth, int intensity, int maxMapIntensity) {
+        lines.add(new HoughLine(90.0D - this.maxSkewToDetect + (double) theta / (double) this.stepsPerDegree,
+                (double) (radius - halfHoughWidth), intensity, (double) intensity / (double) maxMapIntensity));
+//        double th = 90.0D - this.maxSkewToDetect + (double) theta / (double) this.stepsPerDegree;
+//        double ra = (double) (radius - halfHoughWidth);
+//        Log.d("lines:", " theta:" + String.valueOf(th) + " radius:" + String.valueOf(ra) + " intensity:" + String.valueOf(intensity) + " relative intensity:" + String.valueOf((double) intensity / (double) this.maxMapIntensity));
+    }
+
+    private HoughLine[] getMostIntensiveLines(int count, int maxMapIntensity) {
+        collectHoughLines(width / MINIMUM_HOUGHLINE_INTENSIY_FACTOR, maxMapIntensity);
         int n = Math.min(count, this.lines.size());
         HoughLine[] mostIntenseLines = new HoughLine[n];
-
-        System.out.println("get first "+count+"most intensive line");
+        System.out.println("get first " + count + "most intensive line");
         for (int i = 0; i < n; ++i) {
             mostIntenseLines[i] = this.lines.get(i);
-            Log.d("hough lines:", " theta:" + String.valueOf(mostIntenseLines[i].getTheta())
-                    + " radius:" + String.valueOf(mostIntenseLines[i].getRadius())
-                    + " intensity:" + String.valueOf(mostIntenseLines[i].getIntensity())
-                    + " relative intensity:" + String.valueOf(mostIntenseLines[i].getRelativeIntensity()));
-
         }
-
         return mostIntenseLines;
     }
 
     private void initializeHoughMap() {
-        this.houghHeight = (int) (2.0D * this.maxSkewToDetect * (double) this.stepsPerDegree);
-        this.thetaStep = 2.0D * this.maxSkewToDetect * 3.141592653589793D / 180.0D / (double) this.houghHeight;
+        this.houghHeight = (int) (DOUBLE_MULTIPLIER * this.maxSkewToDetect * (double) this.stepsPerDegree);
+        this.thetaStep = DOUBLE_MULTIPLIER * this.maxSkewToDetect * PI / ANGLE_NORMALIZER / (double) this.houghHeight;
         this.sinMap = new double[this.houghHeight];
         this.cosMap = new double[this.houghHeight];
         double minimumTheta = 0.0D;
-//                90.0D - this.maxSkewToDetect;
+        prepareSinCosinMap(minimumTheta);
+    }
 
-        //preparing sine cosine map for optimization
+    private void prepareSinCosinMap(double minimumTheta) {
         for (int i = 0; i < this.houghHeight; ++i) {
-            this.sinMap[i] = Math.sin(minimumTheta * 3.141592653589793D / 180.0D + (double) i * this.thetaStep);
-            this.cosMap[i] = Math.cos(minimumTheta * 3.141592653589793D / 180.0D + (double) i * this.thetaStep);
+            this.sinMap[i] = Math.sin(minimumTheta * PI / ANGLE_NORMALIZER + (double) i * this.thetaStep);
+            this.cosMap[i] = Math.cos(minimumTheta * PI / ANGLE_NORMALIZER + (double) i * this.thetaStep);
         }
     }
 }

@@ -2,7 +2,6 @@ package com.scanner.cardreader.preprocessing;
 
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Matrix;
 
 /**
@@ -40,69 +39,10 @@ public class RotateByMatrix {
     }
 
     public Bitmap applyInPlace(Bitmap fastBitmap) {
-
-//        calculate the scale - in this case = 0.4f
-//        float scaleWidth = ((float) newWidth) / newWidth;
-//        float scaleHeight = ((float) newHeight) / newHeight;
-//        createa rotationMatrix for the manipulation
-//         resize the bit map
-//        rotationMatrix.preScale(scaleWidth, scaleHeight);
-//         rotate the Bitmap
         Matrix rotationMatrix = new Matrix();
         rotationMatrix.setRotate((float) angle);
         Bitmap rotatedBitmap = Bitmap.createBitmap(fastBitmap, 0, 0,
                 newWidth, newHeight, rotationMatrix, false);
-
-//                      System.out.println("rotated values");
-//                int w = resizedBitmap.getWidth();
-//                int h = resizedBitmap.getHeight();
-//
-//                for (int i = 0; i < h; i++) {
-//                    for (int j = 0; j < w; j++) {
-//                        System.out.println("rotated(" + i + "," + j + ")" + Integer.toHexString(resizedBitmap.getPixel(i, j)));
-//                    }
-//                }
-
-
-        for (int i = 0; i < rotatedBitmap.getWidth(); i++) {
-            for (int j = 0; j < rotatedBitmap.getHeight(); j++) {
-                int pixel = rotatedBitmap.getPixel(i, j);
-                int A = Color.alpha(pixel);
-                int R = Color.red(pixel);
-                int G = Color.green(pixel);
-                int B = Color.blue(pixel);
-//
-//                if (i == rotatedBitmap.getWidth()/2)
-//                    System.out.println(i + "," + j + ": " + Color.alpha(pixel) + "," + Color.red(pixel) + "," + Color.green(pixel) + "," + Color.blue(pixel));
-//                if ( (A==255)&&(R == 0) && (G == 0) && (B == 0)) {
-//                    rotatedBitmap.setPixel(i, j, Color.WHITE);
-//                }
-            }
-        }
-
-//        Bitmap whiteBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
-//        whiteBitmap.eraseColor(Color.WHITE);
-//
-//        Bitmap resultBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
-//
-//        Canvas c = new Canvas(resultBitmap);
-
-//        c.drawBitmap(whiteBitmap,0f,0f,null);
-//        c.drawBitmap(rotatedBitmap,newWidth,newHeight,null);
-
-//
-//        Threshold threshold = new BradleyThreshold();
-//        rotatedBitmap = threshold.threshold(rotatedBitmap);
-
-//        Drawable d1 = new BitmapDrawable(whiteBitmap);
-//        Drawable d2 = new BitmapDrawable(rotatedBitmap);
-//
-//        d1.setBounds(0, 0, newWidth, newHeight);
-//        d2.setBounds(100, 100, newWidth - 100, newHeight - 100);
-//        d1.draw(c);
-//        d2.draw(c);
-
-
         return rotatedBitmap;
     }
 

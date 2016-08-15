@@ -22,6 +22,7 @@ public class WeightReader {
     double [][] weightsArr;  //Contains weights and bias array
 
     public double [][] getWeights(String jsonContent, String weights) {
+
         try {
             JSONObject jsonRootObject = new JSONObject(jsonContent);
             JSONArray jsonWeightArray = jsonRootObject.optJSONArray(weights);
@@ -46,7 +47,6 @@ public class WeightReader {
 
 
     }
-
 
 }
 

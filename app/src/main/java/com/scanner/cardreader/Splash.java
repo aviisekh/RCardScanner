@@ -8,8 +8,8 @@ package com.scanner.cardreader;
  * activity since these tasks can be done prior to the  run time.
  *
  */
+
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Camera;
 import android.os.Bundle;
@@ -36,17 +36,20 @@ public class Splash extends Activity {
 
     private TextView siminfo ;
 
-    /** Called when the activity is first created. */
+
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
-       siminfo = (TextView)findViewById(R.id.splashSimInfo) ;
+        siminfo = (TextView) findViewById(R.id.splashSimInfo);
 
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
-        new Handler().postDelayed(new Runnable(){
+        new Handler().postDelayed(new Runnable() {
 
 
             @Override
@@ -54,18 +57,15 @@ public class Splash extends Activity {
 
                 TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
-                    if(telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL"){
+                    if (telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL") {
 
                         SIM = "NCELL";
 
-                    }
-                    else{
+                    } else {
                         SIM = "NTC";
                     }
-                }
-                else
-                {
-                    SIM ="No SIM detected";
+                } else {
+                    SIM = "No SIM detected";
                 }
 
                 siminfo.setText(SIM);
@@ -84,6 +84,7 @@ public class Splash extends Activity {
 
                 /* Create an Intent that will start the Camera Activity. */
                 Intent mainIntent = new Intent(Splash.this,CameraAccess.class);
+
                 Splash.this.startActivity(mainIntent);
                 Splash.this.finish();
             }

@@ -30,7 +30,9 @@ public class NNMatrix {
     }
 
     // copy constructor
-    private NNMatrix(NNMatrix A) { this(A.data); }
+    private NNMatrix(NNMatrix A) {
+        this(A.data);
+    }
 
 
     // return C = A + B
@@ -43,7 +45,6 @@ public class NNMatrix {
                 C.data[i][j] = A.data[i][j] + B.data[i][j];
         return C;
     }
-
 
 
     // return C = A * B
@@ -63,17 +64,15 @@ public class NNMatrix {
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++)
                 //this.data[i][j] =1.0/(1+Math.exp(-this.data[i][j]));
-                A.data[i][j] =1.0/(1+Math.exp(-this.data[i][j]));
+                A.data[i][j] = 1.0 / (1 + Math.exp(-this.data[i][j]));
         return A;
     }
-
-
 
 
     // print matrix to standard output
     public void showOutputArray() {
         Log.d("OutputMatrix", Arrays.deepToString(this.data));
-        }
+    }
 
     public int filterOutput() {
         int largestIndex = 0;
@@ -100,14 +99,13 @@ public class NNMatrix {
 
             }
         }
-        Log.d("Output",largestIndex+" has probability "+Double.toString(largest));
+        Log.d("Output", largestIndex + " has probability " + Double.toString(largest));
 
         if (largest > 0.5)
             return largestIndex;
         else return -1;
 
     }
-
 
 
 }
