@@ -39,18 +39,13 @@ public class CameraOverlay extends View {
         drawLineBoundary = new Paint();
         drawLineGrid = new Paint();
 
-        drawRect.setColor(Color.argb(150, 0, 0, 0));
-        drawRect.setAntiAlias(true);
-        drawRect.setStrokeWidth(5);
-        drawRect.setStyle(Paint.Style.FILL);
-        drawRect.setStrokeJoin(Paint.Join.ROUND);
-        drawRect.setStrokeCap(Paint.Cap.ROUND);
+        drawRect.setColor(Color.argb(50, 0, 0, 0));
 
 
-        drawLineBoundary.setColor(Color.argb(255, 255, 255, 255));
+        drawLineBoundary.setColor(Color.argb(255, 12, 139, 86));
         drawLineBoundary.setStrokeWidth(5);
 
-        drawLineGrid.setColor(Color.argb(200, 255, 255, 255));
+        drawLineGrid.setColor(Color.argb(50, 255, 255, 255));
         drawLineGrid.setStrokeWidth(2);
     }
 
@@ -75,7 +70,7 @@ public class CameraOverlay extends View {
         left = parentWidth / 7;
         top = parentHeight / 6;
         right = 6*parentWidth / 7;
-        bottom = parentHeight / 4;
+        bottom = parentHeight / 3;
     }
 
     public void drawRectangle(Canvas canvas) {
@@ -97,11 +92,22 @@ public class CameraOverlay extends View {
         canvas.drawLine(left, top + (bottom - top) / 3, right, top + (bottom - top) / 3, drawLineGrid);
         canvas.drawLine(left, top + 2 * (bottom - top) / 3, right, top + 2 * (bottom - top) / 3, drawLineGrid);
 
+/*
         canvas.drawLine(left, top, right, top, drawLineBoundary);
         canvas.drawLine(left, top, left, bottom, drawLineBoundary);
         canvas.drawLine(left, bottom, right, bottom, drawLineBoundary);
-        canvas.drawLine(left, bottom, right, bottom, drawLineBoundary);
         canvas.drawLine(right, top, right, bottom, drawLineBoundary);
+*/
+
+        canvas.drawLine(left, top-2, left, top+20, drawLineBoundary);
+        canvas.drawLine(left-2, top, left+20, top, drawLineBoundary);
+        canvas.drawLine(left-2, bottom, left+20, bottom, drawLineBoundary);
+        canvas.drawLine(left, bottom+2, left, bottom-20, drawLineBoundary);
+
+        canvas.drawLine(right, top-2, right, top+20, drawLineBoundary);
+        canvas.drawLine(right+2, top, right-20, top, drawLineBoundary);
+        canvas.drawLine(right+2, bottom, right-20, bottom, drawLineBoundary);
+        canvas.drawLine(right, bottom+2, right, bottom-20, drawLineBoundary);
 
 
     }

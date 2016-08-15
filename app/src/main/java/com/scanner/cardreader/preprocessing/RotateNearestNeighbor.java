@@ -6,15 +6,28 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import com.scanner.cardreader.interfaces.Rotate;
+
 /**
  * Created by anush on 7/19/2016.
  */
 
-public class RotateNearestNeighbor implements com.scanner.cardreader.interfaces.Rotate{
+public class RotateNearestNeighbor implements Rotate {
+
+    private double PI = 3.141592653589793D;
+
+
     private double angle;
+    private double angleRad;
     private boolean keepSize;
     private int newWidth;
     private int newHeight;
+    int originalILocation;
+    int originalJLocation;
+    double oldIradius;
+    double oldJradius;
+    double newIradius;
+    double newJradius;
 
     public double getAngle() {
         return -this.angle;
@@ -42,108 +55,93 @@ public class RotateNearestNeighbor implements com.scanner.cardreader.interfaces.
         this.keepSize = keepSize;
     }
 
-    public Bitmap rotateImage(Bitmap sourceBitmap) {
-        int width;
-        int height;
-        double oldIradius;
-        double oldJradius;
-        Bitmap rotatedBitmap;
-        double newIradius;
-        double newJradius;
-        double angleRad;
-        double angleCos;
-        double angleSin;
-        double ci;
-        double cj;
-        int oi;
-        int oj;
-        int i;
-        int j;
-        int[] sourceImagePixels;
-        int[] resultImagePixels;
-        width = sourceBitmap.getWidth();
-        height = sourceBitmap.getHeight();
-        oldIradius = (double) (height - 4) / 2.0D;
-        oldJradius = (double) (width - 4) / 2.0D;
-        this.calculateNewSize(sourceBitmap);
-        rotatedBitmap = Bitmap.createBitmap(this.newWidth, this.newHeight, Bitmap.Config.ARGB_8888);
+    private double convertToRadian(double angle) {
+        return this.angle * PI / 180.0D;
+    }
+
+    private double calculateCosine(double angle) {
+        return Math.cos(convertToRadian(angle));
+    }
+
+    private double calculateSine(double angle) {
+        return Math.sin(convertToRadian(angle));
+    }
+
+    private void reverseMapping(double calculatedI, double calculatedJ) {
+        double angleCos = calculateCosine(angle);
+        double angleSin = calculateSine(angle);
+        originalILocation = (int) (angleCos * calculatedI + angleSin * calculatedJ + oldIradius);
+        originalJLocation = (int) (-angleSin * calculatedI + angleCos * calculatedJ + oldJradius);
+    }
+
+
+    private void calculateOldRadius(int sourceImageHeight, int sourceImageWidth) {
+        oldIradius = (double) (sourceImageHeight - 4) / 2.0D;
+        oldJradius = (double) (sourceImageWidth - 4) / 2.0D;
+    }
+
+    private void calculateNewRadius() {
         newIradius = (double) (this.newHeight - 4) / 2.0D;
         newJradius = (double) (this.newWidth - 4) / 2.0D;
-        angleRad = this.angle * 3.141592653589793D / 180.0D;
-        angleCos = Math.cos(angleRad);
-        angleSin = Math.sin(angleRad);
-        ci = -newIradius;
+    }
 
+    private boolean isReverseMappingValid(int sourceImageHeight, int sourceImageWidth) {
+        if (originalILocation >= 0 && originalJLocation >= 0 && originalILocation < sourceImageHeight && originalJLocation < sourceImageWidth)
+            return true;
 
+        return false;
+    }
+
+    private int extractOriginalPixel(Bitmap sourceBitmap) {
+        return sourceBitmap.getPixel(originalJLocation, originalILocation);
+    }
+
+    public Bitmap rotateImage(Bitmap sourceBitmap) {
+        int sourceImageWidth = sourceBitmap.getWidth();
+        int sourceImageHeight = sourceBitmap.getHeight();
+        calculateOldRadius(sourceImageHeight, sourceImageWidth);
+        this.calculateNewSize(sourceBitmap);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(this.newWidth, this.newHeight, Bitmap.Config.ARGB_8888);
+        calculateNewRadius();
+        double calculatedI = -newIradius;
+        double calculatedJ;
         System.out.println("values mapped to previous frame");
-        for (i = 0; i < this.newHeight; ++i) {
-            cj = -newJradius;
-
-            for (j = 0; j < this.newWidth; ++j) {
-                oi = (int) (angleCos * ci + angleSin * cj + oldIradius);
-                oj = (int) (-angleSin * ci + angleCos * cj + oldJradius);
-//                System.out.println("x:" + oi + "<" + sourceBitmap.getWidth() + " ,y:"  + oj +"<" + sourceBitmap.getHeight());
-                if (oi >= 0 && oj >= 0 && oi < height && oj < width) {
-                    rotatedBitmap.setPixel(j,i,sourceBitmap.getPixel(oj,oi));
+        for (int height = 0; height < this.newHeight; ++height) {
+            calculatedJ = -newJradius;
+            for (int width = 0; width < this.newWidth; ++width) {
+                reverseMapping(calculatedI, calculatedJ);
+//                System.out.println("x:" + originalILocation + "<" + sourceBitmap.getWidth() + " ,y:"  + originalJLocation +"<" + sourceBitmap.getHeight());
+                if (isReverseMappingValid(sourceImageHeight, sourceImageWidth)) {
+                    rotatedBitmap.setPixel(width, height, extractOriginalPixel(sourceBitmap));
                 } else {
-                    rotatedBitmap.setPixel(j,i, Color.WHITE);
+                    rotatedBitmap.setPixel(width, height, Color.WHITE);
                 }
-                ++cj;
+                ++calculatedJ;
             }
-
-            ++ci;
+            ++calculatedI;
         }
-        System.out.println("rotated height:" + newHeight + " prev height" + height);
-        System.out.println("rotated width:" + newWidth + " prev width" + width);
+//        System.out.println("rotated sourceImageHeight:" + newHeight + " prev sourceImageHeight" + sourceImageHeight);
+//        System.out.println("rotated sourceImageWidth:" + newWidth + " prev sourceImageWidth" + sourceImageWidth);
+        return prepareRotatedBitmap(rotatedBitmap);
+    }
 
-        //sourceBitmap.setImage(rotatedBitmap);
-
-        System.out.println("rotated values");
-
-//        for (int x = 0; x < h; x++) {
-//            for (int y = 0; y < w; y++) {
-//                System.out.println("nn(" + x + "," + y + ")"
-//                        + Integer.toHexString(rotatedBitmap.getPixel(x, y)));
-//            }
-//        }
-
-//        rotatedBitmap.setPixels(resultImagePixels, 0, newWidth, 0, 0, newWidth, newHeight);
-        Bitmap whiteBitmap= Bitmap.createBitmap(newWidth,newHeight, Bitmap.Config.ARGB_8888);
-        whiteBitmap.eraseColor(Color.WHITE);
-        Bitmap resultBitmap =Bitmap.createBitmap(newWidth,newHeight, Bitmap.Config.ARGB_8888);
-
+    private Bitmap prepareRotatedBitmap(Bitmap rotatedBitmap) {
+        Bitmap backgroundBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
+        backgroundBitmap.eraseColor(Color.WHITE);
+        Bitmap resultBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
 
         Canvas resultCanvas = new Canvas(resultBitmap);
-
-//        resultCanvas.drawBitmap(whiteBitmap,0f,0f,null);
+//        resultCanvas.drawBitmap(backgroundBitmap,0f,0f,null);
 //        resultCanvas.drawBitmap(rotatedBitmap,newWidth,newHeight,null);
-
-
-        Drawable whiteDrawable= new BitmapDrawable(whiteBitmap);
-        Drawable rotatedImageDrawable= new BitmapDrawable(rotatedBitmap);
-
-        whiteDrawable.setBounds(0,0,newWidth,newHeight);
-        rotatedImageDrawable.setBounds(1,1,newWidth-1,newHeight-1);
-        whiteDrawable.draw(resultCanvas);
+        Drawable backgroundDrawable = new BitmapDrawable(backgroundBitmap);
+        Drawable rotatedImageDrawable = new BitmapDrawable(rotatedBitmap);
+        backgroundDrawable.setBounds(0, 0, newWidth, newHeight);
+        rotatedImageDrawable.setBounds(1, 1, newWidth - 1, newHeight - 1);
+        backgroundDrawable.draw(resultCanvas);
         rotatedImageDrawable.draw(resultCanvas);
-
-
-//        float scaleWidth = ((float) newWidth) / 2;
-//        float scaleHeight = ((float) newHeight) / 2;
-//        create matrix for the manipulation
-//         resize the bit map
-//
-//         rotate the Bitmap
-//        Matrix matrix = new Matrix();
-//        matrix.setScale(scaleWidth, scaleHeight);
-//        Bitmap lastBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0,
-//                newWidth, newHeight, matrix, false);
-
-//        Bitmap lastBitmap = Bitmap.createScaledBitmap(sourceBitmap,sourceBitmap.getWidth()-200,sourceBitmap.getHeight()-200, true);
         return resultBitmap;
-        //rotatedBitmap.recycle();
-
     }
+
 
     private int[] createPixelArray(int width, int height, Bitmap sourceImage) {
         int[] sourcePixels = new int[width * height];
@@ -151,16 +149,16 @@ public class RotateNearestNeighbor implements com.scanner.cardreader.interfaces.
         return sourcePixels;
     }
 
-    private void calculateNewSize(Bitmap fastBitmap) {
+    private void calculateNewSize(Bitmap sourceBitmap) {
         if (this.keepSize) {
-            this.newWidth = fastBitmap.getWidth();
-            this.newHeight = fastBitmap.getHeight();
+            this.newWidth = sourceBitmap.getWidth();
+            this.newHeight = sourceBitmap.getHeight();
         } else {
             double angleRad = -this.angle * 3.141592653589793D / 180.0D;
             double angleCos = Math.cos(angleRad);
             double angleSin = Math.sin(angleRad);
-            double halfWidth = (double) fastBitmap.getWidth() / 2.0D;
-            double halfHeight = (double) fastBitmap.getHeight() / 2.0D;
+            double halfWidth = (double) sourceBitmap.getWidth() / 2.0D;
+            double halfHeight = (double) sourceBitmap.getHeight() / 2.0D;
 
             double cx1 = halfWidth * angleCos;
             double cy1 = halfWidth * angleSin;

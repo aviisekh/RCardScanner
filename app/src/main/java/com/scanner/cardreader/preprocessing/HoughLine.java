@@ -55,10 +55,10 @@ public class HoughLine implements Comparable {
     }
 
     //TODO draw hough lines
-    public void DrawLineGray(Bitmap fastBitmap, int gray) {
+    public void drawHoughLine(Bitmap sourceBitmap, int gray) {
 
-        int height = fastBitmap.getHeight();
-        int width = fastBitmap.getWidth();
+        int height = sourceBitmap.getHeight();
+        int width = sourceBitmap.getWidth();
         int houghHeight = (int) (Math.sqrt(2.0D) * (double) Math.max(height, width)) / 2;
         float centerX = (float) (width / 2);
         float centerY = (float) (height / 2);
@@ -70,14 +70,14 @@ public class HoughLine implements Comparable {
             for (x = 0; x < height; ++x) {
                 y = (int) ((this.radius - (double) houghHeight - (double) ((float) x - centerX) * tcos) / tsin + (double) centerY);
                 if (y < width && y >= 0) {
-                    fastBitmap.setPixel(x, y, gray);
+                    sourceBitmap.setPixel(x, y, gray);
                 }
             }
         } else {
             for (x = 0; x < width; ++x) {
                 y = (int) ((this.radius - (double) houghHeight - (double) ((float) x - centerY) * tsin) / tcos + (double) centerX);
                 if (y < height && y >= 0) {
-                    fastBitmap.setPixel(y, x, gray);
+                    sourceBitmap.setPixel(y, x, gray);
                 }
             }
         }

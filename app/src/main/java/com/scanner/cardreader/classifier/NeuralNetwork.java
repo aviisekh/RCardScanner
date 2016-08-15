@@ -7,14 +7,14 @@ public class NeuralNetwork {
     NNMatrix weights_at_layer2,weights_at_layer3;
     NNMatrix biases_at_layer2,biases_at_layer3;
 
-    public NeuralNetwork()
+    public NeuralNetwork(double [][]biases_at_layer2,double[][] biases_at_layer3,double[][] weight_at_layer2,double[][] weight_at_layer3)
     {
 
 
-        this.weights_at_layer2 = new NNMatrix(WeightReader.weight_at_layer2);
-        this.weights_at_layer3 = new NNMatrix(WeightReader.weight_at_layer3);
-        this.biases_at_layer2 = new NNMatrix(WeightReader.biases_at_layer2);
-        this.biases_at_layer3 = new NNMatrix(WeightReader.biases_at_layer3);
+        this.weights_at_layer2 = new NNMatrix(weight_at_layer2);
+        this.weights_at_layer3 = new NNMatrix(weight_at_layer3);
+        this.biases_at_layer2 = new NNMatrix(biases_at_layer2);
+        this.biases_at_layer3 = new NNMatrix(biases_at_layer3);
     }
 
     public NNMatrix FeedForward(NNMatrix a)

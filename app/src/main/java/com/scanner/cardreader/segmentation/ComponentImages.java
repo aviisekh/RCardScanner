@@ -22,6 +22,7 @@ public class ComponentImages {
 
     }
 
+
     private void SortByX(ArrayList<int[][]> componentArrayList) {
         int[][] temp;
         boolean swapped;

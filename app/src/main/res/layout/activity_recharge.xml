@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#000000"
+    android:orientation="vertical"
+    tools:context="com.scanner.cardreader.camera.CropActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/darkTheme">
+
+
+        <ImageButton
+            android:id="@+id/redoFromRecharge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:text="@string/redo"
+            android:tint="#FFFF"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/rechargeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="#FFFF"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/relativeLayout2"
+        android:id="@+id/relativeLayout3"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/image_from_camera" />
+
+
+        <EditText
+            android:id="@+id/ocrResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:background="#646262"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+</RelativeLayout>
+

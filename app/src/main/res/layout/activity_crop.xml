@@ -3,85 +3,105 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.scanner.cardreader.camera.CropActivity"
-    android:orientation="vertical">
+    android:background="#000000"
+
+    tools:context="com.scanner.cardreader.camera.CropActivity">
+
 
     <RelativeLayout
+        android:id="@+id/relativeLayout0"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:id="@+id/relativeLayout"
-        >
-
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_alignParentStart="true"
-                android:textSize="22sp"
-                android:text="@string/redo"
-                android:id="@+id/redoBtn"
-                android:visibility="visible"/>
+        android:background="@color/darkTheme">
 
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:textSize="22sp"
-                android:text="@string/recharge"
-                android:id="@+id/rechargeBtn"
-                android:visibility="invisible"
-                />
+        <ImageButton
+            android:id="@+id/redoFromCrop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:text="@string/redo"
+            android:tint="#FFFF"
+            android:visibility="visible" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:textSize="22sp"
-                android:text="@string/crop"
-                android:id="@+id/cropBtn"
-                android:visibility="visible"
-                />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:text="@string/threshold"
-                android:id="@+id/threshBtn"
-                android:textSize="22sp"
-                android:visibility="invisible"
-                />
-        </RelativeLayout>
+        <ImageButton
+            android:id="@+id/cropBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="#FFFF"
+            android:visibility="visible" />
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/relativeLayout">
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/relativeLayout0"
+        android:id="@+id/relativeLayout1">
 
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/imageView"
-            android:contentDescription="@string/image_from_camera"/>
+            android:contentDescription="@string/image_from_camera" />
+
 
         <com.scanner.cardreader.camera.ClippingWindow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:id="@+id/clipping"
-            android:visibility="visible"
-            />
-
-        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ocrResult"
-            android:visibility="visible"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
+            android:layout_height="match_parent"/>
+
+
+
+        <!--        <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/spinner"
+                    android:layout_alignParentBottom="true"
+                    android:layou   t_alignParentStart="true"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:visibility="invisible"/>
+
+
+                <NumberPicker
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/np"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:visibility="visible"></NumberPicker>-->
+        <!--        <EditText
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:id="@+id/rechargePrefix"
+                    android:textColor="@android:color/white"
+                    android:visibility="invisible"
+                    android:layout_marginBottom="5dp"
+                    android:singleLine="true"
+                    android:background="#646262"/>-->
+
+
+
+
     </RelativeLayout>
 </RelativeLayout>
 

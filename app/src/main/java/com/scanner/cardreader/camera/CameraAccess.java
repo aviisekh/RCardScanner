@@ -1,116 +1,195 @@
 package com.scanner.cardreader.camera;
-
-
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.scanner.cardreader.MainActivity;
 import com.scanner.cardreader.R;
+import com.scanner.cardreader.Splash;
+
+import java.io.ByteArrayOutputStream;
 
 
-public class CameraAccess extends Activity implements SurfaceHolder.Callback {
+public class CameraAccess extends Activity implements SurfaceHolder.Callback, View.OnClickListener, View.OnLongClickListener {
+    private Vibrator heptics;
+
+    private final int HEPTICS_CONSTANT=50;
 
     private Camera camera;
-    SurfaceHolder surfaceHolder;
-    SurfaceView surfaceView;
-    boolean isPreviewing = false;
+    private SurfaceHolder surfaceHolder;
+    private SurfaceView surfaceView;
 
-    CameraOverlay cameraOverlay;
+    private boolean isPreviewing = false;
 
-    android.support.design.widget.FloatingActionButton takePicture;
-    TextView simInfo;
+    private RelativeLayout animateView;
+    private ImageButton simSelector;
+    private android.support.design.widget.FloatingActionButton takePicture;
+    private TextView simInfo;
+    private int cameraId;
 
+    private static int count = 1;
     public static Bitmap bitmap;
 
-    int cameraId;
+
+    final PictureCallback jpegPictureCallBack = new PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] bytes, Camera camera) {
+            try {
+                if (bytes != null)
+                {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    //byte[] byteArray = stream.toByteArray();
+
+                    Intent intent = new Intent(getApplicationContext(), CropActivity.class);
+                    //intent.putExtra("image",byteArray);
+
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 4;
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                    setBitmapImage(bitmap);
+                    startActivity(intent);
+                    camera.stopPreview();
+                    camera.release();
+                    camera.setPreviewCallback(null);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        instantiate();
+
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         cameraId = findRearFacingCamera();
-        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        cameraOverlay = (CameraOverlay) findViewById(R.id.clipping);
 
-        simInfo = (TextView) findViewById(R.id.simInfo);
-        simInfo.setText(MainActivity.SIM);
-
-
-        final PictureCallback jpegPictureCallBack = new PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                try {
-                    if (bytes != null)
-                    {
-                        Intent i = new Intent(getApplicationContext(), CropActivity.class);
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 4;
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        setBitmapImage(bitmap);
-                        startActivity(i);
-                        camera.stopPreview();
-                        camera.release();
-                        camera.setPreviewCallback(null);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-
-            }
-        };
-
-        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
-        takePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(camera == null){
-//                    Toast.makeText(CameraAccess.this, "No camera", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    camera.takePicture(null,null,null,jpegPictureCallBack);
-//                    Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        RelativeLayout previewBackground = (RelativeLayout) findViewById(R.id.cameraBackground);
-
+        CameraOverlay previewBackground = (CameraOverlay) findViewById(R.id.overlay);
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 takePicture.setEnabled(false);
-                try {
-                    camera.autoFocus(autoFocusCallback);
+                if (event.getAction() == event.ACTION_DOWN) {
+                    try {
+                        camera.autoFocus(autoFocusCallback);
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return true;
                 }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-                return true;
+                return false;
+
             }
+
 
         });
 
 
+    }
+
+    public void instantiate() {
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        animateView = (RelativeLayout) findViewById(R.id.animateBar);
+        simSelector = (ImageButton) findViewById(R.id.simSelect);
+        simInfo = (TextView) findViewById(R.id.simInfo);
+        simInfo.setText(Splash.SIM);
+        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
+
+        heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
+        simSelector.setOnClickListener(this);
+        takePicture.setOnClickListener(this);
+
+        takePicture.setOnLongClickListener(this);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        heptics.vibrate(HEPTICS_CONSTANT);
+        switch (v.getId()) {
+
+            case R.id.simSelect:
+                displaySimMenu();
+                break;
+
+            case R.id.takepicture:
+                capturePicture();
+                break;
+        }
+
+
+    }
+
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.takepicture:
+                Toast.makeText(this, "Capture Image", Toast.LENGTH_LONG).show();
+                break;
+        }
+        return true;
+    }
+
+    void capturePicture() {
+        try {
+            camera.takePicture(null, null, null, jpegPictureCallBack);
+            //Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displaySimMenu() {
+        if (count % 2 == 0) {
+            TranslateAnimation animate = new TranslateAnimation(0, 0 - animateView.getWidth(), 0, 0);
+            animate.setDuration(500);
+            animateView.startAnimation(animate);
+            animateView.setVisibility(View.GONE);
+            count++;
+
+        }
+
+        else
+        {
+
+            TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
+
+            animate.setDuration(500);
+            animateView.startAnimation(animate);
+            animateView.setVisibility(View.VISIBLE);
+            count++;
+        }
     }
 
     Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {
@@ -121,16 +200,9 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
     };
 
 
-
-//    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
-//        @Override
-//        public void onShutter() {
-//
-//        }
-//    };
-
     public static Bitmap getBitmapImage()
     {
+        //Mapping the overlay Coordinates with Bitmap Coordinates Window to ViewPort Transformation
         bitmap=getRotatedImage(bitmap);
         int left = (bitmap.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
         int right  = (bitmap.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
@@ -222,4 +294,6 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback {
         }
         return cameraId;
     }
+
+
 }
