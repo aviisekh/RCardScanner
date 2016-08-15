@@ -261,7 +261,7 @@ public class CropActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     CcLabeling ccLabeling = new CcLabeling();
                     ComponentImages componentImages = new ComponentImages(CropActivity.this);
-                    componentBitmaps = componentImages.ComponentImages(ccLabeling.CcLabels(booleanImage, width));
+                    componentBitmaps = componentImages.CreateComponentImages(ccLabeling.CcLabels(booleanImage, width));
 //                    writing segment into media
                     for (int i = 0; i < componentBitmaps.size(); i++)
                     {
