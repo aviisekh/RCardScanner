@@ -17,9 +17,6 @@ import java.util.LinkedHashMap;
  */
 public class ComponentImages {
     Context context;
-    ArrayList<Integer> Heights;
-    HashMap<Integer, Integer> segmentHeights;
-
     public ComponentImages(Context context) {
         this.context = context;
 
@@ -161,49 +158,7 @@ public class ComponentImages {
 
     }
 
-
-    public ArrayList<Bitmap> CreateImageFromComponents(int[][][] componentArray) {
-        System.out.println(componentArray.length);
-        ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
-        HeightSorting(componentArray);
-        ArrayList<int[][]> componentArrayList  = Variance.CheckVarianceInClusters(Clustering(componentArray));
-        Log.d("size of components", ""+ componentArrayList.size());
-        SortByX(componentArrayList);
-        Heights = new ArrayList<>();
-        segmentHeights = new LinkedHashMap<>();
-        for (int component = 0; component < componentArray.length; component++) {
-            int minX = MinXY(componentArray[component])[0];
-            int minY = MinXY(componentArray[component])[1];
-            int maxX = MaxXY(componentArray[component])[0];
-            int maxY = MaxXY(componentArray[component])[1];
-            int componentHeight = maxY - minY + 1;
-            int componentWidth = maxX - minX + 1;
-            Heights.add(componentHeight);
-            Bitmap componentSegment = Bitmap.createBitmap(componentWidth, componentHeight, Bitmap.Config.RGB_565);
-            Canvas c = new Canvas(componentSegment);
-            c.drawColor(Color.WHITE);
-            c.drawBitmap(componentSegment, 0, 0, null);
-            for (int pixel = 0; pixel < componentArray[component].length; pixel++) {
-                int x = componentArray[component][pixel][0] - minX;
-                int y = componentArray[component][pixel][1] - minY;
-                componentSegment.setPixel(x, y, Color.BLACK);
-            }
-            bitmapArrayList.add(componentSegment);
-//            ImageWriter imageWriter= new ImageWriter(context);
-
-//            imageWriter.writeImage(componentSegment, true, "aftersegment", "06_segmentation");
-        }
-
-        for (int i : Heights) {
-            System.out.println(i);
-        }
-
-
-        System.out.println(bitmapArrayList.size());
-        return bitmapArrayList;
-    }
-
-    public ArrayList<Bitmap> ComponentImages(int[][][] componentArray) {
+    public ArrayList<Bitmap> CreateComponentImages(int[][][] componentArray) {
         System.out.println(componentArray.length);
         ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
         HeightSorting(componentArray);
@@ -219,11 +174,14 @@ public class ComponentImages {
             int componentHeight = maxY - minY + 1;
             int componentWidth = maxX - minX + 1;
 
+
+
             Bitmap componentSegment = Bitmap.createBitmap(componentWidth, componentHeight, Bitmap.Config.RGB_565);
             Canvas c = new Canvas(componentSegment);
             c.drawColor(Color.WHITE);
             c.drawBitmap(componentSegment, 0, 0, null);
-            for (int pixel = 0; pixel < componentArrayList.get(component).length; pixel++) {
+            for (int pixel = 0; pixel < componentArrayList.get(component).length; pixel++)
+            {
                 int x = componentArrayList.get(component)[pixel][0] - minX;
                 int y = componentArrayList.get(component)[pixel][1] - minY;
                 componentSegment.setPixel(x, y, Color.BLACK);
@@ -233,7 +191,6 @@ public class ComponentImages {
 
 //            imageWriter.writeImage(componentSegment, true, "aftersegment", "06_segmentation");
         }
-
 
         System.out.println(bitmapArrayList.size());
         return bitmapArrayList;
