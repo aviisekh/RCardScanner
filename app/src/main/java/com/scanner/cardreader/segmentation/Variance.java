@@ -1,5 +1,7 @@
 package com.scanner.cardreader.segmentation;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 
@@ -8,9 +10,9 @@ import java.util.ArrayList;
  */
 public class Variance {
 
-    public static int CalculateMean(ArrayList<Integer> minY) {
+    private static double CalculateMean(ArrayList<Integer> minY) {
         int len = minY.size();
-        int sum = 0;
+        double sum = 0;
         for (int i = 0; i < len; i++) {
             sum += minY.get(i);
         }
@@ -18,10 +20,10 @@ public class Variance {
         return sum / len;
     }
 
-    static int CalculateVariance(ArrayList<Integer> minY) {
-        int valuesMean = CalculateMean(minY);
+    private static double CalculateVariance(ArrayList<Integer> minY) {
+        double valuesMean = CalculateMean(minY);
         int len = minY.size();
-        int sum = 0;
+        double sum = 0;
         for (int i = 0; i < len; i++) {
             sum += (minY.get(i) - valuesMean) * (minY.get(i) - valuesMean);
         }
@@ -41,27 +43,78 @@ public class Variance {
     }
 
 
+    private static void VarianceSorting(ArrayList<ArrayList<int[][]>> clusterArrayList, int len) {
+        System.out.println("Arraylist sorting by variance");
+        ArrayList<int[][]> temp;
+        boolean swapped;
+        for (int u = 0; u < len - 1; u++) {
+            swapped = false;
+            for (int v = 0; v < len - 1 - u; v++) {
+                ArrayList<Integer> minY1, minY2;
+                minY1 = new ArrayList<>();
+                minY2 = new ArrayList<>();
+                for (int c1 = 0; c1 < clusterArrayList.get(v).size(); c1++)
+                {
+                    minY1.add(MinY(clusterArrayList.get(v).get(c1)));
+                }
+                for (int c2 = 0; c2 < clusterArrayList.get(v + 1).size(); c2++) {
+                    minY2.add(MinY(clusterArrayList.get(v + 1).get(c2)));
+                }
+                double v1 = CalculateVariance(minY1);
+                double v2 = CalculateVariance(minY2);
+                if ((v1) > (v2)) {
+                    temp = clusterArrayList.get(v);
+                    clusterArrayList.set(v, clusterArrayList.get(v + 1));
+                    clusterArrayList.set(v + 1, temp);
+                    swapped = true;
+                }
+            }
+            if (!swapped) break;
+        }
+
+    }
+
     public static ArrayList<int[][]> CheckVarianceInClusters(ArrayList<ArrayList<int[][]>> clusterArrayList) {
-        ArrayList<Integer> minY;
-        minY = new ArrayList<>();
-        int[] variance = new int[clusterArrayList.size()];
-
-
-        for (int i = 0; i < clusterArrayList.size(); i++) {
+        VarianceSorting(clusterArrayList, clusterArrayList.size());
+        ArrayList<Integer> minY = new ArrayList<>();
+        double[] variance = new double[clusterArrayList.size()];
+                for (int i = 0; i < clusterArrayList.size(); i++) {
             for (int j = 0; j < clusterArrayList.get(i).size(); j++) {
                 minY.add(MinY(clusterArrayList.get(i).get(j)));
             }
             variance[i] = CalculateVariance(minY);
         }
+        int count = 0;
+        for(double i : variance)
+        {
+            Log.d("variance", "" + ++count + ":"+ i);
+        }
 
+        for (int i = 0; i < clusterArrayList.size(); i++) {
+            if (clusterArrayList.get(i).size() >= 12 && clusterArrayList.get(i).size() <= 18) {
 
-        int index = 0;
-        int minVariance = variance[0];
-        for (int i = 0; i < variance.length; i++) {
-            if (minVariance > variance[i]) {
-                index = i;
+                return clusterArrayList.get(i);
             }
         }
-        return clusterArrayList.get(index);
+        return clusterArrayList.get(0);
     }
 }
+
+
+
+
+
+
+
+//
+//
+//        int index = 0;
+////        int minVariance = variance[0];
+////        for (int i = 0; i < variance.length; i++) {
+////            if (minVariance > variance[i]) {
+////                index = i;
+////            }
+////        }
+////        return clusterArrayList.get(index);
+////    }
+////}
