@@ -63,7 +63,7 @@ public class ImageWriter {
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
                 fileOutputStream.write(byteArrayOutputStream.toByteArray());
                 fileOutputStream.close();
-                Log.d("file", "created" + imageName);
+//                Log.d("file", "created" + imageName);
 //                 initiate media scan and put the new things into the folderPath array to
 //                 make the scanner aware of the location and the files you want to see
 

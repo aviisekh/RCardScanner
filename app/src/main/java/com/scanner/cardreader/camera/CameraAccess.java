@@ -269,8 +269,8 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         try {
             camera.stopPreview();
-            camera.release();
             camera.setPreviewCallback(null);
+            camera.release();
             isPreviewing = false;
 
             camera = null;

@@ -16,12 +16,10 @@ if we do the ccl on right image the ccl out put will be one connected component
         int w = img.getWidth();
         int h = img.getHeight();
 
-//        Bitmap resizedImage = Bitmap.createBitmap(img, 0,0,w+2,h+2);
         Bitmap resizedImage = Bitmap.createBitmap(w+2, h+2, Bitmap.Config.RGB_565);
         Canvas g = new Canvas();
         g.setBitmap(resizedImage);
         g.drawColor(Color.WHITE);
-//        g.drawBitmap(img, 1, 1, null);
         g.drawBitmap(img,1,1,null);
 
         return resizedImage;

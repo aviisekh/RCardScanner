@@ -166,7 +166,7 @@ public class HoughLineSkewChecker implements SkewChecker {
             for (skewAngle = startX; skewAngle < stopX; ++indexG) {
                 //different in same column
                 if (isBorderPixel(pixels[indexG], pixels[indexG + width])) {
-                    System.out.println("border pixel found");
+//                    System.out.println("border pixel found");
                     buildHoughMap(skewAngle, houghWidth, halfHoughWidth, hls);
                 }
                 ++skewAngle;

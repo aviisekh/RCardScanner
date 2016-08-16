@@ -42,25 +42,7 @@ public class ComponentImages {
             }
         }
 
-    private void ComponentSort(int[][][] componentArray) {
-        int[][] temp;
-        boolean swapped;
-        int len = componentArray.length;
-        for (int u = 0; u < len - 1; u++) {
-            swapped = false;
-            for (int v = 0; v < len - 1 - u; v++) {
-                if (MinXY(componentArray[v])[0] > MinXY(componentArray[v + 1])[0]) {
-                    temp = componentArray[v];
-                    componentArray[v] = componentArray[v + 1];
-                    componentArray[v + 1] = temp;
-                    swapped = true;
-                }
-            }
-            if (!swapped) {
-                break;
-            }
-        }
-    }
+
 
     public int ComponentHeight(int[][] componentArray)
     {
@@ -71,7 +53,6 @@ public class ComponentImages {
 
 
     public void HeightSorting(int[][][] componentArray) {
-        System.out.println("sorting by heights>>");
 
         int[][] temp;
         boolean swapped;
@@ -82,10 +63,7 @@ public class ComponentImages {
 
                 int h1 = ComponentHeight(componentArray[v]);
                 int h2 = ComponentHeight(componentArray[v+1]);
-//                int minY = MinXY(componentArray[v])[1];
-//                int minY1 = MinXY(componentArray[v + 1])[1];
-//                int maxY = MaxXY(componentArray[v])[1];
-//                int maxY1 = MaxXY(componentArray[v + 1])[1];
+
                 if ((h1) > (h2)) {
                     temp = componentArray[v];
                     componentArray[v] = componentArray[v + 1];
@@ -165,8 +143,8 @@ public class ComponentImages {
         HeightSorting(componentArray);
         ArrayList<int[][]> componentArrayList  = Variance.CheckVarianceInClusters(Clustering(componentArray));
         SortByX(componentArrayList);
-        Log.i("Components" , ""+ componentArray.length);
-        Log.i("sortedComponents" , "" + componentArrayList.size());
+//        Log.i("Components" , ""+ componentArray.length);
+//        Log.i("sortedComponents" , "" + componentArrayList.size());
         for (int component = 0; component < componentArrayList.size(); component++) {
             int minX = MinXY(componentArrayList.get(component))[0];
             int minY = MinXY(componentArrayList.get(component))[1];
@@ -193,7 +171,7 @@ public class ComponentImages {
 //            imageWriter.writeImage(componentSegment, true, "aftersegment", "06_segmentation");
         }
 
-        System.out.println(bitmapArrayList.size());
+//        System.out.println(bitmapArrayList.size());
         return bitmapArrayList;
     }
 

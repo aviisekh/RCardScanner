@@ -18,6 +18,7 @@ import com.scanner.cardreader.Splash;
 import com.scanner.cardreader.classifier.NNMatrix;
 import com.scanner.cardreader.classifier.NeuralNetwork;
 import com.scanner.cardreader.interfaces.GrayScale;
+import com.scanner.cardreader.interfaces.MedianFilter;
 import com.scanner.cardreader.interfaces.Rotate;
 import com.scanner.cardreader.interfaces.SkewChecker;
 import com.scanner.cardreader.interfaces.Threshold;
@@ -26,6 +27,7 @@ import com.scanner.cardreader.preprocessing.GammaCorrection;
 import com.scanner.cardreader.preprocessing.HoughLineSkewChecker;
 import com.scanner.cardreader.preprocessing.ITURGrayScale;
 import com.scanner.cardreader.preprocessing.ImageWriter;
+import com.scanner.cardreader.preprocessing.NonLocalMedianFilter;
 import com.scanner.cardreader.preprocessing.RotateNearestNeighbor;
 import com.scanner.cardreader.segmentation.BinaryArray;
 import com.scanner.cardreader.segmentation.CcLabeling;
@@ -33,7 +35,6 @@ import com.scanner.cardreader.segmentation.ComponentImages;
 import com.scanner.cardreader.segmentation.PrepareImage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -49,13 +50,17 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
     private Vibrator haptics;
     private final int HAPTICS_CONSTANT = 50;
 
+    private final int BLACK = -16777216;
+    private final int WHITE = -1;
 
     private Bitmap croppedImage;
 
     private ArrayList<Bitmap> componentBitmaps = new ArrayList<>();
 
     private Bitmap bmResult;
-    private String ocrString = "";
+    private String ocrResult;
+    private ImageWriter imageWriter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,20 +109,15 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
     public void instantiate() {
 
-        //image = CameraAccess.getBitmapImage();
+        imageWriter = new ImageWriter(RechargeActivity.this);
 
-        //image = BitmapFactory.decodeResource(getResources(), R.drawable.ntc_test);
         rechargeBtn = (ImageButton) findViewById(R.id.rechargeBtn);
         redoButton = (ImageButton) findViewById(R.id.redoFromRecharge);
         haptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-
         ocrResultTV = (EditText) findViewById(R.id.ocrResult);
-
-        //rechargePrefix = (EditText) findViewById(R.id.rechargePrefix);
         rechargeImView = (ImageView) findViewById(R.id.imageView2);
 
-
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
@@ -143,128 +143,121 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
             progressBar.setVisibility(View.INVISIBLE);
             ocrResultTV.setVisibility(View.VISIBLE);
             rechargeImView.setImageBitmap(thresholdedImage);
-            ocrResultTV.setText(ocrString);
+            ocrResultTV.setText(ocrResult);
         }
 
         public void processImage() {
 
-//            Log.d("guptaOut","gupta");
             //Bitmap sourceBitmap = Bitmap.createBitmap(CropActivity.croppedImage);
-            ImageWriter imageWriter = new ImageWriter(RechargeActivity.this);
-
-            //long startGamma = System.currentTimeMillis() / 1000;
-            GammaCorrection gc = new GammaCorrection(1.0);
-            bmResult = gc.correctGamma(croppedImage);
-            //long stopGamma = System.currentTimeMillis() / 1000;
-            imageWriter.writeImage(bmResult, false, "aftergamma", "01_gamma");
-
-
-            //long startGrayscale = System.currentTimeMillis() / 1000;
-            GrayScale grayScale = new ITURGrayScale(bmResult);
-            bmResult = grayScale.grayScale();
-            //long stopGrayscale = System.currentTimeMillis() / 1000;
-            //System.out.println("grayscale:" + (stopGrayscale - startGrayscale));
-            imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
-
-
-            //long startSkew = System.currentTimeMillis() / 1000;
-            SkewChecker skewChecker = new HoughLineSkewChecker();
-            double angle = skewChecker.getSkewAngle(bmResult);
-            //long stopSkew = System.currentTimeMillis() / 1000;
-            //System.out.println("angle:" + angle + " skew time:" + (stopSkew - startSkew));
-
-
-            //long startRotate = System.currentTimeMillis() / 1000;
-            Rotate rotator = new RotateNearestNeighbor(angle);
-            bmResult = rotator.rotateImage(bmResult);
-            //long stopRotate = System.currentTimeMillis() / 1000;
-            //System.out.println("rotate:" + (stopRotate - startRotate));
-            imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
-
-
-//        long startMedian = System.currentTimeMillis() / 1000;
-//        MedianFilter medianFilter = new NonLocalMedianFilter(3);
-//        bmResult = medianFilter.applyMedianFilter(bmResult);
-//        long stopMedian = System.currentTimeMillis() / 1000;
-//        System.out.println("median:" + (stopMedian - startMedian));
-//        imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
-
-
-//                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
-//                bmResult = rotate.applyMedianFilter(bmResult);
-
-            //long startThreshold = System.currentTimeMillis() / 1000;
-            Threshold threshold = new BradleyThreshold();
-            bmResult = threshold.threshold(bmResult);
-            //long stopThreshold = System.currentTimeMillis() / 1000;
-            //System.out.println("threshold:" + (stopThreshold - startThreshold));
-            imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
-
+            bmResult = gammaCorrect(croppedImage);
+            bmResult = grayScale(bmResult);
+            bmResult = skewCorrect(bmResult);
+            //bmResult = medianFilter(bmResult);
+            bmResult = threshold(bmResult);
 
             thresholdedImage = bmResult;
-            //rechargeImView.setImageBitmap(bmResult);
 
-            bmResult = PrepareImage.addBackgroundPixels(bmResult);
-            int height = bmResult.getHeight();
-            int width = bmResult.getWidth();
+            componentBitmaps = getSegmentArray(bmResult);
+            List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
+            //generateBinarySegmentedImages();
+
+            ocrResult = generateOutput(binarySegmentList);
+        }
+
+        private Bitmap gammaCorrect(Bitmap bmp)
+        {
+            GammaCorrection gc = new GammaCorrection(1.0);
+            bmp = gc.correctGamma(bmp);
+            imageWriter.writeImage(bmp, false, "aftergamma", "01_gamma");
+            return bmp;
+        }
+
+        private Bitmap grayScale(Bitmap bmp)
+        {
+            GrayScale grayScale = new ITURGrayScale(bmp);
+            bmp = grayScale.grayScale();
+            imageWriter.writeImage(bmp, false, "aftergrayscale", "02_grayscale");
+            return bmp;
+        }
+
+        private Bitmap skewCorrect(Bitmap bmp)
+        {
+            SkewChecker skewChecker = new HoughLineSkewChecker();
+            double angle = skewChecker.getSkewAngle(bmp);
+
+            Rotate rotator = new RotateNearestNeighbor(angle);
+            bmp = rotator.rotateImage(bmp);
+            imageWriter.writeImage(bmp, false, "afterrotate", "04_rotate");
+            return bmp;
+        }
+
+        private Bitmap medianFilter(Bitmap bmp)
+        {
+            MedianFilter medianFilter = new NonLocalMedianFilter(3);
+            bmp = medianFilter.applyMedianFilter(bmp);
+            imageWriter.writeImage(bmp, false, "aftermedian", "05_median");
+            return bmp;
+        }
+
+        private Bitmap threshold(Bitmap bmp)
+        {
+            Threshold threshold = new BradleyThreshold();
+            bmp = threshold.threshold(bmp);
+            imageWriter.writeImage(bmResult, false, "afterthreshold", "03_threshold");
+            return bmp;
+        }
+
+        private ArrayList<Bitmap> getSegmentArray(Bitmap bmp)
+        {
+            ArrayList<Bitmap> segments;
+            bmp = PrepareImage.addBackgroundPixels(bmp);
+            int height = bmp.getHeight();
+            int width = bmp.getWidth();
 
 //                        get value of pixels from binary image
-            int[] pixels = createPixelArray(width, height, bmResult);
+            int[] pixels = createPixelArray(width, height, bmp);
 
 //                       Create a binary array called booleanImage using pixel values in threshold bitmap
             boolean[] booleanImage = new boolean[width * height];
-            if (Arrays.asList(booleanImage).contains(false)) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(RechargeActivity.this, "Numbers Unreadable. Please, scan again.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
+
 
 //                      false if pixel is a background pixel, else true
-                int index = 0;
-                for (int pixel : pixels) {
-
-                    if (pixel == -16777216) {
-                        booleanImage[index] = true;
-                    }
-
-                    index++;
+            int index = 0;
+            for (int pixel : pixels) {
+                if (pixel == BLACK) {
+                    booleanImage[index] = true;
                 }
-                CcLabeling ccLabeling = new CcLabeling();
-                ComponentImages componentImages = new ComponentImages(RechargeActivity.this);
-                componentBitmaps = componentImages.CreateComponentImages(ccLabeling.CcLabels(booleanImage, width));
+                index++;
+            }
 
-//                    writing segment into media
-                for (int i = 0; i < componentBitmaps.size(); i++) {
-                    imageWriter.writeImage(componentBitmaps.get(i), true, "segment" + i, "06_segmentation");
+            CcLabeling ccLabeling = new CcLabeling();
+            ComponentImages componentImages = new ComponentImages(RechargeActivity.this);
+            segments = componentImages.CreateComponentImages(ccLabeling.CcLabels(booleanImage, width));
+
+            for (int i = 0; i < segments.size(); i++) {
+                imageWriter.writeImage(segments.get(i), true, "segment" + i, "06_segmentation");
+            }
+
+            return segments;
+        }
+
+        private void generateBinarySegmentedImages()
+        {
+            List<int[]> binarySegmentList1D = BinaryArray.CreateBinaryArrayOneD(componentBitmaps);
+
+            int counter = 0;
+            for (int[] segment : binarySegmentList1D) {
+                for (int i = 0; i < 256; i++) {
+                    if (segment[i] == 1) segment[i] = WHITE;
+                    else segment[i] = BLACK;
                 }
-
-                List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
-                List<int[]> binarySegmentList1D = BinaryArray.CreateBinaryArrayOneD(componentBitmaps);
-
-                int counter = 0;
-                for (int[] segment : binarySegmentList1D) {
-                    for (int i = 0; i < 256; i++) {
-                        if (segment[i] == 1) segment[i] = -1;
-                        else segment[i] = -16777216;
-                    }
-                    Bitmap bitmap = Bitmap.createBitmap(segment, 16, 16, Bitmap.Config.RGB_565);
-                    imageWriter.writeImage(bitmap, false, "segment" + counter++, "07_binarysegment");
-
-                }
-
-
-                List<Integer> ocrResult = generateOutput(binarySegmentList);
-                for (int a : ocrResult) {
-                    ocrString = ocrString + Integer.toString(a);
-                }
-
-                //ocrResultTV.setText(ocrString);
+                Bitmap bitmap = Bitmap.createBitmap(segment, 16, 16, Bitmap.Config.RGB_565);
+                imageWriter.writeImage(bitmap, false, "segment" + counter++, "07_binarysegment");
 
             }
+
         }
+
 
 
         private int[] createPixelArray(int width, int height, Bitmap thresholdImage) {
@@ -275,10 +268,10 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         }
 
 
-        private List<Integer> generateOutput(List<double[][]> binarySegmentList) {
 
-
-            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2, Splash.bias_at_layer3, Splash.weights_at_layer2, Splash.weights_at_layer3);
+        private String generateOutput(List<double[][]> binarySegmentList) {
+            String ocrString= " ";
+            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2,Splash.bias_at_layer3,Splash.weights_at_layer2,Splash.weights_at_layer3);
             List<Integer> recognizedList = new ArrayList<Integer>();
             for (double[][] binarySegment : binarySegmentList) {
                 NNMatrix input = new NNMatrix(binarySegment);
@@ -292,10 +285,11 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
             }
 
-            return recognizedList;
+            for (int a : recognizedList) {
+                ocrString = ocrString + Integer.toString(a);
+            }
 
-            // Log.d("output", recognizedList.toString());
-
+            return ocrString;
 
         }
 

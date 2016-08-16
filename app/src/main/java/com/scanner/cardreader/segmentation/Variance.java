@@ -105,16 +105,3 @@ public class Variance {
 
 
 
-
-//
-//
-//        int index = 0;
-////        int minVariance = variance[0];
-////        for (int i = 0; i < variance.length; i++) {
-////            if (minVariance > variance[i]) {
-////                index = i;
-////            }
-////        }
-////        return clusterArrayList.get(index);
-////    }
-////}
