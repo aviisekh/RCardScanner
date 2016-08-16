@@ -20,15 +20,13 @@ import android.widget.TextView;
 import com.scanner.cardreader.camera.CameraAccess;
 import com.scanner.cardreader.camera.CropActivity;
 import com.scanner.cardreader.classifier.JsonContentReader;
+import com.scanner.cardreader.classifier.NNMatrix;
 import com.scanner.cardreader.classifier.WeightReader;
 
 public class Splash extends Activity {
     public static String SIM;
-
-    public static double [][] biases_at_layer2;
-    public static double [][] weight_at_layer2;
-    public static double [][] weight_at_layer3;
-    public static double [][] biases_at_layer3;
+    public static NNMatrix weights_at_layer2,weights_at_layer3;
+    public static NNMatrix bias_at_layer2,bias_at_layer3;
 
 
     /** Duration of wait **/
@@ -75,10 +73,10 @@ public class Splash extends Activity {
                 String jsonContent = jsonContentReader.getJsonString(getApplicationContext());
 
                 WeightReader weightReader = new WeightReader();
-                biases_at_layer2=weightReader.getWeights(jsonContent,"layer_1_bias");
-                weight_at_layer2=weightReader.getWeights(jsonContent,"layer_1_weight");
-                weight_at_layer3=weightReader.getWeights(jsonContent,"layer_2_weight");
-                biases_at_layer3=weightReader.getWeights(jsonContent,"layer_2_bias");
+                bias_at_layer2=new NNMatrix(weightReader.getWeights(jsonContent,"layer_1_bias"));
+                weights_at_layer2=new NNMatrix(weightReader.getWeights(jsonContent,"layer_1_weight"));
+                weights_at_layer3=new NNMatrix(weightReader.getWeights(jsonContent,"layer_2_weight"));
+                bias_at_layer3=new NNMatrix(weightReader.getWeights(jsonContent,"layer_2_bias"));
 
 
 

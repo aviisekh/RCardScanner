@@ -30,7 +30,7 @@
             android:src="@drawable/ic_arrow_back_black_24dp"
             android:text="@string/redo"
             android:tint="#FFFF"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
             style="@style/Widget.AppCompat.Button.Colored"
              />
 
@@ -44,7 +44,7 @@
             android:layout_marginRight="@dimen/fab_margin"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
             style="@style/Widget.AppCompat.Button.Colored"
             />
 

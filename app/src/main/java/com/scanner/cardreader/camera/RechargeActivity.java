@@ -283,7 +283,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         private List<Integer>  generateOutput(List<double[][]> binarySegmentList) {
 
 
-            NeuralNetwork net = new NeuralNetwork(Splash.biases_at_layer2,Splash.biases_at_layer3,Splash.weight_at_layer2,Splash.weight_at_layer3);
+            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2,Splash.bias_at_layer3,Splash.weights_at_layer2,Splash.weights_at_layer3);
             List<Integer> recognizedList = new ArrayList<Integer>();
             for (double[][] binarySegment : binarySegmentList) {
                 NNMatrix input = new NNMatrix(binarySegment);
