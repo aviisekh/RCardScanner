@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/darkTheme"
+
 
     tools:context="com.scanner.cardreader.camera.CropActivity">
 
@@ -11,7 +13,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout0"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/bottom_layout_height"
         android:layout_alignParentBottom="true"
         android:background="@color/darkTheme">
 
@@ -23,12 +25,13 @@
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
             android:layout_marginLeft="@dimen/fab_margin"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_arrow_back_black_24dp"
             android:text="@string/redo"
             android:tint="#FFFF"
+            android:background="?attr/selectableItemBackground"
+            style="@style/Widget.AppCompat.Button.Colored"
              />
 
 
@@ -39,9 +42,10 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/fab_margin"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
+            android:background="?attr/selectableItemBackground"
+            style="@style/Widget.AppCompat.Button.Colored"
             />
 
 
@@ -50,9 +54,10 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:layout_marginTop="@dimen/layout_margin"
+        android:background="@android:color/black"
         android:layout_above="@id/relativeLayout0"
         android:id="@+id/relativeLayout1">
 

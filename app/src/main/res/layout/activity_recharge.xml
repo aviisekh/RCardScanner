@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#000000"
     android:orientation="vertical"
+    android:background="@color/darkTheme"
     tools:context="com.scanner.cardreader.camera.CropActivity">
 
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/bottom_layout_height"
         android:layout_alignParentBottom="true"
         android:background="@color/darkTheme">
 
@@ -23,12 +23,13 @@
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
             android:layout_marginLeft="@dimen/fab_margin"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_arrow_back_black_24dp"
             android:text="@string/redo"
             android:tint="#FFFF"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            style="@style/Widget.AppCompat.Button.Colored"
              />
 
         <ImageButton
@@ -41,6 +42,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="#FFFF"
+            style="@style/Widget.AppCompat.Button.Colored"
             />
 
     </RelativeLayout>
@@ -50,9 +52,10 @@
         android:layout_height="match_parent"
         android:layout_above="@id/relativeLayout2"
         android:id="@+id/relativeLayout3"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:layout_marginTop="@dimen/layout_margin"
+        android:background="@android:color/black">
 
         <ImageView
             android:id="@+id/imageView2"
@@ -66,12 +69,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:background="#646262"
             android:singleLine="true"
             android:textColor="@android:color/white"
-            android:visibility="visible" />
+            android:visibility="invisible"
+            android:backgroundTint="@android:color/black"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:inputType="number"
+            android:textSize="@dimen/text_size"
+            android:gravity="center"
+            android:layout_margin="@dimen/edittext_margin"
+
+
+            />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 </RelativeLayout>

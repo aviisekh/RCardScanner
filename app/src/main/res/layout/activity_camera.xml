@@ -6,40 +6,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.scanner.cardreader.camera.CameraAccess"
-    android:background="@color/darkTheme"
-    android:weightSum="1">
+    android:background="@color/darkTheme">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="@dimen/camera_bottom_layout_height"
         android:layout_alignParentBottom="true"
         android:id="@+id/bottomBar"
         android:background="@color/darkTheme">
 
 
-
         <android.support.design.widget.FloatingActionButton
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contextClickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:rippleColor="@color/pink"
+            app:elevation="6dp"
+            app:fabSize="normal"
             android:id="@+id/takepicture"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_linked_camera_black_24dp"
+            android:layout_margin="10dp"
         />
 
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:src="@drawable/ic_arrow_drop_up_black_24dp"
-            android:background="@android:color/transparent"
             android:id="@+id/simSelect"
             android:layout_centerInParent="true"
             android:layout_toEndOf="@+id/takepicture"
             android:layout_marginLeft="50dp"
-            android:tint="#FFFF"/>
+            android:tint="#FFFF"
+            android:background="?attr/selectableItemBackground"
+            style="@style/Widget.AppCompat.Button.Colored"/>
     </RelativeLayout>
 
     <RelativeLayout

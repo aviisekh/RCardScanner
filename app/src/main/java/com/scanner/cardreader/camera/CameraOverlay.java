@@ -23,12 +23,13 @@ public class CameraOverlay extends View {
     private Rect rectLeft = new Rect();
     private Rect rectRight = new Rect();
 
+    private final int WIDTH_OFFSET = 7;
+    private final int HEIFHT_OFFSET = 6;
     static public int parentWidth,parentHeight,top,left,bottom,right;
+
+
     public CameraOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
-//        setFocusable(false);
-//        setFocusableInTouchMode(false);
-
         setupPaint();
     }
 
@@ -67,10 +68,10 @@ public class CameraOverlay extends View {
 
     public void init()
     {
-        left = parentWidth / 7;
-        top = parentHeight / 6;
-        right = 6*parentWidth / 7;
-        bottom = parentHeight / 3;
+        left = parentWidth / WIDTH_OFFSET;
+        top = parentHeight / HEIFHT_OFFSET;
+        right = 6*parentWidth / WIDTH_OFFSET;
+        bottom = 2*parentHeight / HEIFHT_OFFSET;
     }
 
     public void drawRectangle(Canvas canvas) {
@@ -91,13 +92,6 @@ public class CameraOverlay extends View {
         canvas.drawLine(left + 2 * (right - left) / 3, top, left + 2 * (right - left) / 3, bottom, drawLineGrid);
         canvas.drawLine(left, top + (bottom - top) / 3, right, top + (bottom - top) / 3, drawLineGrid);
         canvas.drawLine(left, top + 2 * (bottom - top) / 3, right, top + 2 * (bottom - top) / 3, drawLineGrid);
-
-/*
-        canvas.drawLine(left, top, right, top, drawLineBoundary);
-        canvas.drawLine(left, top, left, bottom, drawLineBoundary);
-        canvas.drawLine(left, bottom, right, bottom, drawLineBoundary);
-        canvas.drawLine(right, top, right, bottom, drawLineBoundary);
-*/
 
         canvas.drawLine(left, top-2, left, top+20, drawLineBoundary);
         canvas.drawLine(left-2, top, left+20, top, drawLineBoundary);
