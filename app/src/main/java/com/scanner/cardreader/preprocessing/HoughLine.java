@@ -1,7 +1,5 @@
 package com.scanner.cardreader.preprocessing;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by anush on 7/19/2016.
  */
@@ -11,6 +9,9 @@ public class HoughLine implements Comparable {
     private double radius;
     private int intensity;
     private double relativeIntensity;
+
+    private final double MIN_THETA=0.7853981633974483D;
+    private final double MAX_THETA=2.356194490192345D;
 
     public double getRadius() {
         return this.radius;
@@ -44,8 +45,6 @@ public class HoughLine implements Comparable {
         this.relativeIntensity = relativeIntensity;
     }
 
-    public HoughLine() {
-    }
 
     public HoughLine(double theta, double radius, int intensity, double relativeIntensity) {
         this.theta = theta;
@@ -54,38 +53,8 @@ public class HoughLine implements Comparable {
         this.relativeIntensity = relativeIntensity;
     }
 
-    //TODO draw hough lines
-    public void drawHoughLine(Bitmap sourceBitmap, int gray) {
-
-        int height = sourceBitmap.getHeight();
-        int width = sourceBitmap.getWidth();
-        int houghHeight = (int) (Math.sqrt(2.0D) * (double) Math.max(height, width)) / 2;
-        float centerX = (float) (width / 2);
-        float centerY = (float) (height / 2);
-        double tsin = Math.sin(this.theta);
-        double tcos = Math.cos(this.theta);
-        int x;
-        int y;
-        if (this.theta >= 0.7853981633974483D && this.theta <= 2.356194490192345D) {
-            for (x = 0; x < height; ++x) {
-                y = (int) ((this.radius - (double) houghHeight - (double) ((float) x - centerX) * tcos) / tsin + (double) centerY);
-                if (y < width && y >= 0) {
-                    sourceBitmap.setPixel(x, y, gray);
-                }
-            }
-        } else {
-            for (x = 0; x < width; ++x) {
-                y = (int) ((this.radius - (double) houghHeight - (double) ((float) x - centerY) * tsin) / tcos + (double) centerX);
-                if (y < height && y >= 0) {
-                    sourceBitmap.setPixel(y, x, gray);
-                }
-            }
-        }
-
-    }
-
-    public int compareTo(Object o) {
-        HoughLine hl = (HoughLine) o;
-        return this.intensity > hl.intensity ? -1 : (this.intensity < hl.intensity ? 1 : 0);
+    public int compareTo(Object houghLine) {
+        HoughLine comparingHoughLine = (HoughLine) houghLine;
+        return this.intensity > comparingHoughLine.intensity ? -1 : (this.intensity < comparingHoughLine.intensity ? 1 : 0);
     }
 }

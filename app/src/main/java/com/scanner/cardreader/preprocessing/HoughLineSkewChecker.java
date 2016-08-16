@@ -15,12 +15,18 @@ import java.util.List;
 
 public class HoughLineSkewChecker implements SkewChecker {
 
+    private static final int NO_OF_INTENSE_LINES =5 ;
+    private static final double HOUGH_INTENSITY_LIMITER = 0.5D ;
+    private static final int MIN_STEPS_PER_DEGREE=10;
     private final int MASKER = 255;
     private final int BORDER_COMPARATER = 128;
     private final double PI = 3.141592653589793D;
     private final double DOUBLE_MULTIPLIER = 2.0D;
     private final double ANGLE_NORMALIZER = 180.0D;
     private final int MINIMUM_HOUGHLINE_INTENSIY_FACTOR = 10;
+    private final int DIVIDER=2;
+
+    private final double minimumTheta = 0.0D;
 
     private double maxSkewToDetect = 90.0D;
     private int stepsPerDegree = 1;
@@ -44,7 +50,7 @@ public class HoughLineSkewChecker implements SkewChecker {
     }
 
     public void setStepsPerDegree(int stepsPerDegree) {
-        this.stepsPerDegree = Math.max(1, Math.min(10, stepsPerDegree));
+        this.stepsPerDegree = Math.max(1, Math.min(MIN_STEPS_PER_DEGREE, stepsPerDegree));
     }
 
     public double getMaxSkewToDetect() {
@@ -72,11 +78,9 @@ public class HoughLineSkewChecker implements SkewChecker {
         return pixels;
     }
 
-    private boolean isBorderPixel(int pixel, int belowPixel, int index, int imageWidth) {
-        if ((pixel & BORDER_COMPARATER) < MASKER && (belowPixel & BORDER_COMPARATER) >= MASKER)
-            return true;
-        else
-            return false;
+    private boolean isBorderPixel(int pixel, int belowPixel) {
+//        System.out.println(Integer.toHexString(pixel).compareTo(Integer.toHexString(belowPixel)));
+        return ((pixel & MASKER) < BORDER_COMPARATER && (belowPixel & MASKER) >= BORDER_COMPARATER);
     }
 
 
@@ -107,7 +111,7 @@ public class HoughLineSkewChecker implements SkewChecker {
     private void aggregateHoughValues(int noOfItntensiveLines) {
         for (int counter = 0; counter < noOfItntensiveLines; ++counter) {
             HoughLine houghLine = mostIntensiveLines[counter];
-            if (houghLine.getRelativeIntensity() > 0.5D) {
+            if (houghLine.getRelativeIntensity() >HOUGH_INTENSITY_LIMITER) {
 //                Log.d("relative intensity>0.5:",
 //                        " theta:" + String.valueOf(houghLine.getTheta())
 //                                + " radius:" + String.valueOf(houghLine.getRadius())
@@ -143,8 +147,8 @@ public class HoughLineSkewChecker implements SkewChecker {
         this.initializeHoughMap();
         int width = sourceBitmap.getWidth();
         int height = sourceBitmap.getHeight();
-        int halfWidth = width / 2;
-        int halfHeight = height / 2;
+        int halfWidth = width / DIVIDER;
+        int halfHeight = height / DIVIDER;
         int startX = -halfWidth; //column
         int startY = -halfHeight; //row
         int stopX = width - halfWidth;
@@ -161,15 +165,16 @@ public class HoughLineSkewChecker implements SkewChecker {
             //column
             for (skewAngle = startX; skewAngle < stopX; ++indexG) {
                 //different in same column
-                if (isBorderPixel(pixels[indexG], pixels[indexG + width], indexG, width)) {
+                if (isBorderPixel(pixels[indexG], pixels[indexG + width])) {
+                    System.out.println("border pixel found");
                     buildHoughMap(skewAngle, houghWidth, halfHoughWidth, hls);
                 }
                 ++skewAngle;
             }
         }
         maxMapIntensity = getMaxMapIntensity(hls, skewAngle, houghWidth);
-//        System.out.println("max intensity in hough map " + maxMapIntensity);
-        mostIntensiveLines = this.getMostIntensiveLines(5, maxMapIntensity);
+        System.out.println("max intensity in hough map " + maxMapIntensity);
+        mostIntensiveLines = this.getMostIntensiveLines(NO_OF_INTENSE_LINES, maxMapIntensity);
         int noOfItntensiveLines = mostIntensiveLines.length;
         normalizeTheta(noOfItntensiveLines);
         return calculateTheta(thetaAggregator);
@@ -230,7 +235,7 @@ public class HoughLineSkewChecker implements SkewChecker {
                 }
             }
         }
-//        System.out.println(lines.size() + " hough lines>" + minLineIntensity + " minimum intensity added.");
+        System.out.println(lines.size() + " hough lines>" + minLineIntensity + " minimum intensity added.");
         sortHoughLines();
     }
 
@@ -263,7 +268,7 @@ public class HoughLineSkewChecker implements SkewChecker {
         this.thetaStep = DOUBLE_MULTIPLIER * this.maxSkewToDetect * PI / ANGLE_NORMALIZER / (double) this.houghHeight;
         this.sinMap = new double[this.houghHeight];
         this.cosMap = new double[this.houghHeight];
-        double minimumTheta = 0.0D;
+
         prepareSinCosinMap(minimumTheta);
     }
 

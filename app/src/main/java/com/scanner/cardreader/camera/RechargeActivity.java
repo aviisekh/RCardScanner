@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,14 +40,14 @@ import java.util.List;
 *Created by aviisekh on 8/11/16.
 */
 
-public class RechargeActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener{
+public class RechargeActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     //public Bitmap image;
-    private ImageButton rechargeBtn,redoButton;
+    private ImageButton rechargeBtn, redoButton;
     private EditText ocrResultTV;
     private ImageView rechargeImView;
     private ProgressBar progressBar;
     private Vibrator haptics;
-    private final int HAPTICS_CONSTANT=50;
+    private final int HAPTICS_CONSTANT = 50;
 
 
     private Bitmap croppedImage;
@@ -56,11 +55,10 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
     private ArrayList<Bitmap> componentBitmaps = new ArrayList<>();
 
     private Bitmap bmResult;
-    private String ocrString="";
+    private String ocrString = "";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recharge);
 
@@ -119,7 +117,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         rechargeImView = (ImageView) findViewById(R.id.imageView2);
 
 
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         rechargeBtn.setOnClickListener(this);
         redoButton.setOnClickListener(this);
@@ -129,8 +127,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         //myTask.cancel(true);
     }
 
-    class MyTask extends AsyncTask<Void, Void, Void>
-    {
+    class MyTask extends AsyncTask<Void, Void, Void> {
 
         private Bitmap thresholdedImage;
 
@@ -142,7 +139,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
 
         @Override
-        protected void onPostExecute(Void params){
+        protected void onPostExecute(Void params) {
             progressBar.setVisibility(View.INVISIBLE);
             ocrResultTV.setVisibility(View.VISIBLE);
             rechargeImView.setImageBitmap(thresholdedImage);
@@ -185,14 +182,12 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
             imageWriter.writeImage(bmResult, false, "afterrotate", "04_rotate");
 
 
-/*
-        long startMedian = System.currentTimeMillis() / 1000;
-        MedianFilter medianFilter = new NonLocalMedianFilter(3);
-        bmResult = medianFilter.applyMedianFilter(bmResult);
-        long stopMedian = System.currentTimeMillis() / 1000;
-        System.out.println("median:" + (stopMedian - startMedian));
-        imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
-*/
+//        long startMedian = System.currentTimeMillis() / 1000;
+//        MedianFilter medianFilter = new NonLocalMedianFilter(3);
+//        bmResult = medianFilter.applyMedianFilter(bmResult);
+//        long stopMedian = System.currentTimeMillis() / 1000;
+//        System.out.println("median:" + (stopMedian - startMedian));
+//        imageWriter.writeImage(bmResult, false, "aftermedian", "05_median");
 
 
 //                RotateByMatrix rotate = new RotateByMatrix(croppedImage.getWidth(), croppedImage.getHeight(), angle);
@@ -280,10 +275,10 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         }
 
 
-        private List<Integer>  generateOutput(List<double[][]> binarySegmentList) {
+        private List<Integer> generateOutput(List<double[][]> binarySegmentList) {
 
 
-            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2,Splash.bias_at_layer3,Splash.weights_at_layer2,Splash.weights_at_layer3);
+            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2, Splash.bias_at_layer3, Splash.weights_at_layer2, Splash.weights_at_layer3);
             List<Integer> recognizedList = new ArrayList<Integer>();
             for (double[][] binarySegment : binarySegmentList) {
                 NNMatrix input = new NNMatrix(binarySegment);

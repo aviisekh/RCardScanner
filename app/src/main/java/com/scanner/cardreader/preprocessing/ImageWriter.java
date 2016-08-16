@@ -15,13 +15,17 @@ import java.io.IOException;
  */
 
 public class ImageWriter {
+
+    private final int SCALED_HEIGHT = 16;
+    private final int SCALED_WIDTH = 16;
+    private final int COMPRESS_QUALITY=100;
     Context context;
 
     public ImageWriter(Context context) {
         this.context = context;
     }
 
-    private String getFolderPath(String folderName){
+    private String getFolderPath(String folderName) {
         File folder = new File(Environment.getExternalStorageDirectory() + File.separator + folderName);
         if (!folder.exists()) {
             folder.mkdir();
@@ -31,9 +35,9 @@ public class ImageWriter {
     }
 
 
-    private ByteArrayOutputStream getScaledImage(Bitmap printImage,ByteArrayOutputStream byteArrayOutputStream){
-        Bitmap scaled = Bitmap.createScaledBitmap(printImage, 16, 16, true);
-        scaled.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+    private ByteArrayOutputStream getScaledImage(Bitmap printImage, ByteArrayOutputStream byteArrayOutputStream) {
+        Bitmap scaled = Bitmap.createScaledBitmap(printImage, SCALED_WIDTH, SCALED_HEIGHT, true);
+        scaled.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, byteArrayOutputStream);
         return byteArrayOutputStream;
     }
 
@@ -42,18 +46,18 @@ public class ImageWriter {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         if (scale) {
-          byteArrayOutputStream= getScaledImage(printImage,byteArrayOutputStream);
+            byteArrayOutputStream = getScaledImage(printImage, byteArrayOutputStream);
         } else {
-            printImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            printImage.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, byteArrayOutputStream);
         }
 
         File imageFile = new File(getFolderPath(folderName) + File.separator + imageName + "_" + System.currentTimeMillis() / 1000 + ".jpg");
 
-        writeStream(imageFile,byteArrayOutputStream,imageName);
+        writeStream(imageFile, byteArrayOutputStream, imageName);
 
     }
 
-    private boolean writeStream(File imageFile, ByteArrayOutputStream byteArrayOutputStream, String imageName){
+    private boolean writeStream(File imageFile, ByteArrayOutputStream byteArrayOutputStream, String imageName) {
         try {
             if (imageFile.createNewFile()) {
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
@@ -64,8 +68,8 @@ public class ImageWriter {
 //                 make the scanner aware of the location and the files you want to see
 
 
-                SingleMediaScanner scanNewFolders=new SingleMediaScanner();
-                scanNewFolders.beginConnection(context,imageFile);
+                SingleMediaScanner scanNewFolders = new SingleMediaScanner();
+                scanNewFolders.beginConnection(context, imageFile);
 
                 return true;
             }

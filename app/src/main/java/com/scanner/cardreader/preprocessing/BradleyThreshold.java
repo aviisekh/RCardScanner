@@ -128,11 +128,7 @@ public class BradleyThreshold implements Threshold {
         negativeYValue = boundNegativeYBorder(column - halfFrameSize);
         positiveYValue = boundPositiveYBorder(column + halfFrameSize);
 
-        if (negativeXValue >= 0 && negativeYValue >= 0 && positiveXValue >= 0 && positiveYValue >= 0) {
-            return true;
-        } else {
-            return false;
-        }
+       return(negativeXValue >= 0 && negativeYValue >= 0 && positiveXValue >= 0 && positiveYValue >= 0);
     }
 
 

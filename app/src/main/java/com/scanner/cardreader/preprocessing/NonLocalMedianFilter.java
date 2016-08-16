@@ -15,14 +15,23 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class NonLocalMedianFilter implements MedianFilter {
+    private final int CORE_MULTIPLIER=16;
+    private final long THREAD_ALIVE_TIME=300L;
+    private final int DIVIDER=2;
+    private final int BOUNDRY_LIMITER=1;
+    private final int MIN_X=0;
+    private final int MIN_Y=0;
+
     private int frameSize = 1;
     private Bitmap resultBitmap;
     private int width;
     private int height;
-    int xMin;
-    int xMax;
-    int yMin;
-    int ymax;
+    private int xMin;
+    private int xMax;
+    private int yMin;
+
+    private int ymax;
+
 
 
     public int getFrameSize() {
@@ -43,9 +52,9 @@ public class NonLocalMedianFilter implements MedianFilter {
 //        System.out.println(framePixels.length);
         int noOfPixels = framePixels.length;
         if (noOfPixels % 2 == 1)
-            return framePixels[noOfPixels / 2];
+            return framePixels[noOfPixels / DIVIDER];
         else
-            return ((framePixels[noOfPixels / 2] + framePixels[noOfPixels / 2 - 1]) / 2);
+            return ((framePixels[noOfPixels / DIVIDER] + framePixels[noOfPixels / DIVIDER - BOUNDRY_LIMITER]) / DIVIDER);
     }
 
 
@@ -58,15 +67,15 @@ public class NonLocalMedianFilter implements MedianFilter {
 
     private void fixFrameEdges(int width, int height){
         //special edge cases
-        if (xMin < 0)
-            xMin = 0;
-        if (xMax > (width - 1))
+        if (xMin < MIN_X)
+            xMin = MIN_X;
+        if (xMax > (width - BOUNDRY_LIMITER))
 
-            xMax = width - 1;
-        if (yMin < 0)
-            yMin = 0;
-        if (ymax > (height - 1))
-            ymax = height - 1;
+            xMax = width - BOUNDRY_LIMITER;
+        if (yMin < MIN_Y)
+            yMin = MIN_Y;
+        if (ymax > (height - BOUNDRY_LIMITER))
+            ymax = height - BOUNDRY_LIMITER;
     }
 
     public ArrayList<Integer> getFramePixels(Bitmap bitmap, int x, int y) {
@@ -76,18 +85,14 @@ public class NonLocalMedianFilter implements MedianFilter {
         calculateFrameEdges(x, y);
         fixFrameEdges(width,height);
         //the actual number of pixels to be considered
-        int noOfPixelsFrame = (xMax - xMin + 1) * (ymax - yMin + 1);
+        int noOfPixelsFrame = (xMax - xMin + BOUNDRY_LIMITER) * (ymax - yMin + BOUNDRY_LIMITER);
         int counter = 0;
-        String a = "";
         for (int i = xMin; i < xMax; i++) {
-            a = "";
             for (int j = yMin; j < ymax; j++) {
                 framePixels.add(counter, bitmap.getPixel(i, j));
-//                a = a + bitmap.getPixel(i, j) + ",";
                 counter++;
             }
         }
-//        System.out.println(counter);
         return framePixels;
     }
 
@@ -97,7 +102,7 @@ public class NonLocalMedianFilter implements MedianFilter {
         width = sourceBitmap.getWidth();
         height = sourceBitmap.getHeight();
         int cores = Runtime.getRuntime().availableProcessors();
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(cores * 16, cores * 16, 300L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(cores * CORE_MULTIPLIER, cores * CORE_MULTIPLIER, THREAD_ALIVE_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
         executor.execute(new Runnable() {
             @Override
