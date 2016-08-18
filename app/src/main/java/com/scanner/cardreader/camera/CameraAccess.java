@@ -30,6 +30,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
 
     private final int HEPTICS_CONSTANT=50;
 
+
     private Camera camera;
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
@@ -44,6 +45,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
 
     private static int count = 1;
     public static Bitmap bitmap;
+
 
 
     final PictureCallback jpegPictureCallBack = new PictureCallback() {
@@ -75,19 +77,19 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         }
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
         instantiate();
-
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         cameraId = findRearFacingCamera();
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
 
         CameraOverlay previewBackground = (CameraOverlay) findViewById(R.id.overlay);
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
