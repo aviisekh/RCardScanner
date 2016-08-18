@@ -13,7 +13,7 @@ import android.widget.ImageView;
  */
 public class CroppingCoordinates {
 
-    public static Rect getCroppingCoordinates(ImageView imview)
+    public static Rect getCroppingCoordinates(ImageView imview, Rect clippingWindowCoordinates)
 
     {
         Rect bitmapCoordinates= new Rect();
@@ -32,10 +32,10 @@ public class CroppingCoordinates {
         final float transX = matrixValues[Matrix.MTRANS_X];
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
-        bitmapCoordinates.left = (int) Math.max((ClippingWindow.left - transX) / scaleX, 0);  //Since Image is translated and scaled in Imageview
-        bitmapCoordinates.right =(int) Math.min((ClippingWindow.right - transX) / scaleX, drawable.getIntrinsicWidth());
-        bitmapCoordinates.top = (int) Math.max((ClippingWindow.top - transY) / scaleY, 0);
-        bitmapCoordinates.bottom = (int) Math.min((ClippingWindow.bottom - transY) / scaleY, drawable.getIntrinsicHeight());
+        bitmapCoordinates.left = (int) Math.max((clippingWindowCoordinates.left - transX) / scaleX, 0);  //Since Image is translated and scaled in Imageview
+        bitmapCoordinates.right =(int) Math.min((clippingWindowCoordinates.right - transX) / scaleX, drawable.getIntrinsicWidth());
+        bitmapCoordinates.top = (int) Math.max((clippingWindowCoordinates.top - transY) / scaleY, 0);
+        bitmapCoordinates.bottom = (int) Math.min((clippingWindowCoordinates.bottom - transY) / scaleY, drawable.getIntrinsicHeight());
 
 
         return bitmapCoordinates;

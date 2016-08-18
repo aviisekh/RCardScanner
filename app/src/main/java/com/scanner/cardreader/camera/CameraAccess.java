@@ -35,16 +35,19 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
 
+    private final String simInfo = Splash.getSimInfo();
+
     private boolean isPreviewing = false;
+
 
     private RelativeLayout animateView;
     private ImageButton simSelector;
     private android.support.design.widget.FloatingActionButton takePicture;
-    private TextView simInfo;
+    private TextView simInfoView;
     private int cameraId;
 
     private static int count = 1;
-    public static Bitmap bitmap;
+    private static Bitmap bitmap;
 
 
 
@@ -121,8 +124,8 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         animateView = (RelativeLayout) findViewById(R.id.animateBar);
         simSelector = (ImageButton) findViewById(R.id.simSelect);
-        simInfo = (TextView) findViewById(R.id.simInfo);
-        simInfo.setText(Splash.SIM);
+        simInfoView = (TextView) findViewById(R.id.simInfo);
+        simInfoView.setText(simInfo);
         takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
 
         heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);

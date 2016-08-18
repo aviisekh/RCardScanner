@@ -64,12 +64,14 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
     private final int HAPTICS_CONSTANT = 50;
 
 
+    private final String simInfo = Splash.getSimInfo();
     private final int BLACK = -16777216;
     private final int WHITE = -1;
 
     private Bitmap croppedImage;
 
     private ArrayList<Bitmap> componentBitmaps = new ArrayList<>();
+    private final ArrayList<NNMatrix> weightsArr = Splash.getWeights();
 
     private Bitmap bmResult;
     private String ocrResult;
@@ -106,25 +108,16 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
     private void recharge() {
         String prefix;
-        if (Splash.SIM == "NTC" | Splash.SIM == "NCELL") {
+        if (simInfo == "NTC" | simInfo == "NCELL") {
 
-            if (Splash.SIM == "NTC") prefix = "*412*";
+            if (simInfo == "NTC") prefix = "*412*";
             else  prefix = "*102*";
             String dial = prefix + ocrResultTV.getText().toString() + "#";
             dial = dial.replace("*", Uri.encode("*")).replace("#", Uri.encode("#"));
             Uri data = Uri.parse("tel:" + dial);
             Intent dialIntent = new Intent(Intent.ACTION_CALL, data);
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
+
             startActivity(dialIntent);
         }
 
@@ -196,17 +189,19 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
             //Bitmap sourceBitmap = Bitmap.createBitmap(CropActivity.croppedImage);
             bmResult = gammaCorrect(croppedImage);
-            imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
+            //imageWriter.writeImage(bmResult, false, "aftergamma", "01_gamma");
+
 
             bmResult = grayScale(bmResult);
+            //imageWriter.writeImage(bmResult, false, "aftergrayscale", "02_grayscale");
             bmResult = skewCorrect(bmResult);
-            imageWriter.writeImage(bmResult, false, "afterrotate", "03_rotate");
+            //imageWriter.writeImage(bmResult, false, "afterrotate", "03_rotate");
 
             //bmResult = medianFilter(bmResult);
             //imageWriter.writeImage(bmResult, false, "aftermedianfilter", "04_medianfilter");
 
             bmResult = threshold(bmResult);
-            imageWriter.writeImage(bmResult, false, "afterthreshold", "05_threshold");
+            //imageWriter.writeImage(bmResult, false, "afterthreshold", "05_threshold");
 
             thresholdedImage = bmResult;
 
@@ -224,7 +219,6 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
         private Bitmap gammaCorrect(Bitmap bmp) {
             GammaCorrection gc = new GammaCorrection(1.0);
             bmp = gc.correctGamma(bmp);
-            imageWriter.writeImage(bmp, false, "aftergamma", "01_gamma");
             return bmp;
         }
 
@@ -310,7 +304,7 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
 
         private String generateOutput(List<double[][]> binarySegmentList) {
             String ocrString = " ";
-            NeuralNetwork net = new NeuralNetwork(Splash.bias_at_layer2, Splash.bias_at_layer3, Splash.weights_at_layer2, Splash.weights_at_layer3);
+            NeuralNetwork net = new NeuralNetwork(weightsArr.get(0), weightsArr.get(1), weightsArr.get(2), weightsArr.get(3));
             List<Integer> recognizedList = new ArrayList<Integer>();
             for (double[][] binarySegment : binarySegmentList) {
                 NNMatrix input = new NNMatrix(binarySegment);

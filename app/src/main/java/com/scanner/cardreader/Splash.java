@@ -11,8 +11,6 @@ package com.scanner.cardreader;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -32,31 +30,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Splash extends Activity {
-    public static String SIM;
-    public static NNMatrix weights_at_layer2, weights_at_layer3;
-    public static NNMatrix bias_at_layer2, bias_at_layer3;
+    private static String SIM;
+    private  static NNMatrix weights_at_layer2, weights_at_layer3;
+    private  static NNMatrix bias_at_layer2, bias_at_layer3;
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-    boolean isPermissionAsked = false;
-    /**
-     * Duration of wait
-     **/
-    private final int SPLASH_DISPLAY_LENGTH = 1000;
 
     private TextView siminfo;
 
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
-
     @TargetApi(Build.VERSION_CODES.M)
-    private void permissionWrapper() {
+    private boolean permissionRequest() {
         List<String> permissionNeeded = new ArrayList<String>();
         final List<String> permissionList = new ArrayList<String>();
 
@@ -70,7 +53,7 @@ public class Splash extends Activity {
             permissionNeeded.add("MOUNT FOLDER");
         }
         if (!addPermission(permissionList, Manifest.permission.READ_PHONE_STATE)) {
-            permissionNeeded.add("SIME");
+            permissionNeeded.add("SIN");
         }
         if (!addPermission(permissionList, Manifest.permission.VIBRATE)) {
             permissionNeeded.add("HAPTICS");
@@ -78,29 +61,10 @@ public class Splash extends Activity {
 
 
         if (permissionList.size() > 0) {
-            if (permissionNeeded.size() > 0) {
-                //need rationale
-//                String message = "Please grant access to " + permissionNeeded.get(0);
-//                for (int i = 1; i < permissionNeeded.size(); i++) {
-//                    message = message + "," + permissionNeeded.get(i);
-//                }
-
-//                showMessageOKCancel(message, new DialogInterface.OnClickListener() {
-//                    @TargetApi(Build.VERSION_CODES.M)
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        requestPermissions(permissionList.toArray(new String[permissionList.size()]),
-//                                REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-//                    }
-//                });
-//                return;
-            }
-            requestPermissions(permissionList.toArray(new String[permissionList.size()]),
-                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-
-            isPermissionAsked = true;
-            return;
-        }
+            requestPermissions(permissionList.toArray(new String[permissionList.size()]),REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            return true;
+        } else
+            return false;
     }
 
 
@@ -136,24 +100,20 @@ public class Splash extends Activity {
                         && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED) {
                     // All Permissions Granted
-                    Toast.makeText(this, "ALll Permission granted", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(this, "ALll Permission granted", Toast.LENGTH_SHORT).show();
+                    loadData();
+                    changeIntent();
                 } else {
-                    // Permission De
-                    // ied
-                    Toast.makeText(this, "Some Permission is Denied", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(this, "Grant permissions from settings", Toast.LENGTH_LONG).show();
                 }
             }
             break;
+
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,55 +121,68 @@ public class Splash extends Activity {
 
         siminfo = (TextView) findViewById(R.id.splashSimInfo);
 
-        /* New Handler to start the Menu-Activity
-         * and close this Splash-Screen after some seconds.*/
+        if (!permissionRequest()) {
+            loadData();
+            changeIntent();
+        }
 
-            if (!isPermissionAsked)
-                permissionWrapper();
 
-        runThread();
+
     }
 
-    private void runThread(){
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
+    private void changeIntent()
+    {
+        /* Create an Intent that will start the Camera Activity. */
+        Intent mainIntent = new Intent(Splash.this, CameraAccess.class);
+        Splash.this.startActivity(mainIntent);
+        Splash.this.finish();
 
-                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
-                    if (telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL") {
-
-                        SIM = "NCELL";
-
-                    } else {
-                        SIM = "NTC";
-                    }
-                } else {
-                    SIM = "No SIM detected";
-                }
-
-                siminfo.setText(SIM);
+    }
 
 
-                JsonContentReader jsonContentReader = new JsonContentReader();
-                String jsonContent = jsonContentReader.getJsonString(getApplicationContext());
+    private void loadData() {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
+            if (telephonyManager.getNetworkOperatorName().toUpperCase().trim() == "NCELL") {
 
-                WeightReader weightReader = new WeightReader();
-                bias_at_layer2 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_1_bias"));
-                weights_at_layer2 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_1_weight"));
-                weights_at_layer3 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_2_weight"));
-                bias_at_layer3 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_2_bias"));
+                SIM = "NCELL";
 
-                        /* Create an Intent that will start the Camera Activity. */
-                Intent mainIntent = new Intent(Splash.this, CameraAccess.class);
-                Splash.this.startActivity(mainIntent);
-//                Splash.this.finish();
-
-
+            } else {
+                SIM = "NTC";
             }
+        } else {
+            SIM = "No SIM detected";
+        }
 
-//        }, SPLASH_DISPLAY_LENGTH);
+        siminfo.setText(SIM);
 
-//    }
+
+        JsonContentReader jsonContentReader = new JsonContentReader();
+        String jsonContent = jsonContentReader.getJsonString(getApplicationContext());
+
+        WeightReader weightReader = new WeightReader();
+        bias_at_layer2 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_1_bias"));
+        weights_at_layer2 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_1_weight"));
+        weights_at_layer3 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_2_weight"));
+        bias_at_layer3 = new NNMatrix(weightReader.getWeights(jsonContent, "layer_2_bias"));
+
+
+
+    }
+
+    public static ArrayList<NNMatrix> getWeights()
+    {
+        ArrayList<NNMatrix>  weightArr = new ArrayList<NNMatrix>();
+        weightArr.add(bias_at_layer2);
+        weightArr.add(bias_at_layer3);
+        weightArr.add(weights_at_layer2);
+        weightArr.add(weights_at_layer3);
+        return weightArr;
+    }
+
+    public static String getSimInfo()
+    {
+        return SIM;
+    }
+
 }

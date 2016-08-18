@@ -17,6 +17,8 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.ImageView;
 
+import Catalano.Statistics.Distributions.LognormalDistribution;
+
 
 public class ClippingWindow extends View {
 
@@ -36,8 +38,6 @@ public class ClippingWindow extends View {
     private boolean croppable, topCroppable, bottomCroppable, rightCroppable, leftCroppable;
     private VelocityTracker mVelocityTracker = null;
 
-    private static int parentWidth;         //The View's Width
-    private static int parentHeight;
     private final int TOLERANCE = 30;       //Tolerence of Touch
     private final int BOUNDARY_INIT=20;
     private final int MINIMAL_CROP_AREA=10;
@@ -50,7 +50,7 @@ public class ClippingWindow extends View {
     private int moveX;               //Movement of touch along X-axis
     private int moveY;
 
-    public static int left, top, right, bottom; //Coordinates of the clipping window
+    private int left, top, right, bottom; //Coordinates of the clipping window
     private int leftBoundary, rightBoundary, topBoundary, bottomBoundary;    //Coordinates of image in imageview
 
     public ClippingWindow(Context context, AttributeSet attrs) {
@@ -58,25 +58,12 @@ public class ClippingWindow extends View {
         setupPaint();
     }
 
-
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-        this.setMeasuredDimension(parentWidth, parentHeight);
-    }
-
-
     public void initializeBoundary(Rect r) {
         this.leftBoundary =r.left;
         this.rightBoundary =r.right;
         this.topBoundary =r.top;
         this.bottomBoundary =r.bottom;
 
-        //Log.d("abhishek","abhishek");
         this.left = r.left+BOUNDARY_INIT;
         this.right = r.right-BOUNDARY_INIT;
         this.top = r.top+BOUNDARY_INIT;
@@ -100,7 +87,7 @@ public class ClippingWindow extends View {
         drawRect.setStrokeJoin(Paint.Join.ROUND);
         drawRect.setStrokeCap(Paint.Cap.ROUND);
 
-        drawCircle.setColor(Color.argb(220,255,255,255));
+        drawCircle.setColor(Color.argb(255,255,255,255));
 
         drawLineBoundary.setColor(Color.argb(255,255,255,255));
         drawLineBoundary.setStrokeWidth(5);
@@ -266,10 +253,10 @@ public class ClippingWindow extends View {
 
     private void drawRectangle(Canvas canvas) {
 
-        rectTop.set(0,0,parentWidth,top);
-        rectBottom.set(0,bottom,parentWidth,parentHeight);
-        rectLeft.set(0,top,left,bottom);
-        rectRight.set(right,top,parentWidth,bottom);
+        rectTop.set(leftBoundary,topBoundary,rightBoundary,top);
+        rectBottom.set(leftBoundary,bottom,rightBoundary,bottomBoundary);
+        rectLeft.set(leftBoundary,top,left,bottom);
+        rectRight.set(right,top,rightBoundary,bottom);
 
         canvas.drawRect(rectTop, drawRect);
         canvas.drawRect(rectBottom, drawRect);
@@ -298,6 +285,16 @@ public class ClippingWindow extends View {
         canvas.drawCircle((left+right)/2,bottom,RADIUS,drawCircle);
         canvas.drawCircle(left,(top+bottom)/2, RADIUS, drawCircle);
         canvas.drawCircle(right,(top+bottom)/2, RADIUS, drawCircle);
+    }
+
+    public Rect getClippingWindowCoordinates()
+    {
+        Rect coordinates = new Rect();
+        coordinates.left = left;
+        coordinates.right = right;
+        coordinates.top = top;
+        coordinates.bottom = bottom;
+        return coordinates;
     }
 }
 
