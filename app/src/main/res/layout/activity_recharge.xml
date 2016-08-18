@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottom_layout_height"
         android:layout_alignParentBottom="true"
-        android:background="@color/darkTheme">
+        android:background="@color/darkTheme"
+        android:visibility="gone">
 
 
         <ImageButton
@@ -79,17 +80,7 @@
             android:textSize="@dimen/text_size"
             android:gravity="center"
             android:layout_margin="@dimen/edittext_margin"
-
-
             />
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 </RelativeLayout>
