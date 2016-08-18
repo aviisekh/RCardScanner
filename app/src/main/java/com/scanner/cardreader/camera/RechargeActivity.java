@@ -3,20 +3,17 @@ package com.scanner.cardreader.camera;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -41,12 +38,9 @@ import com.scanner.cardreader.segmentation.CcLabeling;
 import com.scanner.cardreader.segmentation.ComponentImages;
 import com.scanner.cardreader.segmentation.PrepareImage;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Filters.Mean;
 
 /*
 *Created by aviisekh on 8/11/16.

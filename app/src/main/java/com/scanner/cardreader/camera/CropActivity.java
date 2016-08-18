@@ -4,15 +4,12 @@ package com.scanner.cardreader.camera;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
 
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
@@ -24,6 +21,7 @@ import com.scanner.cardreader.R;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+
 
 public class CropActivity extends Activity implements View.OnClickListener, View.OnLongClickListener {
 

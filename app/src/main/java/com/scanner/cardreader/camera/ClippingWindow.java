@@ -1,24 +1,19 @@
 package com.scanner.cardreader.camera;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
-import android.widget.ImageView;
 
-import Catalano.Statistics.Distributions.LognormalDistribution;
-
+/**
+ *  Created by aviisekh on 6/27/16.
+ */
 
 public class ClippingWindow extends View {
 
