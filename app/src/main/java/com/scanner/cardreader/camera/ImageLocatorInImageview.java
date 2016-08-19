@@ -1,49 +1,37 @@
 package com.scanner.cardreader.camera;
 
-import android.graphics.Matrix;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.FloatRange;
-import android.util.Log;
 import android.widget.ImageView;
+
+import com.scanner.cardreader.interfaces.ImageViewCoordinates;
 
 /**
  * Created by aviisekh on 8/11/16.
  */
-public class ImageLocatorInImageview {
 
-    public  static Rect getImageCoordinates(ImageView imView)
-    {
-        Rect imageCoordinates = new Rect();
-        Drawable drawable = imView.getDrawable();
+public class ImageLocatorInImageview implements ImageViewCoordinates {
+    private  ImageParametersInImageview imageParametersInImageview;
 
-        Log.d("drawable bounds",drawable.getBounds().flattenToString());
-        // Get image matrix values and place them in an array.
-        final float[] matrixValues = new float[9];
-        imView.getImageMatrix().getValues(matrixValues);
+    @Override
+    public Rect getCoordinates(ImageView imageView) {
 
-        // Extract the scale and translation values. Note, we currently do not handle any other transformations (e.g. skew).
-        final float scaleX = matrixValues[Matrix.MSCALE_X];
-        final float scaleY = matrixValues[Matrix.MSCALE_Y];
-        final float transX = matrixValues[Matrix.MTRANS_X];
-        final float transY = matrixValues[Matrix.MTRANS_Y];
+        Rect imageViewCoordinates = new Rect();
 
-        final int originalWidth = drawable.getIntrinsicWidth();
-        final int originalHeight = drawable.getIntrinsicHeight();
+        imageParametersInImageview = new ImageParametersInImageview(imageView);
 
         //Scaled dimensions in imageview
-        final int scaledWidth = Math.round(originalWidth * scaleX);
-        final int scaledHeight = Math.round(originalHeight * scaleY);
+        final int scaledWidth = Math.round(imageParametersInImageview.getImageWidth() * imageParametersInImageview.getScaleX()); //Needs to make
+        final int scaledHeight = Math.round(imageParametersInImageview.getImageHeight() * imageParametersInImageview.getScaleY());
 
         //Log.d("new","transx" + Float.toString(scaleX)+"transy"+ Float.toString(scaleY));
-        imageCoordinates.left = (int) Math.max(transX, 0);
-        imageCoordinates.top = (int) Math.max(transY, 0);
-        imageCoordinates.right = Math.min(imageCoordinates.left + scaledWidth, imView.getWidth());
-        imageCoordinates.bottom= Math.min(imageCoordinates.top + scaledHeight, imView.getHeight());
+        imageViewCoordinates.left = (int) Math.max(imageParametersInImageview.getTransX(), 0);
+        imageViewCoordinates.top = (int) Math.max(imageParametersInImageview.getTransY(), 0);
+        imageViewCoordinates.right = Math.min(imageViewCoordinates.left + scaledWidth, imageView.getWidth());
+        imageViewCoordinates.bottom= Math.min(imageViewCoordinates.top + scaledHeight, imageView.getHeight());
 
-        return imageCoordinates;
-
-
+        //return imageViewCoordinates;
+        return imageViewCoordinates;
     }
+
 
 }

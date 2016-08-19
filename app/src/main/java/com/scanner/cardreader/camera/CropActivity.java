@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.scanner.cardreader.R;
 
@@ -88,13 +87,14 @@ public class CropActivity extends Activity implements View.OnClickListener, View
 
         clippingWindow = (ClippingWindow) findViewById(R.id.clipping);
 
+
         ViewTreeObserver vto = cropImView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @Override
             public void onGlobalLayout() {
 
-                imageCoordinates = ImageLocatorInImageview.getImageCoordinates(cropImView);
+                imageCoordinates = new ImageLocatorInImageview().getCoordinates(cropImView);
                 //clippingWindow = new ClippingWindow(getApplicationContext(), imageCoordinates);
                 clippingWindow.initializeBoundary(imageCoordinates);
 
@@ -107,11 +107,8 @@ public class CropActivity extends Activity implements View.OnClickListener, View
 
     }
 
-
     private void crop() {
-
-
-        Rect bitmapClippingCoordinates = CroppingCoordinates.getCroppingCoordinates(cropImView, clippingWindow.getClippingWindowCoordinates());
+        Rect bitmapClippingCoordinates = new CoordinateLocatorInBitmap().getCoordinates(cropImView, clippingWindow.getClippingWindowCoordinates());
 //        cropImView.setImageBitmap(croppedImage);
         Bitmap originalBitmap = ((BitmapDrawable) cropImView.getDrawable()).getBitmap();
         croppedImage = Bitmap.createBitmap(originalBitmap, bitmapClippingCoordinates.left, bitmapClippingCoordinates.top, bitmapClippingCoordinates.right - bitmapClippingCoordinates.left, bitmapClippingCoordinates.bottom - bitmapClippingCoordinates.top);

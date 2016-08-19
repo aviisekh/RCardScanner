@@ -101,7 +101,7 @@ public class NNMatrix {
         }
         Log.d("Output", largestIndex + " has probability " + Double.toString(largest));
 
-        if (largest > 0.5)
+        if (largest > 0.2)
             return largestIndex;
         else return -1;
 
