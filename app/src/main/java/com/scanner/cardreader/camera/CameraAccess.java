@@ -1,4 +1,5 @@
 package com.scanner.cardreader.camera;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -50,6 +51,8 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
 
     private static int count = 1;
     private static Bitmap bitmap;
+
+
 
 
 

@@ -8,6 +8,22 @@
     tools:context="com.scanner.cardreader.camera.CameraAccess"
     android:background="@color/darkTheme">
 
+    <android.support.v7.widget.Toolbar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/btn_height_small"
+            android:text="Departure"
+            android:layout_gravity="right"
+            />
+
+    </android.support.v7.widget.Toolbar>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/camera_bottom_layout_height"

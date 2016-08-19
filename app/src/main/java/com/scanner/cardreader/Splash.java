@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,9 +71,8 @@ public class Splash extends Activity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private boolean addPermission(List<String> permissionList, String permission) {
-        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(permission);
-
             if (!shouldShowRequestPermissionRationale(permission))
                 return false;
         }
