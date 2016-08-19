@@ -200,9 +200,9 @@ public class RechargeActivity extends AppCompatActivity implements View.OnClickL
             thresholdedImage = bmResult;
 
             componentBitmaps = getSegmentArray(bmResult);
-            for (int i = 0; i < componentBitmaps.size(); i++) {
+            /*for (int i = 0; i < componentBitmaps.size(); i++) {
                 imageWriter.writeImage(componentBitmaps.get(i), true, "segment" + i, "06_segmentation");
-            }
+            }*/
 
             List<double[][]> binarySegmentList = BinaryArray.CreateBinaryArray(componentBitmaps);
             //generateBinarySegmentedImages();

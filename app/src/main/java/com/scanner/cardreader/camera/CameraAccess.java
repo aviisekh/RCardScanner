@@ -25,8 +25,6 @@ import android.widget.Toast;
 import com.scanner.cardreader.R;
 import com.scanner.cardreader.Splash;
 
-import java.io.ByteArrayOutputStream;
-
 
 public class CameraAccess extends Activity implements SurfaceHolder.Callback, View.OnClickListener, View.OnLongClickListener {
     private Vibrator heptics;
@@ -50,41 +48,10 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
     private int cameraId;
 
     private static int count = 1;
-    private static Bitmap bitmap;
+    private static Bitmap cameraImage;
 
-
-
-
-
-    final PictureCallback jpegPictureCallBack = new PictureCallback() {
-        @Override
-        public void onPictureTaken(byte[] bytes, Camera camera) {
-            try {
-                if (bytes != null)
-                {
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    //byte[] byteArray = stream.toByteArray();
-
-                    Intent intent = new Intent(getApplicationContext(), CropActivity.class);
-                    //intent.putExtra("image",byteArray);
-
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inSampleSize = 4;
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                    setBitmapImage(bitmap);
-                    startActivity(intent);
-                    camera.stopPreview();
-                    camera.release();
-                    camera.setPreviewCallback(null);
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
-        }
-    };
-
+    private PictureCallback jpegPictureCallBack;
+    private Camera.AutoFocusCallback  autoFocusCallback;
 
 
     @Override
@@ -93,11 +60,37 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         instantiate();
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+    }
+
+    private void instantiate() {
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        animateView = (RelativeLayout) findViewById(R.id.animateBar);
+        simSelector = (ImageButton) findViewById(R.id.simSelect);
+        simInfoView = (TextView) findViewById(R.id.simInfo);
+
+        simInfoView.setText(simInfo);
+
+        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
+        heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
+        simSelector.setOnClickListener(this);
+        takePicture.setOnClickListener(this);
+        takePicture.setOnLongClickListener(this);
+
         cameraId = findRearFacingCamera();
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+
+        autoFocusCallback = new Camera.AutoFocusCallback() {
+            @Override
+            public void onAutoFocus(boolean b, Camera camera) {
+                takePicture.setEnabled(true);
+            }
+        };
 
         CameraOverlay previewBackground = (CameraOverlay) findViewById(R.id.overlay);
         previewBackground.setOnTouchListener(new View.OnTouchListener() {
@@ -122,23 +115,27 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
 
         });
 
+        jpegPictureCallBack = new PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+                try {
+                    if (bytes != null)
+                    {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 4;
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                        setBitmapImage(bitmap);
 
-    }
+                        Intent intent = new Intent(getApplicationContext(), CropActivity.class);
+                        startActivity(intent);
 
-    public void instantiate() {
-        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-        animateView = (RelativeLayout) findViewById(R.id.animateBar);
-        simSelector = (ImageButton) findViewById(R.id.simSelect);
-        simInfoView = (TextView) findViewById(R.id.simInfo);
-        simInfoView.setText(simInfo);
-        takePicture = (android.support.design.widget.FloatingActionButton) findViewById(R.id.takepicture);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
 
-        heptics = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-
-        simSelector.setOnClickListener(this);
-        takePicture.setOnClickListener(this);
-
-        takePicture.setOnLongClickListener(this);
+            }
+        };
     }
 
 
@@ -171,7 +168,7 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         return true;
     }
 
-    void capturePicture() {
+    private void capturePicture() {
         try {
             camera.takePicture(null, null, null, jpegPictureCallBack);
             //Toast.makeText(CameraAccess.this, "Button CLicked :)", Toast.LENGTH_SHORT).show();
@@ -180,21 +177,19 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         }
     }
 
-    public void displaySimMenu() {
+    private void displaySimMenu() {
         if (count % 2 == 0) {
             TranslateAnimation animate = new TranslateAnimation(0, 0 - animateView.getWidth(), 0, 0);
             animate.setDuration(500);
             animateView.startAnimation(animate);
             animateView.setVisibility(View.GONE);
             count++;
-
         }
 
         else
         {
 
             TranslateAnimation animate = new TranslateAnimation(0 - animateView.getWidth(), 0, 0, 0);
-
             animate.setDuration(500);
             animateView.startAnimation(animate);
             animateView.setVisibility(View.VISIBLE);
@@ -202,38 +197,33 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
         }
     }
 
-    Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {
-        @Override
-        public void onAutoFocus(boolean b, Camera camera) {
-            takePicture.setEnabled(true);
-        }
-    };
+
 
 
     public static Bitmap getBitmapImage()
     {
         //Mapping the overlay Coordinates with Bitmap Coordinates Window to ViewPort Transformation
-        bitmap=getRotatedImage(bitmap);
-        int left = (bitmap.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
-        int right  = (bitmap.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
-        int top  = (bitmap.getHeight()*CameraOverlay.top)/CameraOverlay.parentHeight;
-        int bottom  = (bitmap.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
+        cameraImage =getRotatedImage(cameraImage);
+        int left = (cameraImage.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
+        int right  = (cameraImage.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
+        int top  = (cameraImage.getHeight()*CameraOverlay.top)/CameraOverlay.parentHeight;
+        int bottom  = (cameraImage.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
 
-        Bitmap bmp = Bitmap.createBitmap(bitmap, left,top,right-left,bottom-top);
+        Bitmap bmp = Bitmap.createBitmap(cameraImage, left,top,right-left,bottom-top);
 
         return bmp;
 
     }
 
-    static Bitmap getRotatedImage(Bitmap bmp) {
+    private static Bitmap getRotatedImage(Bitmap bmp) {
         Matrix returnImage = new Matrix();
         returnImage.postRotate(90);
         return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), returnImage, true);
 
     }
 
-    public void setBitmapImage(Bitmap bitmap) {
-        this.bitmap = bitmap;
+    private void setBitmapImage(Bitmap bitmap) {
+        this.cameraImage = bitmap;
     }
 
 

@@ -29,27 +29,16 @@ public class CropActivity extends Activity implements View.OnClickListener, View
     private ClippingWindow clippingWindow;
     private Vibrator haptics;
     private final int HAPTICS_CONSTANT = 50;
-
-
     private ImageButton redoButton, cropButton;
-
-
     private Bitmap image;
     private Bitmap croppedImage;
-    private RelativeLayout relativeLayout;
     private Rect imageCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
-
-        //byte[] byteArray = getIntent().getByteArrayExtra("image");
-        //image = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
         instantiate();
-
-
     }
 
     @Override
@@ -75,8 +64,6 @@ public class CropActivity extends Activity implements View.OnClickListener, View
             case R.id.cropBtn:
                 Toast.makeText(this, "Crop", Toast.LENGTH_LONG).show();
                 break;
-
-
             case R.id.redoFromCrop:
                 Toast.makeText(this, "Redo", Toast.LENGTH_LONG).show();
                 break;
@@ -99,7 +86,6 @@ public class CropActivity extends Activity implements View.OnClickListener, View
         cropImView = (ImageView) findViewById(R.id.imageView);
         cropImView.setImageBitmap(image);
 
-//        relativeLayout = (RelativeLayout)findViewById(R.id.relativeLayout1);
         clippingWindow = (ClippingWindow) findViewById(R.id.clipping);
 
         ViewTreeObserver vto = cropImView.getViewTreeObserver();
@@ -116,7 +102,7 @@ public class CropActivity extends Activity implements View.OnClickListener, View
             }
         });
 
-//        relativeLayout.addView(clippingWindow);
+
 
 
     }
