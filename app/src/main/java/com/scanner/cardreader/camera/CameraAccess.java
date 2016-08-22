@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.scanner.cardreader.R;
 import com.scanner.cardreader.Splash;
+import com.scanner.cardreader.interfaces.Coordinates;
 
 
 public class CameraAccess extends Activity implements SurfaceHolder.Callback, View.OnClickListener, View.OnLongClickListener {
@@ -204,13 +206,9 @@ public class CameraAccess extends Activity implements SurfaceHolder.Callback, Vi
     {
         //Mapping the overlay Coordinates with Bitmap Coordinates Window to ViewPort Transformation
         cameraImage =getRotatedImage(cameraImage);
-        int left = (cameraImage.getWidth()*CameraOverlay.left)/CameraOverlay.parentWidth;
-        int right  = (cameraImage.getWidth()*CameraOverlay.right)/CameraOverlay.parentWidth;
-        int top  = (cameraImage.getHeight()*CameraOverlay.top)/CameraOverlay.parentHeight;
-        int bottom  = (cameraImage.getHeight()*CameraOverlay.bottom)/CameraOverlay.parentHeight;
-
-        Bitmap bmp = Bitmap.createBitmap(cameraImage, left,top,right-left,bottom-top);
-
+        Coordinates coordinates = new CoordinateLocatorInBitmap(cameraImage, CameraOverlay.getRectangleCoordinates());
+        Rect imageCoordinates = coordinates.getCoordinates();
+        Bitmap bmp = Bitmap.createBitmap(cameraImage, imageCoordinates.left,imageCoordinates.top,imageCoordinates.right-imageCoordinates.left,imageCoordinates.bottom-imageCoordinates.top);
         return bmp;
 
     }

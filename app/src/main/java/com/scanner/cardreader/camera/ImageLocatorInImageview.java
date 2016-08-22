@@ -3,21 +3,17 @@ package com.scanner.cardreader.camera;
 import android.graphics.Rect;
 import android.widget.ImageView;
 
-import com.scanner.cardreader.interfaces.ImageViewCoordinates;
+import com.scanner.cardreader.interfaces.Coordinates;
 
 /**
  * Created by aviisekh on 8/11/16.
  */
 
-public class ImageLocatorInImageview implements ImageViewCoordinates {
-    private  ImageParametersInImageview imageParametersInImageview;
+public class ImageLocatorInImageview implements Coordinates {
+    Rect imageViewCoordinates = new Rect();
 
-    @Override
-    public Rect getCoordinates(ImageView imageView) {
-
-        Rect imageViewCoordinates = new Rect();
-
-        imageParametersInImageview = new ImageParametersInImageview(imageView);
+    public ImageLocatorInImageview(ImageView imageView){
+        ImageParametersInImageview imageParametersInImageview = new ImageParametersInImageview(imageView);
 
         //Scaled dimensions in imageview
         final int scaledWidth = Math.round(imageParametersInImageview.getImageWidth() * imageParametersInImageview.getScaleX()); //Needs to make
@@ -30,6 +26,11 @@ public class ImageLocatorInImageview implements ImageViewCoordinates {
         imageViewCoordinates.bottom= Math.min(imageViewCoordinates.top + scaledHeight, imageView.getHeight());
 
         //return imageViewCoordinates;
+
+    }
+
+    @Override
+    public Rect getCoordinates() {
         return imageViewCoordinates;
     }
 

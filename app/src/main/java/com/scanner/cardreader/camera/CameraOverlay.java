@@ -25,7 +25,7 @@ public class CameraOverlay extends View {
 
     private final int WIDTH_OFFSET = 7;
     private final int HEIFHT_OFFSET = 6;
-    static public int parentWidth,parentHeight,top,left,bottom,right;
+    private static int parentWidth,parentHeight,top,left,bottom,right;
 
 
     public CameraOverlay(Context context, AttributeSet attrs) {
@@ -66,7 +66,7 @@ public class CameraOverlay extends View {
         init();
     }
 
-    public void init()
+    private void init()
     {
         left = parentWidth / WIDTH_OFFSET;
         top = parentHeight / HEIFHT_OFFSET;
@@ -74,7 +74,7 @@ public class CameraOverlay extends View {
         bottom = 2*parentHeight / HEIFHT_OFFSET;
     }
 
-    public void drawRectangle(Canvas canvas) {
+    private void drawRectangle(Canvas canvas) {
 
         rectTop.set(0, 0, parentWidth, top);
         rectBottom.set(0, bottom, parentWidth, parentHeight);
@@ -87,7 +87,7 @@ public class CameraOverlay extends View {
         canvas.drawRect(rectRight, drawRect);
     }
 
-    public void drawLine(Canvas canvas) {
+    private void drawLine(Canvas canvas) {
         canvas.drawLine(left + (right - left) / 3, top, left + (right - left) / 3, bottom, drawLineGrid);
         canvas.drawLine(left + 2 * (right - left) / 3, top, left + 2 * (right - left) / 3, bottom, drawLineGrid);
         canvas.drawLine(left, top + (bottom - top) / 3, right, top + (bottom - top) / 3, drawLineGrid);
@@ -104,5 +104,25 @@ public class CameraOverlay extends View {
         canvas.drawLine(right, bottom+2, right, bottom-20, drawLineBoundary);
 
 
+    }
+
+    public static Rect getRectangleCoordinates()
+    {
+        Rect rectangleCoordinates = new Rect();
+        rectangleCoordinates.left = left;
+        rectangleCoordinates.right = right;
+        rectangleCoordinates.top = top;
+        rectangleCoordinates.bottom = bottom;
+        return rectangleCoordinates;
+    }
+
+    public static int getParentWidth()
+    {
+        return parentWidth;
+    }
+
+    public static int getParentHeight()
+    {
+        return parentHeight;
     }
 }
